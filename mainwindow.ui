@@ -34,17 +34,36 @@
      <x>0</x>
      <y>0</y>
      <width>800</width>
-     <height>38</height>
+     <height>22</height>
     </rect>
    </property>
    <widget class="QMenu" name="menu">
     <property name="title">
      <string>HHHhh</string>
     </property>
+    <addaction name="action2233"/>
+    <addaction name="action232334"/>
+    <addaction name="separator"/>
+    <addaction name="action2324r2"/>
    </widget>
    <addaction name="menu"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
+  <action name="action2233">
+   <property name="text">
+    <string>2233</string>
+   </property>
+  </action>
+  <action name="action232334">
+   <property name="text">
+    <string>232334</string>
+   </property>
+  </action>
+  <action name="action2324r2">
+   <property name="text">
+    <string>2324r2</string>
+   </property>
+  </action>
  </widget>
  <resources/>
  <connections/>
