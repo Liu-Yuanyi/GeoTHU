@@ -25,6 +25,12 @@ void Point::draw(QPainter* painter) const {
         painter->drawEllipse(position_, radius_ + 2, radius_ + 2);
     }
 
+    if (hovered_) {
+        painter->setBrush(Qt::red);
+        painter->setPen(Qt::black);
+        painter->drawEllipse(position_, radius_ + 2, radius_ + 2);
+    }
+
     painter->restore();
 }
 

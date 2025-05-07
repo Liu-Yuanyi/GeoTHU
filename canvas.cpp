@@ -69,17 +69,24 @@ void Canvas::mousePressEvent(QMouseEvent* event) {
 }
 
 void Canvas::mouseMoveEvent(QMouseEvent* event) {
-    if (!selectedObjs_.empty() && (event->buttons() & Qt::LeftButton)) {
-        // Update position while dragging
-        QPointF currentPos = event->position();
-        QPointF delta = currentPos - mousePos_;
-        // Update all selected objects relative to their initial positions
-        for (auto obj : selectedObjs_) {
-            QPointF newPos = initialPositions_[obj] + delta;
-            obj->setPosition(newPos);
+    QPointF currentPos = event->position();
+
+    if (currentMode == CreatePointMode) {
+        updateHoverState(currentPos);
+    }
+
+    if (currentMode == SelectionMode){
+        if (!selectedObjs_.empty() && (event->buttons() & Qt::LeftButton)) {
+            // Update position while dragging
+            QPointF delta = currentPos - mousePos_;
+            // Update all selected objects relative to their initial positions
+            for (auto obj : selectedObjs_) {
+                QPointF newPos = initialPositions_[obj] + delta;
+                obj->setPosition(newPos);
+            }
+            deselectPermitted = false;
+            update();
         }
-        deselectPermitted = false;
-        update();
     }
 }
 
