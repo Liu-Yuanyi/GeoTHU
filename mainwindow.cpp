@@ -1,7 +1,6 @@
 #include "mainwindow.h"
 #include "canvas.h"
 #include <QButtonGroup>
-#include "pointCreater.h"
 
 MainWindow::MainWindow(QWidget* parent)
     : QMainWindow(parent) {
@@ -33,11 +32,10 @@ MainWindow::MainWindow(QWidget* parent)
     // Connect signals
     connect(btnSelect, &QPushButton::clicked, [this]() {
         canvas->setMode(Canvas::SelectionMode);
-        canvas->setOperation(nullptr);
+       canvas->setOperation(nullptr);
     });
     connect(btnPointCreate, &QPushButton::clicked, [this]() {
         canvas->setMode(Canvas::CreatePointMode);
-        canvas->setOperation(new PointCreater);
     });
 
     // Set initial mode

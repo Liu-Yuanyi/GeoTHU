@@ -29,7 +29,6 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         point.h point.cpp
         canvas.h canvas.cpp
         operation.h
-        pointcreater.h
         objecttype.h
 
     )

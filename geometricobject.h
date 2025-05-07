@@ -11,24 +11,17 @@ public:
 
     virtual ~GeometricObject() = default;
     virtual void draw(QPainter* painter) const = 0;
-
     bool isSelected() const { return selected_; }
     bool isHidden() const{return hidden_; }
-    bool isLegal() const {return legal_;}
-    bool isHovered() const { return hovered_; }
-
+    bool islegal() const {return legal_;}
     void setHidden(bool hidden){hidden_=hidden;}
     void setSelected(bool selected) { selected_ = selected;}
     void setHovered(bool hovered) {hovered_ = hovered;}
-    void setLegal(bool legal) { legal_ = legal; }
-
     virtual bool isNear(const QPointF& Pos) const = 0;
     virtual void setPosition(const QPointF& pos) = 0;
     virtual QPointF position() const = 0;
 
     GeometricObject(): selected_(true), hovered_(false) {}
-
-    //缺少对parents和children的操作
 
 protected:
     bool selected_;

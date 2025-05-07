@@ -47,7 +47,7 @@ void Canvas::mousePressEvent(QMouseEvent* event) {
             // Only create if not near existing point
             if (!findPointNear(mousePos_)) {
                 clearSelections();
-                GeometricObject* newPoint = operation->apply(mousePos_);
+                GeometricObject* newPoint = new Point(mousePos_);
                 objects_.push_back(newPoint);
                 selectedObjs_.insert(newPoint);
                 deselectPermitted = false;

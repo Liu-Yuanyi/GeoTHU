@@ -6,11 +6,32 @@
 
 class Operation {
 protected:
-    std::set<std::set<GeometricObject*>> input;
+    std::vector<std::vector<ObjectType>> inputType;
+    std::string operationName;
+    virtual int getInputIndex(std::vector<GeometricObject*> objs) const = 0;
 
 public:
-    virtual bool isValidInput() const = 0;
-    virtual GeometricObject* apply(QPointF position = QPointF()) const = 0;
+    virtual int isValidInput(std::vector<GeometricObject*> objs) const = 0;
+    std::string getName() {return operationName;}
+    virtual std::set<GeometricObject*> apply(std::vector<GeometricObject*> objs,
+                                              QPointF position = QPointF()) const = 0;
 };
 
 #endif // OPERATION_H
+
+
+
+/*currentOperation= operations[7];
+for select:
+             if(cO->isvalid(selected)==0){
+        quxiao;
+        break;
+    }
+if(==1){
+    continue;
+}
+if(==2){
+    add(apply(input));
+    quxiao
+    break
+}*/
