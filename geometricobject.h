@@ -3,11 +3,11 @@
 
 #include <QPainter>
 #include <vector>
-#include <objecttype.h>
+#include "objecttype.h"
 
 class GeometricObject {
 public:
-    std::string name = "";
+    ObjectName name;
 
     virtual ~GeometricObject() = default;
     virtual void draw(QPainter* painter) const = 0;
@@ -15,7 +15,7 @@ public:
     bool isHidden() const{return hidden_; }
     bool islegal() const {return legal_;}
     void setHidden(bool hidden){hidden_=hidden;}
-    void setSelected(bool selected) { selected_ = selected; }
+    void setSelected(bool selected) { selected_ = selected;}
     void setHovered(bool hovered) {hovered_ = hovered;}
     virtual bool isNear(const QPointF& Pos) const = 0;
     virtual void setPosition(const QPointF& pos) = 0;

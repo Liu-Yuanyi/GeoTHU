@@ -1,0 +1,27 @@
+# ninja log v6
+20	1988	7682881362303426	test_project_autogen/timestamp	240b661f727d8e28
+20	1988	7682881362303426	test_project_autogen/mocs_compilation.cpp	240b661f727d8e28
+20	1988	7682881362303426	C:/Users/32880/Documents/GitHub/unnamed/build/Desktop_Qt_6_9_0_MinGW_64_bit-Debug/test_project_autogen/timestamp	240b661f727d8e28
+20	1988	7682881362303426	C:/Users/32880/Documents/GitHub/unnamed/build/Desktop_Qt_6_9_0_MinGW_64_bit-Debug/test_project_autogen/mocs_compilation.cpp	240b661f727d8e28
+2008	3537	7682881364141643	CMakeFiles/test_project.dir/main.cpp.obj	45d8a9948c025b15
+2021	3791	7682881364271649	CMakeFiles/test_project.dir/mainwindow.cpp.obj	671cacf788e7191e
+1996	3806	7682881364021646	CMakeFiles/test_project.dir/test_project_autogen/mocs_compilation.cpp.obj	b5b712356bdb3ae6
+12	250	7682881635926797	test_project_autogen/timestamp	240b661f727d8e28
+12	250	7682881635926797	test_project_autogen/mocs_compilation.cpp	240b661f727d8e28
+12	250	7682881635926797	C:/Users/32880/Documents/GitHub/unnamed/build/Desktop_Qt_6_9_0_MinGW_64_bit-Debug/test_project_autogen/timestamp	240b661f727d8e28
+12	250	7682881635926797	C:/Users/32880/Documents/GitHub/unnamed/build/Desktop_Qt_6_9_0_MinGW_64_bit-Debug/test_project_autogen/mocs_compilation.cpp	240b661f727d8e28
+251	1338	7682881638334635	CMakeFiles/test_project.dir/point.cpp.obj	a69925449c414581
+12	244	7682882121434455	test_project_autogen/timestamp	240b661f727d8e28
+12	244	7682882121434455	test_project_autogen/mocs_compilation.cpp	240b661f727d8e28
+12	244	7682882121434455	C:/Users/32880/Documents/GitHub/unnamed/build/Desktop_Qt_6_9_0_MinGW_64_bit-Debug/test_project_autogen/timestamp	240b661f727d8e28
+12	244	7682882121434455	C:/Users/32880/Documents/GitHub/unnamed/build/Desktop_Qt_6_9_0_MinGW_64_bit-Debug/test_project_autogen/mocs_compilation.cpp	240b661f727d8e28
+245	1690	7682882123757607	CMakeFiles/test_project.dir/canvas.cpp.obj	8519476b234e5c13
+16	802	7682882801384310	test_project_autogen/timestamp	240b661f727d8e28
+16	802	7682882801384310	test_project_autogen/mocs_compilation.cpp	240b661f727d8e28
+16	802	7682882801384310	C:/Users/32880/Documents/GitHub/unnamed/build/Desktop_Qt_6_9_0_MinGW_64_bit-Debug/test_project_autogen/timestamp	240b661f727d8e28
+16	802	7682882801384310	C:/Users/32880/Documents/GitHub/unnamed/build/Desktop_Qt_6_9_0_MinGW_64_bit-Debug/test_project_autogen/mocs_compilation.cpp	240b661f727d8e28
+825	2026	7682882802539988	CMakeFiles/test_project.dir/point.cpp.obj	a69925449c414581
+814	2438	7682882802429497	CMakeFiles/test_project.dir/mainwindow.cpp.obj	671cacf788e7191e
+803	2438	7682882802319451	CMakeFiles/test_project.dir/test_project_autogen/mocs_compilation.cpp.obj	b5b712356bdb3ae6
+836	2525	7682882802649452	CMakeFiles/test_project.dir/canvas.cpp.obj	8519476b234e5c13
+2525	2803	7682882819501396	test_project.exe	683a0fea7720e56a

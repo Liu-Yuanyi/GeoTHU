@@ -128,7 +128,7 @@ GeometricObject* Canvas::findObjNear(const QPointF& pos) const {
 
 Point* Canvas::findPointNear(const QPointF& pos) const {
     for (auto* obj : objects_) {
-        if (obj->name == "point" and obj->isNear(pos)) {
+        if (obj->name == ObjectName::Point and obj->isNear(pos)) {
             Point* point = dynamic_cast<Point*>(obj);
             return point;
         }

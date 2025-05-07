@@ -14,7 +14,7 @@ enum class ObjectName {
 
 typedef ObjectName ObjectType;
 
-std::string GetObjectNameString(ObjectName name){
+inline std::string GetObjectNameString(ObjectName name){
     switch(name){
     case ObjectName::None: return "None";
     case ObjectName::Point: return "Point";
@@ -23,6 +23,7 @@ std::string GetObjectNameString(ObjectName name){
     case ObjectName::Lineoo: return "Lineoo";
     case ObjectName::Circle: return "Circle";
         // ... other cases if any
+    default: return "Unknown";
     }
 }
 

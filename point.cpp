@@ -5,7 +5,7 @@ double defaultRadius = 4;
 
 Point::Point(const QPointF& position) : GeometricObject(), position_(position), radius_(defaultRadius),
     color_(defaultColor) {
-    name = "point";
+    name = ObjectName::Point;
 }
 
 void Point::setPosition(const QPointF& pos) {
