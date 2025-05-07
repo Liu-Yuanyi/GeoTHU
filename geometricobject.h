@@ -19,6 +19,7 @@ public:
     void setHovered(bool hovered) {hovered_ = hovered;}
     virtual void setColor(QColor color) = 0;
     virtual void setSize(double size) = 0;
+    void setLabel(QString str) { label_ = str; }
     virtual bool isNear(const QPointF& Pos) const = 0;
     virtual void setPosition(const QPointF& pos) = 0;
     virtual QPointF position() const = 0;
@@ -30,6 +31,7 @@ protected:
     bool hovered_;
     bool legal_;
     bool hidden_;
+    QString label_;
     std::vector<GeometricObject*> parents = {};
     std::vector<GeometricObject*> children = {};
 };

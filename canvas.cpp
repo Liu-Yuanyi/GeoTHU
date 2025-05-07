@@ -161,6 +161,12 @@ void Canvas::contextMenuEvent(QContextMenuEvent* event) {
 
         menu.addAction("hide", [this, point]() { point->setHidden(true); update(); });
 
+        menu.addAction("label", [this, point]() {
+            QString text = QInputDialog::getText(this, "Enter Label", "Label:", QLineEdit::Normal, "");
+            point->setLabel(text);
+            update();
+        });
+
         menu.exec(event->globalPos());
     }
 }

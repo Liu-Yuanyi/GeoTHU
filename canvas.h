@@ -7,6 +7,7 @@
 #include <QPaintEvent>
 #include <QMenu>
 #include <QColorDialog>
+#include <QInputDialog>
 #include "geometricobject.h"
 #include "point.h"
 #include "operation.h"

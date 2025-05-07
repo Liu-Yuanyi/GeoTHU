@@ -17,6 +17,11 @@ void Point::draw(QPainter* painter) const {
         return;
     }
 
+    if (label_ != "") {
+        painter->setPen(Qt::black);
+        painter->drawText(position().x() + 6, position().y() - 6, label_);
+    }
+
     if (hovered_) {
         painter->setBrush(Qt::red);
         painter->setPen(Qt::black);
