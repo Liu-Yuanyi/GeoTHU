@@ -9,7 +9,7 @@ void Canvas::setMode(Mode newMode) {
 }
 
 void Canvas::setOperation(Operation* operation) {
-    this->operation = operation;
+    this->currentOperation = operation;
 }
 
 void Canvas::updateHoverState(const QPointF& pos) {
@@ -114,6 +114,39 @@ void Canvas::paintEvent(QPaintEvent* event) {
     painter.setRenderHint(QPainter::Antialiasing);
     for (const auto* obj : objects_) {
         obj->draw(&painter);
+    }
+}
+
+void Canvas::contextMenuEvent(QContextMenuEvent* event) {
+    QPointF pos = event->pos();
+    GeometricObject* contextMenuObj = findObjNear(pos);
+
+    if (contextMenuObj && contextMenuObj->name == ObjectName::Point) {
+        QMenu menu(this);
+        Point* point = dynamic_cast<Point*>(contextMenuObj);
+
+        QMenu* colorMenu = menu.addMenu("Color");
+        colorMenu->addAction("Red", [this, point]() { point->setColor(Qt::red); update(); });
+        colorMenu->addAction("Blue", [this, point]() { point->setColor(Qt::blue); update(); });
+        colorMenu->addAction("Green", [this, point]() { point->setColor(Qt::green); update(); });
+        colorMenu->addAction("Black", [this, point]() { point->setColor(Qt::black); update(); });
+        /*colorMenu->addAction("Custom...", [this]() {
+            QColor color = QColorDialog::getColor(contextMenuPoint->color(), this);
+            if (color.isValid()) {
+                contextMenuObj->setColor(color);
+                update();
+            }
+        });*/
+
+        QMenu* sizeMenu = menu.addMenu("Change Size");
+        sizeMenu->addAction("Tiny", [this, point]() { point->setSize(2); update(); });
+        sizeMenu->addAction("Small", [this, point]() { point->setSize(3); update(); });
+        sizeMenu->addAction("Medium", [this, point]() { point->setSize(4); update(); });
+        sizeMenu->addAction("Large", [this, point]() { point->setSize(5); update(); });
+
+        menu.addAction("hide", [this, point]() { point->setHidden(true); update(); });
+
+        menu.exec(event->globalPos());
     }
 }
 

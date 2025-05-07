@@ -5,6 +5,7 @@
 #include <QList>
 #include <QMouseEvent>
 #include <QPaintEvent>
+#include <QMenu>
 #include "geometricobject.h"
 #include "point.h"
 #include "operation.h"
@@ -23,6 +24,7 @@ protected:
     void mouseMoveEvent(QMouseEvent* event) override;
     void mouseReleaseEvent(QMouseEvent* event) override;
     void paintEvent(QPaintEvent* event) override;
+    void contextMenuEvent(QContextMenuEvent* event) override;
 
 private:
     std::vector<GeometricObject*> objects_;
@@ -33,7 +35,7 @@ private:
     QPointF mousePos_;
     std::map<GeometricObject*, QPointF> initialPositions_;
     bool deselectPermitted = true;
-    Operation* operation;
+    Operation* currentOperation;
 
     void updateHoverState(const QPointF& pos);
     GeometricObject* findObjNear(const QPointF& pos) const;

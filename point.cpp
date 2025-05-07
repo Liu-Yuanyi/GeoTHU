@@ -13,6 +13,22 @@ void Point::setPosition(const QPointF& pos) {
 }
 
 void Point::draw(QPainter* painter) const {
+    if (hidden_) {
+        return;
+    }
+
+    if (hovered_) {
+        painter->setBrush(Qt::red);
+        painter->setPen(Qt::black);
+        painter->drawEllipse(position_, radius_ + 1, radius_ + 1);
+        if (selected_){
+            painter->setBrush(Qt::NoBrush);
+            painter->setPen(QPen(Qt::darkRed, 2));
+            painter->drawEllipse(position_, radius_ + 3, radius_ + 3);
+        }
+        return;
+    }
+
     painter->save();
     painter->setRenderHint(QPainter::Antialiasing);    // Smooth edges
     painter->setBrush(color_); // Fill color
@@ -25,13 +41,17 @@ void Point::draw(QPainter* painter) const {
         painter->drawEllipse(position_, radius_ + 2, radius_ + 2);
     }
 
-    if (hovered_) {
-        painter->setBrush(Qt::red);
-        painter->setPen(Qt::black);
-        painter->drawEllipse(position_, radius_ + 2, radius_ + 2);
-    }
-
     painter->restore();
+}
+
+void Point::setColor(Qt::GlobalColor color) {
+    defaultColor = color;
+    color_ = color;
+}
+
+void Point::setSize(double size) {
+    defaultRadius = size;
+    radius_ = size;
 }
 
 bool Point::isNear(const QPointF& clickPos) const {

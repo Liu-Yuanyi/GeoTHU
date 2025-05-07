@@ -12,6 +12,8 @@ public:
     void setPosition(const QPointF& pos) override;
     void draw(QPainter* painter) const override;
     bool isNear(const QPointF& Pos) const override;
+    void setColor(Qt::GlobalColor color) override;
+    void setSize(double size) override;
 
 private:
     QPointF position_;
