@@ -12,6 +12,8 @@ enum class ObjectName {
     Circle,
 };
 
+typedef ObjectName ObjectType;
+
 std::string GetObjectNameString(ObjectName name){
     switch(name){
     case ObjectName::None: return "None";
