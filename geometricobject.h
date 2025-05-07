@@ -2,6 +2,8 @@
 #define GEOMETRICOBJECT_H
 
 #include <QPainter>
+#include <vector>
+#include <objecttype.h>
 
 class GeometricObject {
 public:
