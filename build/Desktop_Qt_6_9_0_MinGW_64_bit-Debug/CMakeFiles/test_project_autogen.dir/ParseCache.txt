@@ -794,8 +794,8 @@ C:/Users/32880/Documents/GitHub/unnamed/mainwindow.h
  mdp:C:/Users/32880/Documents/GitHub/unnamed/build/Desktop_Qt_6_9_0_MinGW_64_bit-Debug/test_project_autogen/moc_predefs.h
  mdp:C:/Users/32880/Documents/GitHub/unnamed/mainwindow.h
 C:/Users/32880/Documents/GitHub/unnamed/objecttype.h
-C:/Users/32880/Documents/GitHub/unnamed/operation.h
 C:/Users/32880/Documents/GitHub/unnamed/canvas.cpp
+C:/Users/32880/Documents/GitHub/unnamed/operation.h
 C:/Users/32880/Documents/GitHub/unnamed/pointCreater.h
 C:/Users/32880/Documents/GitHub/unnamed/main.cpp
 C:/Users/32880/Documents/GitHub/unnamed/mainwindow.cpp
