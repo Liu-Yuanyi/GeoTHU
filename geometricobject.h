@@ -10,6 +10,9 @@ public:
     virtual ~GeometricObject() = default;
     virtual void draw(QPainter* painter) const = 0;
     bool isSelected() const { return selected_; }
+    bool isHidden() const{return hidden_; }
+    bool islegal() const {return legal_;}
+    void setHidden(bool hidden){hidden_=hidden;}
     void setSelected(bool selected) { selected_ = selected; }
     void setHovered(bool hovered) {hovered_ = hovered;}
     virtual bool isNear(const QPointF& Pos) const = 0;
@@ -21,6 +24,8 @@ public:
 protected:
     bool selected_;
     bool hovered_;
+    bool legal_;
+    bool hidden_;
     std::vector<GeometricObject*> parents = {};
     std::vector<GeometricObject*> children = {};
 };
