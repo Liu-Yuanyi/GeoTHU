@@ -12,13 +12,14 @@ public:
     void setPosition(const QPointF& pos) override;
     void draw(QPainter* painter) const override;
     bool isNear(const QPointF& Pos) const override;
-    void setColor(Qt::GlobalColor color) override;
+    void setColor(QColor color) override;
     void setSize(double size) override;
+    QColor getColor();
 
 private:
     QPointF position_;
     double radius_;
-    Qt::GlobalColor color_;
+    QColor color_;
 };
 
 #endif // POINT_H

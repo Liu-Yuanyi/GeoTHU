@@ -66,6 +66,21 @@ void Canvas::mousePressEvent(QMouseEvent* event) {
 
         update();
     }
+
+    if (event->button() == Qt::RightButton) {
+        mousePos_ = event->position();
+        initialPositions_.clear();
+        GeometricObject* clickedObj = findObjNear(mousePos_);
+
+        if (clickedObj) {
+            clearSelections();
+            clickedObj->setSelected(true);
+            selectedObjs_.insert(clickedObj);
+            deselectPermitted = false;
+        }
+
+        update();
+    }
 }
 
 void Canvas::mouseMoveEvent(QMouseEvent* event) {
@@ -130,13 +145,13 @@ void Canvas::contextMenuEvent(QContextMenuEvent* event) {
         colorMenu->addAction("Blue", [this, point]() { point->setColor(Qt::blue); update(); });
         colorMenu->addAction("Green", [this, point]() { point->setColor(Qt::green); update(); });
         colorMenu->addAction("Black", [this, point]() { point->setColor(Qt::black); update(); });
-        /*colorMenu->addAction("Custom...", [this]() {
-            QColor color = QColorDialog::getColor(contextMenuPoint->color(), this);
+        colorMenu->addAction("Custom", [this, point]() {
+            QColor color = QColorDialog::getColor(point->getColor(), this);
             if (color.isValid()) {
-                contextMenuObj->setColor(color);
+                point->setColor(color);
                 update();
             }
-        });*/
+        });
 
         QMenu* sizeMenu = menu.addMenu("Change Size");
         sizeMenu->addAction("Tiny", [this, point]() { point->setSize(2); update(); });

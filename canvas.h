@@ -6,6 +6,7 @@
 #include <QMouseEvent>
 #include <QPaintEvent>
 #include <QMenu>
+#include <QColorDialog>
 #include "geometricobject.h"
 #include "point.h"
 #include "operation.h"

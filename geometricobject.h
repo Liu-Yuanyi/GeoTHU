@@ -17,7 +17,7 @@ public:
     void setHidden(bool hidden) { hidden_ = hidden; }
     void setSelected(bool selected) { selected_ = selected;}
     void setHovered(bool hovered) {hovered_ = hovered;}
-    virtual void setColor(Qt::GlobalColor color) = 0;
+    virtual void setColor(QColor color) = 0;
     virtual void setSize(double size) = 0;
     virtual bool isNear(const QPointF& Pos) const = 0;
     virtual void setPosition(const QPointF& pos) = 0;

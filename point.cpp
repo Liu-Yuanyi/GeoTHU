@@ -1,6 +1,6 @@
 #include "point.h"
 
-Qt::GlobalColor defaultColor = Qt::red;
+QColor defaultColor = Qt::red;
 double defaultRadius = 4;
 
 Point::Point(const QPointF& position) : GeometricObject(), position_(position), radius_(defaultRadius),
@@ -44,9 +44,13 @@ void Point::draw(QPainter* painter) const {
     painter->restore();
 }
 
-void Point::setColor(Qt::GlobalColor color) {
+void Point::setColor(QColor color) {
     defaultColor = color;
     color_ = color;
+}
+
+QColor Point::getColor() {
+    return color_;
 }
 
 void Point::setSize(double size) {
