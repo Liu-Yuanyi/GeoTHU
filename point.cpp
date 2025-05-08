@@ -1,10 +1,8 @@
 #include "point.h"
 
-QColor defaultColor = Qt::red;
-double defaultRadius = 4;
-
-Point::Point(const QPointF& position) : GeometricObject(), position_(position), radius_(defaultRadius),
-    color_(defaultColor) {
+Point::Point(const QPointF& position) : GeometricObject(), position_(position),
+    size_(),
+    color_() {
     name = ObjectName::Point;
 }
 

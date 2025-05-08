@@ -17,8 +17,6 @@ public:
 
     // Override pure virtual functions from GeometricObject
     void draw(QPainter* painter) const override;
-    void setColor(QColor color) override;
-    void setSize(double size) override; // Interpreted as thickness
     bool isNear(const QPointF& pos) const override;
     void setPosition(const QPointF& pos) override; // Moves startPoint_ to pos, endPoint_ relative
     QPointF position() const override; // Returns startPoint_
