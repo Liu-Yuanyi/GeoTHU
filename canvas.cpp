@@ -97,7 +97,10 @@ void Canvas::mouseMoveEvent(QMouseEvent* event) {
             // Update all selected objects relative to their initial positions
             for (auto obj : selectedObjs_) {
                 QPointF newPos = initialPositions_[obj] + delta;
-                obj->setPosition(newPos);
+                if (obj->getObjectType() == ObjectType::Point){
+                    Point* point = dynamic_cast<Point*>(obj);
+                    point->setPosition(newPos);
+                }
             }
             deselectPermitted = false;
             update();
@@ -136,11 +139,11 @@ void Canvas::contextMenuEvent(QContextMenuEvent* event) {
     QPointF pos = event->pos();
     GeometricObject* contextMenuObj = findObjNear(pos);
 
-    if (contextMenuObj && contextMenuObj->name == ObjectName::Point) {
+    if (contextMenuObj && contextMenuObj->getObjectType() == ObjectType::Point) {
         QMenu menu(this);
         Point* point = dynamic_cast<Point*>(contextMenuObj);
 
-        QMenu* colorMenu = menu.addMenu("Color");
+        QMenu* colorMenu = menu.addMenu("color");
         colorMenu->addAction("Red", [this, point]() { point->setColor(Qt::red); update(); });
         colorMenu->addAction("Blue", [this, point]() { point->setColor(Qt::blue); update(); });
         colorMenu->addAction("Green", [this, point]() { point->setColor(Qt::green); update(); });
@@ -153,7 +156,7 @@ void Canvas::contextMenuEvent(QContextMenuEvent* event) {
             }
         });
 
-        QMenu* sizeMenu = menu.addMenu("Change Size");
+        QMenu* sizeMenu = menu.addMenu("size");
         sizeMenu->addAction("Tiny", [this, point]() { point->setSize(2); update(); });
         sizeMenu->addAction("Small", [this, point]() { point->setSize(3); update(); });
         sizeMenu->addAction("Medium", [this, point]() { point->setSize(4); update(); });
@@ -182,7 +185,7 @@ GeometricObject* Canvas::findObjNear(const QPointF& pos) const {
 
 Point* Canvas::findPointNear(const QPointF& pos) const {
     for (auto* obj : objects_) {
-        if (obj->name == ObjectName::Point and obj->isNear(pos)) {
+        if (obj->getObjectType() == ObjectType::Point and obj->isNear(pos)) {
             Point* point = dynamic_cast<Point*>(obj);
             return point;
         }

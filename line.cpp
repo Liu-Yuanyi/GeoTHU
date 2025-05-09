@@ -4,17 +4,8 @@
 #include <cmath>    // For sqrt, fabs, pow
 #include <algorithm> // For std::min, std::max
 
-// Default values, similar to Point class for consistency if desired
-QColor defaultLineColor = Qt::black;
-double defaultLineThickness = 1.0;
-
-Line::Line(const QPointF& p1, const QPointF& p2, QColor color, double thickness)
-    : GeometricObject(), startPoint_(p1), endPoint_(p2), color_(color), thickness_(thickness) {
-    name = ObjectName::Line; // Set the object name, assuming ObjectName::Line is defined in objecttype.h
-    if (color_ == QColor()) { // Handle default constructor QColor case
-        color_ = defaultLineColor;
-    }
-}
+Line::Line(const QPointF& p1, const QPointF& p2)
+    : GeometricObject(ObjectName::Line), startPoint_(p1), endPoint_(p2) {}
 
 void Line::draw(QPainter* painter) const {
     if (isHidden()) { // Use getter from base class
@@ -52,14 +43,6 @@ void Line::draw(QPainter* painter) const {
     }
 
     painter->restore();
-}
-
-void Line::setColor(QColor color) {
-    color_ = color;
-}
-
-void Line::setSize(double size) {
-    thickness_ = std::max(0.5, size); // Ensure thickness is not too small
 }
 
 // Helper function for distance from point p to line segment p1p2

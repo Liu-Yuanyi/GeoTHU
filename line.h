@@ -13,12 +13,12 @@ const double LINE_NEAR_TOLERANCE = 5.0;
 class Line : public GeometricObject {
 public:
     // Constructor
-    explicit Line(const QPointF& p1, const QPointF& p2, QColor color = Qt::black, double thickness = 1.0);
+    explicit Line(const QPointF& p1, const QPointF& p2);
 
     // Override pure virtual functions from GeometricObject
     void draw(QPainter* painter) const override;
     bool isNear(const QPointF& pos) const override;
-    void setPosition(const QPointF& pos) override; // Moves startPoint_ to pos, endPoint_ relative
+    void setPosition(const QPointF& pos); // Moves startPoint_ to pos, endPoint_ relative
     QPointF position() const override; // Returns startPoint_
 
     // Line specific getters and setters

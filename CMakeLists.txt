@@ -32,6 +32,8 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         objecttype.h
         line.h line.cpp
         geometricobject.cpp
+        threeinonebutton.h threeinonebutton.cpp
+
 
     )
 # Define target properties for Android with Qt 6 as:

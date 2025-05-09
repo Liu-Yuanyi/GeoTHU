@@ -15,7 +15,7 @@
 class Canvas : public QWidget {
     Q_OBJECT
 public:
-    enum Mode { SelectionMode, CreatePointMode };
+    enum Mode { SelectionMode, CreatePointMode, OperationMode };
     explicit Canvas(QWidget* parent = nullptr);
     ~Canvas() override { qDeleteAll(objects_); }
     void setMode(Mode newMode);

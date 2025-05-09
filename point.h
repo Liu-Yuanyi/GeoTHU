@@ -10,10 +10,10 @@ public:
 
     explicit Point(const QPointF& position);
 
-    ObjectType getObjectType()const override{return ObjectType::Point;};
+    ObjectType getObjectType() const override { return ObjectType::Point; }
     void draw(QPainter* painter) const override;
     bool isNear(const QPointF& Pos) const override;
-    QPointF position() const override { return position_;}
+    QPointF position() const override { return position_; }
 
     void setPosition(const QPointF& pos);
 

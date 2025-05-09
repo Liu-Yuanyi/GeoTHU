@@ -35,6 +35,36 @@ std::map<ObjectType, int> GetDefaultShape = {
     {ObjectType::Circle, 0}
 };
 
+GeometricObject::GeometricObject(ObjectName name):
+    selected_(true), hovered_(false), legal_(true), hidden_(false), name_(name),
+    label_(GetDefaultLable[name]), color_(GetDefaultColor[name]),
+    size_(GetDefaultSize[name]), shape_(GetDefaultShape[name]),
+    generation_(0) {}
+
+GeometricObject::~GeometricObject() {
+    // 移除父子关系
+    std::vector<GeometricObject*> parents_copy = parents_;
+    for (GeometricObject* p : parents_copy) {
+        if (p) {
+            p->removeChild(this);
+        }
+    }
+
+    std::vector<GeometricObject*> children_copy = children_;
+    for (GeometricObject* c : children_copy) {
+        if (c) {
+            c->removeParent(this);
+        }
+    }
+
+    // 删除所有子对象
+    for (GeometricObject* c : children_) {
+        delete c;  // 删除子对象
+    }
+    children_.clear();  // 清空子对象列表
+    parents_.clear();
+}
+
 bool GeometricObject::addParent(GeometricObject* parent) {
     if (!parent || parent == this) {
         return false; // Invalid operation: null parent or self-parenting

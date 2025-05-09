@@ -4,6 +4,7 @@
 #include <QMainWindow>
 #include <QPushButton>
 #include <QToolBar>
+#include "threeinonebutton.h"
 
 class Canvas; // Forward declaration
 
@@ -15,7 +16,11 @@ public:
 private:
     QPushButton* btnSelect;
     QPushButton* btnPointCreate;
+    QPushButton* btnCircleCreate;
+    ThreeInOneButton* btnLineCreate;
     Canvas* canvas;
+
+    void setupToolbar();
 };
 
 #endif // MAINWINDOW_H
