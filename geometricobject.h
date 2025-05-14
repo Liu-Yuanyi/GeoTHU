@@ -9,6 +9,12 @@ extern std::map<ObjectType, QString> GetDefaultLable;
 extern std::map<ObjectType, QColor> GetDefaultColor;
 extern std::map<ObjectType, double> GetDefaultSize;
 extern std::map<ObjectType, int> GetDefaultShape;
+namespace LineStyle {
+const int Solid = 0;
+const int Dashed = 1;
+const int Dotted = 2; // 如果以后需要
+// ... 其他样式
+}
 
 class GeometricObject {
 public:

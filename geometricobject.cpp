@@ -3,136 +3,151 @@
 
 #include "geometricobject.h"
 
+// 默认标签映射表
 std::map<ObjectType, QString> GetDefaultLable = {
-    {ObjectType::Point, "A"},
-    {ObjectType::Line, "l1"},
-    {ObjectType::Lineo, "l1"},
-    {ObjectType::Lineoo, "l1"},
-    {ObjectType::Circle, "Circle1"}
+    {ObjectType::Point, "A"},       // 点的默认标签
+    {ObjectType::Line, "l1"},      // 线的默认标签
+    {ObjectType::Lineo, "l1"},     // 单向射线的默认标签
+    {ObjectType::Lineoo, "l1"},    // 双向射线的默认标签
+    {ObjectType::Circle, "Circle1"}// 圆的默认标签
 };
 
+// 默认颜色映射表
 std::map<ObjectType, QColor> GetDefaultColor = {
-    {ObjectType::Point, Qt::red},
-    {ObjectType::Line, Qt::darkBlue},
-    {ObjectType::Lineo, Qt::darkBlue},
-    {ObjectType::Lineoo, Qt::darkBlue},
-    {ObjectType::Circle, Qt::green}
+    {ObjectType::Point, Qt::red},        // 点的默认颜色
+    {ObjectType::Line, Qt::darkBlue},   // 线的默认颜色
+    {ObjectType::Lineo, Qt::darkBlue},  // 单向射线的默认颜色
+    {ObjectType::Lineoo, Qt::darkBlue}, // 双向射线的默认颜色
+    {ObjectType::Circle, Qt::black}     // 圆的默认颜色
 };
 
+// 默认大小/粗细映射表
 std::map<ObjectType, double> GetDefaultSize = {
-    {ObjectType::Point, 4.0},
-    {ObjectType::Line, 2.0},
-    {ObjectType::Lineo, 2.0},
-    {ObjectType::Lineoo, 2.0},
-    {ObjectType::Circle, 2.0}
+    {ObjectType::Point, 4.0},  // 点的默认大小
+    {ObjectType::Line, 2.0},   // 线的默认粗细
+    {ObjectType::Lineo, 2.0},  // 单向射线的默认粗细
+    {ObjectType::Lineoo, 2.0}, // 双向射线的默认粗细
+    {ObjectType::Circle, 2.0}  // 圆的默认粗细
 };
 
+// 默认形状/线型映射表
 std::map<ObjectType, int> GetDefaultShape = {
-    {ObjectType::Point, 0},
-    {ObjectType::Line, 0},
-    {ObjectType::Lineo, 0},
-    {ObjectType::Lineoo, 0},
-    {ObjectType::Circle, 0}
+    {ObjectType::Point, LineStyle::Solid},  // 点的默认形状 (通常不适用线型，但为保持一致性)
+    {ObjectType::Line, LineStyle::Solid},   // 线的默认线型 (实线)
+    {ObjectType::Lineo, LineStyle::Solid},  // 单向射线的默认线型 (实线)
+    {ObjectType::Lineoo, LineStyle::Solid}, // 双向射线的默认线型 (实线)
+    {ObjectType::Circle, LineStyle::Solid}  // 圆的默认线型 (实线)
+    // ... 其他类型
 };
+
 
 GeometricObject::GeometricObject(ObjectName name):
-    selected_(true), hovered_(false), legal_(true), hidden_(false), name_(name),
-    label_(GetDefaultLable[name]), color_(GetDefaultColor[name]),
-    size_(GetDefaultSize[name]), shape_(GetDefaultShape[name]),
-    generation_(0) {}
+    selected_(true),      // 默认选中状态 (注意：这里设置为 true，通常可能希望是 false)
+    hovered_(false),      // 默认悬停状态
+    legal_(true),         // 默认合法状态
+    hidden_(false),       // 默认隐藏状态
+    name_(name),          // 对象类型名
+    label_(GetDefaultLable[name]),   // 使用映射表获取默认标签
+    color_(GetDefaultColor[name]),   // 使用映射表获取默认颜色
+    size_(GetDefaultSize[name]),     // 使用映射表获取默认大小
+    shape_(GetDefaultShape[name]),   // 使用映射表获取默认形状/线型
+    generation_(0) {}     // 对象的生成代数，初始为0
 
 GeometricObject::~GeometricObject() {
     // 移除父子关系
-    std::vector<GeometricObject*> parents_copy = parents_;
+    std::vector<GeometricObject*> parents_copy = parents_; // 创建父对象列表的副本以安全迭代
     for (GeometricObject* p : parents_copy) {
         if (p) {
-            p->removeChild(this);
+            p->removeChild(this); // 让父对象移除对当前对象的子对象引用
         }
     }
 
-    std::vector<GeometricObject*> children_copy = children_;
+    std::vector<GeometricObject*> children_copy = children_; // 创建子对象列表的副本以安全迭代
     for (GeometricObject* c : children_copy) {
         if (c) {
-            c->removeParent(this);
+            c->removeParent(this); // 让子对象移除对当前对象的父对象引用
         }
     }
 
     // 删除所有子对象
+    // 注意：这里直接 delete 子对象，意味着 GeometricObject 拥有其子对象的所有权。
+    // 这在某些设计中是合适的，但也可能导致双重删除，如果子对象也由其他地方管理。
     for (GeometricObject* c : children_) {
         delete c;  // 删除子对象
     }
     children_.clear();  // 清空子对象列表
-    parents_.clear();
+    parents_.clear();   // 清空父对象列表
 }
 
 bool GeometricObject::addParent(GeometricObject* parent) {
     if (!parent || parent == this) {
-        return false; // Invalid operation: null parent or self-parenting
+        return false; // 无效操作：父对象为空或父对象是自身
     }
-    // Check if already a parent
+    // 检查是否已经是父对象
     if (std::find(parents_.begin(), parents_.end(), parent) != parents_.end()) {
-        return false; // Already a parent, no change made
+        return false; // 已经是父对象，未做更改
     }
     parents_.push_back(parent);
-    parent->addChild(this); // Maintain bidirectional relationship
-    return true; // Successfully added to this object's parents list
+    parent->addChild(this); // 维持双向关系：让父对象也添加当前对象作为子对象
+    return true; // 成功添加到当前对象的父对象列表
 }
 
 bool GeometricObject::addChild(GeometricObject* child) {
     if (!child || child == this) {
-        return false; // Invalid operation: null child or self-child
+        return false; // 无效操作：子对象为空或子对象是自身
     }
-    // Check if already a child
+    // 检查是否已经是子对象
     if (std::find(children_.begin(), children_.end(), child) != children_.end()) {
-        return false; // Already a child, no change made
+        return false; // 已经是子对象，未做更改
     }
     children_.push_back(child);
-    child->addParent(this); // Maintain bidirectional relationship
-    return true; // Successfully added to this object's children list
+    child->addParent(this); // 维持双向关系：让子对象也添加当前对象作为父对象
+    return true; // 成功添加到当前对象的子对象列表
 }
 
 bool GeometricObject::removeChild(GeometricObject* child) {
     if (!child) {
-        return false; // Cannot remove nullptr
+        return false; // 不能移除空指针
     }
     auto it = std::find(children_.begin(), children_.end(), child);
     if (it != children_.end()) {
         children_.erase(it);
-        child->removeParent(this); // Maintain bidirectional relationship
-        return true; // Successfully removed from this object's children list
+        child->removeParent(this); // 维持双向关系：让子对象也移除当前对象的父对象引用
+        return true; // 成功从当前对象的子对象列表中移除
     }
-    return false; // Child not found, no change made
+    return false; // 未找到子对象，未做更改
 }
+
 
 bool GeometricObject::removeParent(GeometricObject* parent) {
     if (!parent) {
-        return false; // Cannot remove nullptr
+        return false; // 不能移除空指针
     }
     auto it = std::find(parents_.begin(), parents_.end(), parent);
     if (it != parents_.end()) {
         parents_.erase(it);
-        parent->removeChild(this); // Maintain bidirectional relationship
-        return true; // Successfully removed from this object's parents list
+        parent->removeChild(this); // 维持双向关系：让父对象也移除当前对象的子对象引用
+        return true; // 成功从当前对象的父对象列表中移除
     }
-    return false; // Parent not found, no change made
+    return false; // 未找到父对象，未做更改
 }
 
 const std::vector<GeometricObject*>& GeometricObject::getChildren() const {
-    return children_;
+    return children_; // 返回子对象列表的常量引用
 }
 
 const std::vector<GeometricObject*>& GeometricObject::getParents() const {
-    return parents_;
+    return parents_; // 返回父对象列表的常量引用
 }
 
 bool GeometricObject::hasChild(GeometricObject* child) const {
-    if (!child) return false;
-    return std::find(children_.begin(), children_.end(), child) != children_.end();
+    if (!child) return false; // 如果检查的子对象为空，则返回 false
+    return std::find(children_.begin(), children_.end(), child) != children_.end(); // 检查是否存在指定的子对象
 }
 
 bool GeometricObject::hasParent(GeometricObject* parent) const {
-    if (!parent) return false;
-    return std::find(parents_.begin(), parents_.end(), parent) != parents_.end();
+    if (!parent) return false; // 如果检查的父对象为空，则返回 false
+    return std::find(parents_.begin(), parents_.end(), parent) != parents_.end(); // 检查是否存在指定的父对象
 }
 
 #endif
