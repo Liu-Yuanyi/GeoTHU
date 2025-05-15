@@ -104,13 +104,13 @@ QPointF Line::position() const {
     return getTwoPoint().first;
 }
 
-inline std::pair<const QPointF&,const QPointF&> zhongchui(std::pair<const QPointF&,const QPointF&> ppp){
+inline std::pair<const QPointF,const QPointF> zhongchui(std::pair<const QPointF&,const QPointF&> ppp){
     double x1=ppp.first.x(),x2=ppp.second.x(),y1=ppp.first.y(),y2=ppp.second.y();
     return std::make_pair(QPointF((x1+x2)/2.0,(y1+y2)/2.0),
                           QPointF((x1+x2)/2.0+y2-y1,(y1+y2)/2.0+x1-x2));
 }
 
-std::pair<const QPointF&,const QPointF&> Line::getTwoPoint() const{
+std::pair<const QPointF,const QPointF> Line::getTwoPoint() const{
     switch(generation_){
     case 0:return std::make_pair(parents_[0]->position(),parents_[1]->position());
     case 1:{
@@ -122,4 +122,11 @@ std::pair<const QPointF&,const QPointF&> Line::getTwoPoint() const{
     default:
         //TODO: 补全;
     }
+}
+
+std::set<GeometricObject*> LineCreator::apply(std::vector<GeometricObject*> objs,
+                                  QPointF position) const{
+    Line *pLine=new Line(objs,0);
+    std::set<GeometricObject*> ret{pLine};
+    return ret;
 }

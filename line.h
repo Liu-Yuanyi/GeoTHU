@@ -20,7 +20,7 @@ public:
     explicit Line(const std::vector<GeometricObject*>& parents,const int& generation);
 
     // 重写 GeometricObject 中的纯虚函数
-    ObjectType getObjectType(){return ObjectType::Line;}
+    ObjectType getObjectType() const override{return ObjectType::Line;}
     void draw(QPainter* painter) const override; // 绘制函数
     bool isNear(const QPointF& pos) const override; // 判断点是否在线附近
     QPointF position() const override; // 返回 startPoint_
@@ -28,7 +28,7 @@ public:
 protected:
     // isNear 计算的辅助函数 (点到线段的距离)
     Qt::PenStyle getPenStyle()const;
-    std::pair<const QPointF&, const QPointF&> getTwoPoint() const;
+    std::pair<const QPointF, const QPointF> getTwoPoint() const;
     double distanceToLine(const QPointF& p,const std::pair<QPointF,QPointF>& Points) const;
 };
 
@@ -37,9 +37,10 @@ protected:
 
 //line的生成方式:
 //0:两点连线, 1两点中垂线, 2线段中垂线, 3平行线, (4圆上一点的切线)
-class LineCreator: public Operation{
+class LineCreator: public Operation{//两点连线
 public:
-
+    std::set<GeometricObject*> apply(std::vector<GeometricObject*> objs,
+                               QPointF position = QPointF()) const override;
 };
 
 #endif // LINE_H
