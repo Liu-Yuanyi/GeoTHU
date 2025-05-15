@@ -124,6 +124,10 @@ std::pair<const QPointF,const QPointF> Line::getTwoPoint() const{
     }
 }
 
+LineCreator::LineCreator(){
+    inputType.push_back(std::vector<ObjectType>{ObjectType::Point,ObjectType::Point});
+}
+
 std::set<GeometricObject*> LineCreator::apply(std::vector<GeometricObject*> objs,
                                   QPointF position) const{
     Line *pLine=new Line(objs,0);
