@@ -5,12 +5,14 @@
 #include "point.h" // 如果圆心是一个Point对象，或者你需要Point来定义圆
 #include <QPointF>
 #include <cmath> // For std::sqrt in isNear
+#include "operation.h"
 
 class Circle : public GeometricObject {
 public:
     // 构造函数: 可以有多种，例如通过圆心点对象和半径，或通过圆心坐标和半径
     explicit Circle(Point* centerPoint, double radius, ObjectName name = ObjectName::Circle); // 假设ObjectName::Circle存在
     explicit Circle(const QPointF& centerPos, double radius, ObjectName name = ObjectName::Circle);
+    explicit Circle(Point* centerPoint, Point* pointOnCircle);
 
     ~Circle() override; // 析构函数
 
@@ -35,11 +37,18 @@ public:
 
 private:
     Point* centerPoint_;     // 可选：如果圆心是一个独立的Point对象
+    Point* pointOnCircle_;
     QPointF centerPosition_; // 圆心的坐标 (即使有centerPoint_，也可能缓存其坐标)
     double radius_;
 
     // 辅助函数，用于更新centerPosition_（如果centerPoint_存在）
     void updateCenterPositionFromPoint();
+};
+
+class TwoPointCircleCreator: public Operation {
+    TwoPointCircleCreator();
+    std::set<GeometricObject*> apply(std::vector<GeometricObject*> objs,
+                                      QPointF position = QPointF()) const;
 };
 
 #endif // CIRCLE_H

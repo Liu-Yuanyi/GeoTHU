@@ -28,13 +28,13 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         canvas.h
         point.h point.cpp
         canvas.h canvas.cpp
-        operation.h
+
         objecttype.h
         line.h line.cpp
         geometricobject.cpp
         threeinonebutton.h threeinonebutton.cpp
-	circle.h circle.cpp
-
+         circle.h circle.cpp
+         operation.h operation.cpp
 
     )
 # Define target properties for Android with Qt 6 as:

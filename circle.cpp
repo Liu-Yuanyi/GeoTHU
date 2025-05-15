@@ -28,6 +28,13 @@ Circle::Circle(const QPointF& centerPos, double radius, ObjectName name)
     // 同上，设置颜色、标签等
 }
 
+Circle::Circle(Point* centerPoint, Point* pointOnCircle)
+    : GeometricObject(ObjectType::Circle), centerPoint_(centerPoint), centerPosition_(), pointOnCircle_(pointOnCircle) {
+    this->addParent(centerPoint_);
+    this->addParent(pointOnCircle_);
+    updateCenterPositionFromPoint();
+}
+
 Circle::~Circle() {
     // 如果在构造函数中建立了需要显式断开的连接，在这里处理
     // 例如，如果父子关系不仅仅是添加到列表，还有其他逻辑
@@ -154,4 +161,18 @@ void Circle::updateCenterPositionFromPoint() {
     if (centerPoint_) {
         centerPosition_ = centerPoint_->position();
     }
+}
+
+TwoPointCircleCreator::TwoPointCircleCreator(){
+    inputType.push_back({ObjectType::Point, ObjectType::Point});
+    operationName = "CircleCreator";
+}
+
+std::set<GeometricObject*> TwoPointCircleCreator::apply(std::vector<GeometricObject*> objs,
+                                                 QPointF position) const {
+    std::set<GeometricObject*> s;
+    Point* p1 = dynamic_cast<Point*>(objs[0]);
+    Point* p2 = dynamic_cast<Point*>(objs[1]);
+    s.insert(new Circle(p1, p2));
+    return s;
 }

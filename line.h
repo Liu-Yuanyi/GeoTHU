@@ -11,11 +11,13 @@
 
 // isNear 检查用的小容差值 (例如，以像素为单位)
 const double LINE_NEAR_TOLERANCE = 5.0;
+const double HOVER_ADD_WIDTH =2.0;
+const double SELECTED_WIDTH =2.0;
 
 class Line : public GeometricObject {
 public:
     // 构造函数
-    explicit Line(const QPointF& p1, const QPointF& p2);
+    explicit Line(const std::vector<GeometricObject*>& parents,const int& generation);
 
     // 重写 GeometricObject 中的纯虚函数
     ObjectType getObjectType(){return ObjectType::Line;}
@@ -24,14 +26,18 @@ public:
     QPointF position() const override; // 返回 startPoint_
 
 private:
-    QColor color_;       // 颜色
-    double thickness_;   // 线宽
-
     // isNear 计算的辅助函数 (点到线段的距离)
-    double distanceToSegment(const QPointF& p, const QPointF& P1, const QPointF& P2) const;
+    Qt::PenStyle getPenStyle()const;
+    std::pair<QPointF,QPointF> getTwoPoint() const;
+    double distanceToLine(const QPointF& p,const std::pair<QPointF,QPointF>& Points) const;
 };
 
-class pp_to_Line: public Operation{
+//line的shape:
+//0实线, 1虚线, 2点线
+
+//line的生成方式:
+//
+class LineCreator: public Operation{
 public:
 
 };
