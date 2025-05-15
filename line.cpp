@@ -17,7 +17,7 @@ void drawExtendedLine(QPainter* painter, const QPointF& p1, const QPointF& p2) {
 
     QPointF start, end;
 
-    if (qAbs(dx) < 1e-6) {  // 垂直线
+    if (qAbs(dx) < 1e-7) {  // 垂直线
         start = QPointF(p1.x(), minY);
         end = QPointF(p1.x(), maxY);
     } else {
@@ -101,9 +101,25 @@ bool Line::isNear(const QPointF& pos) const {
 }
 
 QPointF Line::position() const {
-
+    return getTwoPoint().first;
 }
 
-std::pair<QPointF,QPointF> Line::getTwoPoint() const{
+inline std::pair<const QPointF&,const QPointF&> zhongchui(std::pair<const QPointF&,const QPointF&> ppp){
+    double x1=ppp.first.x(),x2=ppp.second.x(),y1=ppp.first.y(),y2=ppp.second.y();
+    return std::make_pair(QPointF((x1+x2)/2.0,(y1+y2)/2.0),
+                          QPointF((x1+x2)/2.0+y2-y1,(y1+y2)/2.0+x1-x2));
+}
 
+std::pair<const QPointF&,const QPointF&> Line::getTwoPoint() const{
+    switch(generation_){
+    case 0:return std::make_pair(parents_[0]->position(),parents_[1]->position());
+    case 1:{
+        return zhongchui(std::make_pair(parents_[0]->position(),parents_[1]->position()));
+    }
+    case 2:{
+        //TODO: 补全2和3的情形;
+    }
+    default:
+        //TODO: 补全;
+    }
 }
