@@ -18,20 +18,3 @@ public:
 };
 
 #endif // OPERATION_H
-
-
-
-/*currentOperation= operations[7];
-for select:
-             if(cO->isvalid(selected)==0){
-        quxiao;
-        break;
-    }
-if(==1){
-    continue;
-}
-if(==2){
-    add(apply(input));
-    quxiao
-    break
-}*/

@@ -72,6 +72,7 @@ protected:
     double size_;
     int shape_;
     int generation_;//这个对象是怎么产生的
+    //统一约定: -1为平移产生的, -2为旋转产生的, -3为轴对称产生的, (-4为中心对称产生的)
     ObjectName name_;
 };
 

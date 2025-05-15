@@ -33,6 +33,7 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         line.h line.cpp
         geometricobject.cpp
         threeinonebutton.h threeinonebutton.cpp
+	circle.h circle.cpp
 
 
     )

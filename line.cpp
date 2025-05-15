@@ -45,20 +45,10 @@ void Line::draw(QPainter* painter) const {
     painter->restore(); // 恢复 QPainter 的状态
 }
 
-// 辅助函数：计算点 p 到线段 p1p2 的距离
-double Line::distanceToSegment(const QPointF& p, const QPointF& segP1, const QPointF& segP2) const {
+// 辅助函数：计算点 p 到直线 p1p2 的距离
+double Line::distanceToSegment(const QPointF& p, const QPointF& P1, const QPointF& P2) const {
     // 计算线段长度的平方
-    double l2 = (segP2.x() - segP1.x()) * (segP2.x() - segP1.x()) + (segP2.y() - segP1.y()) * (segP2.y() - segP1.y());
-    if (l2 == 0.0) return std::sqrt((p.x() - segP1.x()) * (p.x() - segP1.x()) + (p.y() - segP1.y()) * (p.y() - segP1.y())); // segP1 和 segP2 是同一点
-
-    // 考虑线段所在直线为 P = segP1 + t * (segP2 - segP1)
-    // t = [(p - segP1) . (segP2 - segP1)] / |segP2 - segP1|^2  (点积运算)
-    double t = ((p.x() - segP1.x()) * (segP2.x() - segP1.x()) + (p.y() - segP1.y()) * (segP2.y() - segP1.y())) / l2;
-    t = std::max(0.0, std::min(1.0, t)); // 将 t 限制在 [0,1] 区间内，以确保投影点在线段上
-
-    QPointF projection = segP1 + t * (segP2 - segP1); // 计算点 p 在线段上的投影点
-    // 返回点 p 到投影点的距离
-    return std::sqrt(std::pow(p.x() - projection.x(), 2) + std::pow(p.y() - projection.y(), 2));
+    return std::abs((P2.y()))/std::sqrt();
 }
 
 

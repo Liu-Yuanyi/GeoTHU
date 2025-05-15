@@ -1,9 +1,0 @@
-/Users/charleschen/Desktop/QT/Project1/build/unknown-Debug/CMakeFiles/test_project.dir
-/Users/charleschen/Desktop/QT/Project1/build/unknown-Debug/CMakeFiles/edit_cache.dir
-/Users/charleschen/Desktop/QT/Project1/build/unknown-Debug/CMakeFiles/rebuild_cache.dir
-/Users/charleschen/Desktop/QT/Project1/build/unknown-Debug/CMakeFiles/list_install_components.dir
-/Users/charleschen/Desktop/QT/Project1/build/unknown-Debug/CMakeFiles/install.dir
-/Users/charleschen/Desktop/QT/Project1/build/unknown-Debug/CMakeFiles/install/local.dir
-/Users/charleschen/Desktop/QT/Project1/build/unknown-Debug/CMakeFiles/install/strip.dir
-/Users/charleschen/Desktop/QT/Project1/build/unknown-Debug/CMakeFiles/test_project_autogen_timestamp_deps.dir
-/Users/charleschen/Desktop/QT/Project1/build/unknown-Debug/CMakeFiles/test_project_autogen.dir
