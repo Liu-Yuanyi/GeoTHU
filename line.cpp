@@ -5,41 +5,75 @@
 #include "lineoo.h"
 
 void drawExtendedLine(QPainter* painter, const QPointF& p1, const QPointF& p2) {
-    // 获取画布大小
     QRectF bounds = painter->viewport();
     qreal minX = bounds.left();
     qreal maxX = bounds.right();
     qreal minY = bounds.top();
     qreal maxY = bounds.bottom();
 
-    // 计算直线参数 (y = kx + b)
     qreal dx = p2.x() - p1.x();
     qreal dy = p2.y() - p1.y();
 
-    QPointF start, end;
+    // 存储所有可能的交点
+    QVector<QPointF> intersections;
 
-    if (qAbs(dx) < 1e-7) {  // 垂直线
-        start = QPointF(p1.x(), minY);
-        end = QPointF(p1.x(), maxY);
-    } else {
+    // 处理垂直线
+    if (qAbs(dx) < 1e-7) {
+        intersections.append(QPointF(p1.x(), minY));
+        intersections.append(QPointF(p1.x(), maxY));
+    }
+    // 处理水平线
+    else if (qAbs(dy) < 1e-7) {
+        intersections.append(QPointF(minX, p1.y()));
+        intersections.append(QPointF(maxX, p1.y()));
+    }
+    // 处理斜线
+    else {
         qreal k = dy / dx;
         qreal b = p1.y() - k * p1.x();
 
-        // 计算与边界的交点
-        qreal x1 = minX;
-        qreal y1 = k * x1 + b;
-        qreal x2 = maxX;
-        qreal y2 = k * x2 + b;
+        // 与左右边界的交点
+        qreal y_left = k * minX + b;
+        qreal y_right = k * maxX + b;
 
-        // 确保交点在画布范围内
-        start = QPointF(x1, qBound(minY, y1, maxY));
-        end = QPointF(x2, qBound(minY, y2, maxY));
+        // 与上下边界的交点
+        qreal x_top = (minY - b) / k;
+        qreal x_bottom = (maxY - b) / k;
+
+        // 检查每个交点是否在边界上
+        if (y_left >= minY && y_left <= maxY)
+            intersections.append(QPointF(minX, y_left));
+        if (y_right >= minY && y_right <= maxY)
+            intersections.append(QPointF(maxX, y_right));
+        if (x_top >= minX && x_top <= maxX)
+            intersections.append(QPointF(x_top, minY));
+        if (x_bottom >= minX && x_bottom <= maxX)
+            intersections.append(QPointF(x_bottom, maxY));
     }
 
-    // 绘制直线
-    painter->drawLine(start, end);
+    // 至少需要两个交点才能画线
+    if (intersections.size() >= 2) {
+        // 如果有多于两个交点，选择最远的两个
+        if (intersections.size() > 2) {
+            qreal maxDist = 0;
+            int idx1 = 0, idx2 = 1;
+            for (int i = 0; i < intersections.size(); ++i) {
+                for (int j = i + 1; j < intersections.size(); ++j) {
+                    QPointF diff = intersections[i] - intersections[j];
+                    qreal dist = diff.x() * diff.x() + diff.y() * diff.y();
+                    if (dist > maxDist) {
+                        maxDist = dist;
+                        idx1 = i;
+                        idx2 = j;
+                    }
+                }
+            }
+            painter->drawLine(intersections[idx1], intersections[idx2]);
+        } else {
+            painter->drawLine(intersections[0], intersections[1]);
+        }
+    }
 }
-
 Line::Line(const std::vector<GeometricObject*>& parents,const int& generation)
     : GeometricObject(ObjectName::Line){
     parents_=parents;
@@ -122,6 +156,7 @@ std::pair<const QPointF,const QPointF> Line::getTwoPoint() const{
     default:
         break;
     }
+    QMessageBox::warning(nullptr, "警告", "lineoo的getTwoPoint方法没有完成!");
     return std::make_pair(QPointF(),QPointF());
 }
 
