@@ -125,9 +125,9 @@ void Line::draw(QPainter* painter) const {
 
 // 辅助函数：计算点 p 到直线 p1p2 的距离
 double Line::distanceToLine(const QPointF& p, const std::pair<QPointF,QPointF>& Points) const {
-    double x1=Points.first.x(),x2=Points.second.x(),y1=Points.first.y(),y2=Points.first.y();
+    double x1=Points.first.x(),x2=Points.second.x(),y1=Points.first.y(),y2=Points.second.y();
     double X=p.x(),Y=p.y();
-    return std::abs((y2-y1)*X+(x1-x2)*Y+y1*x2-y2*x1)/std::sqrt((y2-y2)*(y2-y1)+(x1-x2)*(x1-x2));
+    return std::abs((y2-y1)*X+(x1-x2)*Y+y1*x2-y2*x1)/std::sqrt((y2-y1)*(y2-y1)+(x1-x2)*(x1-x2));
 }
 
 

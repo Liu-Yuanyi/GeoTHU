@@ -52,7 +52,7 @@ void Lineoo::draw(QPainter* painter) const {
 
 // 辅助函数：计算点 p 到直线 p1p2 的距离
 double Lineoo::distanceToLineoo(const QPointF& p, const std::pair<QPointF,QPointF>& Points) const {
-    double x1=Points.first.x(),x2=Points.second.x(),y1=Points.first.y(),y2=Points.first.y();
+    double x1=Points.first.x(),x2=Points.second.x(),y1=Points.first.y(),y2=Points.second.y();
     double X=p.x(),Y=p.y();
     double A = X - x1;
     double B = Y - y1;

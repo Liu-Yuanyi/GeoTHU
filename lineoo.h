@@ -11,7 +11,7 @@
 #include <QMessageBox>
 
 // isNear 检查用的小容差值 (例如，以像素为单位)
-const double NEAR_TOLERANCE = 5.0;
+const double NEAR_TOLERANCE = 4.0;
 const double HOVER_ADD_WIDTH =1.5;
 const double SELECTED_WIDTH =2.5;
 
