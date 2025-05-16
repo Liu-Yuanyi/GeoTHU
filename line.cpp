@@ -95,7 +95,9 @@ void Line::draw(QPainter* painter) const {
     }
     if (label_ != "") {
         painter->setPen(Qt::black);
-        painter->drawText(position().x() + 6, position().y() - 6, label_);
+        painter->drawText((getTwoPoint().first.x()+getTwoPoint().second.x())/2 + 6,
+                          (getTwoPoint().first.y()+getTwoPoint().second.y())/2 - 6,
+                          label_);
     }
 
     auto ppp=getTwoPoint();
@@ -134,7 +136,7 @@ double Line::distanceToLine(const QPointF& p, const std::pair<QPointF,QPointF>& 
 bool Line::isNear(const QPointF& pos) const {
     if (isHidden()) return false; // 如果对象隐藏，则认为不在附近
     // 判断点到线段的距离是否小于容差值 (容差值考虑了线的厚度)
-    return distanceToLine(pos, getTwoPoint()) < (NEAR_TOLERANCE + size_ / 2.0);
+    return distanceToLine(pos, getTwoPoint()) < ( 1e-2 + size_ / 2.0);
 }
 
 QPointF Line::position() const {
