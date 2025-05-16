@@ -33,7 +33,9 @@ void Lineoo::draw(QPainter* painter) const {
     double add=((int)hovered_)*HOVER_ADD_WIDTH;
 
     if(selected_){
-        pen.setColor(getColor().lighter());
+        QColor selectcolor=getColor().lighter(250);
+        selectcolor.setAlpha(128);
+        pen.setColor(selectcolor);
         pen.setWidth(getSize()+add+SELECTED_WIDTH);
         pen.setStyle(Qt::SolidLine);
         painter->setPen(pen);
