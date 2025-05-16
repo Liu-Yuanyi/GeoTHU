@@ -17,6 +17,7 @@ public:
     std::string getName() {return operationName;}
     virtual std::set<GeometricObject*> apply(std::vector<GeometricObject*> objs,
                                               QPointF position = QPointF()) const = 0;
+    virtual ~Operation();
 };
 
 #endif // OPERATION_H

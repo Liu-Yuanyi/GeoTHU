@@ -33,6 +33,8 @@ Circle::Circle(Point* centerPoint, Point* pointOnCircle)
     this->addParent(centerPoint_);
     this->addParent(pointOnCircle_);
     updateCenterPositionFromPoint();
+    QPointF pos1 = centerPoint->position(), pos2 = pointOnCircle->position();
+    radius_ = std::sqrt(std::pow(pos1.x() - pos2.x(), 2) + std::pow(pos1.y() - pos2.y(), 2));
 }
 
 Circle::~Circle() {
@@ -165,7 +167,7 @@ void Circle::updateCenterPositionFromPoint() {
 
 TwoPointCircleCreator::TwoPointCircleCreator(){
     inputType.push_back({ObjectType::Point, ObjectType::Point});
-    operationName = "CircleCreator";
+    operationName = "TwoPointCircleCreator";
 }
 
 std::set<GeometricObject*> TwoPointCircleCreator::apply(std::vector<GeometricObject*> objs,

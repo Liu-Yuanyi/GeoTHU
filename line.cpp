@@ -2,6 +2,7 @@
 #include <QPainter>
 #include <QPen>
 #include <cmath>       // 用于 sqrt, fabs, pow
+#include "lineoo.h"
 
 void drawExtendedLine(QPainter* painter, const QPointF& p1, const QPointF& p2) {
     // 获取画布大小
@@ -72,13 +73,13 @@ void Line::draw(QPainter* painter) const {
 
     if(selected_){
         pen.setColor(getColor().lighter());
-        pen.setWidth(getSize()+HOVER_ADD_WIDTH+SELECTED_WIDTH);
+        pen.setWidth(getSize()+add+SELECTED_WIDTH);
         pen.setStyle(Qt::SolidLine);
         painter->setPen(pen);
         drawExtendedLine(painter,P1,P2);
     }
     pen.setColor(getColor());       // 使用基类中定义的颜色
-    pen.setWidth(getSize()+HOVER_ADD_WIDTH);        // 使用基类中定义的大小 (线宽)
+    pen.setWidth(getSize()+add);        // 使用基类中定义的大小 (线宽)
     pen.setStyle(getPenStyle());
     painter->setPen(pen);
     drawExtendedLine(painter,P1,P2);
@@ -97,7 +98,7 @@ double Line::distanceToLine(const QPointF& p, const std::pair<QPointF,QPointF>& 
 bool Line::isNear(const QPointF& pos) const {
     if (isHidden()) return false; // 如果对象隐藏，则认为不在附近
     // 判断点到线段的距离是否小于容差值 (容差值考虑了线的厚度)
-    return distanceToLine(pos, getTwoPoint()) < (LINE_NEAR_TOLERANCE + size_ / 2.0);
+    return distanceToLine(pos, getTwoPoint()) < (NEAR_TOLERANCE + size_ / 2.0);
 }
 
 QPointF Line::position() const {
@@ -116,16 +117,17 @@ std::pair<const QPointF,const QPointF> Line::getTwoPoint() const{
     case 1:{
         return zhongchui(std::make_pair(parents_[0]->position(),parents_[1]->position()));
     }
-    case 2:{
-        //TODO: 补全2和3的情形;
-    }
+    case 2:
+
     default:
-        //TODO: 补全;
+        break;
     }
+    return std::make_pair(QPointF(),QPointF());
 }
 
 LineCreator::LineCreator(){
     inputType.push_back(std::vector<ObjectType>{ObjectType::Point,ObjectType::Point});
+    operationName="LineCreator";
 }
 
 std::set<GeometricObject*> LineCreator::apply(std::vector<GeometricObject*> objs,

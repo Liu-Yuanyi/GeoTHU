@@ -1,0 +1,25 @@
+<RCC>
+    <qresource prefix="/">
+        <file>raw_icons/angle_bisector.png</file>
+        <file>raw_icons/circle_arc.png</file>
+        <file>raw_icons/circle_center_point.png</file>
+        <file>raw_icons/circle_center_radius.png</file>
+        <file>raw_icons/circle_center_segment.png</file>
+        <file>raw_icons/circle_semi.png</file>
+        <file>raw_icons/circle_three_point.png</file>
+        <file>raw_icons/delete.png</file>
+        <file>raw_icons/line.png</file>
+        <file>raw_icons/midpoint.png</file>
+        <file>raw_icons/move.png</file>
+        <file>raw_icons/parrallel.png</file>
+        <file>raw_icons/perpendicular_bisector.png</file>
+        <file>raw_icons/perpendicular.png</file>
+        <file>raw_icons/point.png</file>
+        <file>raw_icons/reflect_circle.png</file>
+        <file>raw_icons/reflect_line.png</file>
+        <file>raw_icons/reflect_point.png</file>
+        <file>raw_icons/segment.png</file>
+        <file>raw_icons/show_hide.png</file>
+        <file>raw_icons/tangents.png</file>
+    </qresource>
+</RCC>

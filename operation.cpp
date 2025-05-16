@@ -1,5 +1,7 @@
 #include "operation.h"
 
+Operation::~Operation(){}
+
 // assertion: match exists
 // use isValidInput beforehand
 int Operation::getInputIndex(std::vector<GeometricObject*> objs) const {

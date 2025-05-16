@@ -4,36 +4,42 @@
 #include <QColorDialog> // 确保包含 QColorDialog
 #include <cmath>        // For std::sqrt, std::pow, std::abs (QLineF::length() 也可以)
 #include <algorithm>    // For std::remove if deleting objects
+#include "circle.h"
+#include "line.h"
+#include "lineoo.h"
 
 // 假设你的 ObjectType 和 ObjectName 在 "objecttype.h" (或其他地方) 定义，并且 GetDefault... 映射存在
 // extern std::map<ObjectType, QColor> GetDefaultColor;
 // extern std::map<ObjectType, double> GetDefaultSize;
 // extern std::map<ObjectType, QString> GetDefaultLable;
 
-
 Canvas::Canvas(QWidget* parent) : QWidget(parent) {
     setMouseTracking(true); // 开启鼠标跟踪以接收 mouseMoveEvent (即使没有按钮按下)
-    currentOperation = nullptr; // 初始化
-    previewCircle_ = nullptr;   // 初始化
-    circleCreationCenterPoint_ = nullptr; // 初始化
+    currentOperation_ = nullptr; // 初始化
+    currentMode = SelectionMode;
+    operations.push_back(new TwoPointCircleCreator());
+    operations.push_back(new LineCreator());
+    operations.push_back(new LineooCreator());
+    // TODO: add other operations here.
+}
+
+Canvas::~Canvas(){
+    for (auto obj : objects_){
+        delete obj;
+    }
+    for (auto operation : operations){
+        delete operation;
+    }
 }
 
 void Canvas::setMode(Mode newMode) {
-    // 当离开创建圆模式时，清理临时的预览圆对象
-    if (currentMode == CreateCircleMode && newMode != CreateCircleMode) {
-        delete previewCircle_;
-        previewCircle_ = nullptr;
-        circleCreationCenterPoint_ = nullptr;
-    }
-    // 你也可以在这里添加离开其他模式时的清理逻辑
-
     currentMode = newMode;
-    // clearSelections(); // 切换模式时是否清除选择，根据需求决定
+    clearSelections(); // 切换模式时是否清除选择，根据需求决定
     update(); // 更新画布显示，例如模式切换可能有视觉提示
 }
 
-void Canvas::setOperation(Operation* operation) {
-    this->currentOperation = operation;
+void Canvas::setOperation(const int index) {
+    this->currentOperation_ = operations[index];
 }
 
 void Canvas::updateHoverState(const QPointF& pos) {
@@ -72,12 +78,12 @@ void Canvas::mousePressEvent(QMouseEvent* event) {
                     }
                     // 如果已选中且未按Ctrl，则保持选中状态，准备拖动
                 }
-                deselectPermitted = false; // 准备拖动或多选，释放时不取消选择
+                deselectPermitted_ = false; // 准备拖动或多选，释放时不取消选择
             } else { // 点击到空白区域
                 if (!(event->modifiers() & Qt::ControlModifier)) { // 如果没有按下Ctrl键
                     clearSelections();
                 }
-                deselectPermitted = true; // 允许在释放时取消选择（如果这是一个简单的点击）
+                deselectPermitted_ = true; // 允许在释放时取消选择（如果这是一个简单的点击）
             }
             // 为所有选中的对象记录初始位置，用于拖动
             for (auto obj : selectedObjs_) {
@@ -97,32 +103,32 @@ void Canvas::mousePressEvent(QMouseEvent* event) {
                 existingPoint->setSelected(true);
                 selectedObjs_.insert(existingPoint);
             }
-            deselectPermitted = false;
-        } else if (currentMode == CreateCircleMode) { // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< 新增：创建圆模式下的鼠标按下逻辑
+            deselectPermitted_ = false;
+        } else if (currentMode == OperationMode) {
             clearSelections(); // 创建新对象前清除选择
-            deselectPermitted = false; // 正在创建，释放时不取消选择
-
-            // 尝试捕捉到附近的现有 Point 对象作为圆心
-            circleCreationCenterPoint_ = findPointNear(mousePos_);
-            if (circleCreationCenterPoint_) {
-                circleCreationCenterPos_ = circleCreationCenterPoint_->position();
-                // 可以选择性地也选中圆心点
-                // circleCreationCenterPoint_->setSelected(true);
-                // selectedObjs_.insert(circleCreationCenterPoint_);
-            } else {
-                circleCreationCenterPos_ = mousePos_; // 使用当前鼠标位置作为圆心
+            deselectPermitted_ = false; // 正在创建，释放时不取消选择
+            Point* targetPoint = findPointNear(mousePos_);
+            if (!targetPoint) { // 如果附近没有点，则创建新点
+                Point* newPoint = new Point(mousePos_);
+                objects_.push_back(newPoint);
+                targetPoint = newPoint;
             }
-
-            // 创建一个预览圆，初始半径很小
-            // 确保你的 ObjectName 枚举中有 ObjectName::Circle
-            if (circleCreationCenterPoint_) {
-                previewCircle_ = new Circle(circleCreationCenterPoint_, 0.1, ObjectName::Circle);
-            } else {
-                previewCircle_ = new Circle(circleCreationCenterPos_, 0.1, ObjectName::Circle);
+            targetPoint->setSelected(true);
+            selectedObjs_.insert(targetPoint);
+            operationSelections_.push_back(targetPoint);
+            if (currentOperation_->isValidInput(operationSelections_) == -1){ //不可能符合
+                clearSelections();
+                operationSelections_.clear();
+            } else if (currentOperation_->isValidInput(operationSelections_) == 1){
+                clearSelections();
+                std::set<GeometricObject*> newObject = currentOperation_->apply(operationSelections_);
+                operationSelections_.clear();
+                for (auto obj : newObject){
+                    obj->setSelected(true);
+                    objects_.push_back(obj);
+                    selectedObjs_.insert(obj);
+                }
             }
-            // previewCircle_->setColor(GetDefaultColor[ObjectType::Circle]); // 设置默认颜色
-            // previewCircle_->setSize(GetDefaultSize[ObjectType::Circle]);   // 设置默认线宽
-            // previewCircle_->setHovered(true); // 可以给预览对象一个高亮状态
         }
         update();
     } else if (event->button() == Qt::RightButton) { // 右键点击
@@ -139,7 +145,7 @@ void Canvas::mousePressEvent(QMouseEvent* event) {
         } else {
             clearSelections(); // 右键点击空白处，清除所有选择
         }
-        deselectPermitted = false; // 右键操作后通常不允许立即取消选择
+        deselectPermitted_ = false; // 右键操作后通常不允许立即取消选择
         update();
         // Qt 会自动在之后调用 contextMenuEvent
     }
@@ -171,14 +177,7 @@ void Canvas::mouseMoveEvent(QMouseEvent* event) {
                 }
                 // 你可能需要为其他类型的对象（如线、多边形等）添加拖动逻辑
             }
-            deselectPermitted = false; // 拖动过程中不允许取消选择
-            update();
-        }
-    } else if (currentMode == CreateCircleMode) { // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< 新增：创建圆模式下的鼠标移动逻辑
-        if (previewCircle_ && (event->buttons() & Qt::LeftButton)) { // 如果正在创建圆（左键按下并拖动）
-            double radius = QLineF(circleCreationCenterPos_, currentPos).length();
-            if (radius < 0.5) radius = 0.5; // 设置一个最小半径，避免半径为0
-            previewCircle_->setRadius(radius);
+            deselectPermitted_ = false; // 拖动过程中不允许取消选择
             update();
         }
     }
@@ -186,29 +185,10 @@ void Canvas::mouseMoveEvent(QMouseEvent* event) {
 
 void Canvas::mouseReleaseEvent(QMouseEvent* event) {
     if (event->button() == Qt::LeftButton) {
-        if (currentMode == CreateCircleMode) { // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< 新增：创建圆模式下的鼠标释放逻辑
-            if (previewCircle_) {
-                if (previewCircle_->getRadius() > 0.5) { // 检查半径是否有效
-                    // 将预览圆添加到正式的对象列表中
-                    objects_.push_back(previewCircle_);
-                    // 可以选择在创建后选中这个新圆
-                    // clearSelections();
-                    // previewCircle_->setSelected(true);
-                    // selectedObjs_.insert(previewCircle_);
-                    previewCircle_ = nullptr; // 置空预览指针，因为对象已移交给 objects_ 管理
-                } else {
-                    delete previewCircle_; // 如果半径太小或无效，则删除预览对象
-                    previewCircle_ = nullptr;
-                }
-                circleCreationCenterPoint_ = nullptr; // 重置临时圆心点指针
-            }
-            // setMode(SelectionMode); // 创建完毕后可以自动切换回选择模式
-            deselectPermitted = true; // 重置标志
-            update();
-        } else if (currentMode == SelectionMode) {
+        if (currentMode == SelectionMode) {
             // 处理拖拽结束后的 deselectPermitted 状态
-            if (!deselectPermitted) { // 如果之前是拖拽或按下时选中
-                deselectPermitted = true;
+            if (!deselectPermitted_) { // 如果之前是拖拽或按下时选中
+                deselectPermitted_ = true;
             } else { // 如果是一个简单的点击释放（没有拖拽，且按下时未改变选择状态）
                 // 这里的逻辑用于处理：如果用户点击一个已选中的对象（非Ctrl），是否取消选择它。
                 // 当前的 mousePressEvent 逻辑已经处理了大部分选择情况。
@@ -223,7 +203,7 @@ void Canvas::mouseReleaseEvent(QMouseEvent* event) {
         } else if (currentMode == CreatePointMode) {
             // 创建点主要在 mousePressEvent 中完成，释放时通常不需要额外操作
             // setMode(SelectionMode); // 可以选择切换回选择模式
-            deselectPermitted = true;
+            deselectPermitted_ = true;
             update();
         }
     }
@@ -239,11 +219,6 @@ void Canvas::paintEvent(QPaintEvent* event) {
         if (obj && !obj->isHidden()) { // 检查对象是否存在且未隐藏
             obj->draw(&painter);
         }
-    }
-
-    // 如果正在创建圆，绘制预览圆
-    if (previewCircle_ && !previewCircle_->isHidden()) { // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< 新增：绘制预览圆
-        previewCircle_->draw(&painter);
     }
 
     // 未来可以添加其他预览元素的绘制，如选择框、辅助线等

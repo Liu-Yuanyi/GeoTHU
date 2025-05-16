@@ -1,5 +1,5 @@
-#ifndef LINE_H
-#define LINE_H
+#ifndef LINEOO_H
+#define LINEOO_H
 
 #include "geometricobject.h" // 已更新以匹配提供的文件名
 #include "operation.h"
@@ -8,11 +8,17 @@
 #include <QColor>
 #include <QPen>   // 用于 draw 方法中的 QPen
 #include <cmath>  // 用于 isNear 方法中的 std::sqrt, std::fabs
+#include <QMessageBox>
 
-class Line : public GeometricObject {
+// isNear 检查用的小容差值 (例如，以像素为单位)
+const double NEAR_TOLERANCE = 5.0;
+const double HOVER_ADD_WIDTH =2.0;
+const double SELECTED_WIDTH =2.0;
+
+class Lineoo : public GeometricObject {
 public:
     // 构造函数
-    explicit Line(const std::vector<GeometricObject*>& parents,const int& generation);
+    explicit Lineoo(const std::vector<GeometricObject*>& parents,const int& generation);
 
     // 重写 GeometricObject 中的纯虚函数
     ObjectType getObjectType() const override{return ObjectType::Line;}
@@ -24,19 +30,20 @@ protected:
     // isNear 计算的辅助函数 (点到线段的距离)
     Qt::PenStyle getPenStyle()const;
     std::pair<const QPointF, const QPointF> getTwoPoint() const;
-    double distanceToLine(const QPointF& p,const std::pair<QPointF,QPointF>& Points) const;
+    double distanceToLineoo(const QPointF& p,const std::pair<QPointF,QPointF>& Points) const;
 };
 
-//line的shape:
+//lineoo的shape:
 //0实线, 1虚线, 2点线
 
-//line的生成方式:
-//0:两点连线, 1两点中垂线, 2线段中垂线, 3平行线, (4圆上一点的切线)
-class LineCreator: public Operation{//两点连线
+//lineoo的生成方式:
+//0:两点连线
+
+class LineooCreator: public Operation{//两点连线
 public:
-    LineCreator();
+    LineooCreator();
     std::set<GeometricObject*> apply(std::vector<GeometricObject*> objs,
-                               QPointF position = QPointF()) const override;
+                                      QPointF position = QPointF()) const override;
 };
 
-#endif // LINE_H
+#endif // LINEOO_H

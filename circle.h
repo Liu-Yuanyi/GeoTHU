@@ -46,6 +46,7 @@ private:
 };
 
 class TwoPointCircleCreator: public Operation {
+public:
     TwoPointCircleCreator();
     std::set<GeometricObject*> apply(std::vector<GeometricObject*> objs,
                                       QPointF position = QPointF()) const;
