@@ -6,38 +6,37 @@
 // 默认标签映射表
 std::map<ObjectType, QString> GetDefaultLable = {
     {ObjectType::Point, "A"},       // 点的默认标签
-    {ObjectType::Line, "l1"},      // 线的默认标签
-    {ObjectType::Lineo, "l1"},     // 单向射线的默认标签
-    {ObjectType::Lineoo, "l1"},    // 双向射线的默认标签
-    {ObjectType::Circle, "Circle1"}// 圆的默认标签
+    {ObjectType::Line, "line_1"},
+    {ObjectType::Lineo, "ray_1"},
+    {ObjectType::Lineoo, "segment_1"},
+    {ObjectType::Circle, "Circle1"}
 };
 
 // 默认颜色映射表
 std::map<ObjectType, QColor> GetDefaultColor = {
-    {ObjectType::Point, Qt::red},        // 点的默认颜色
-    {ObjectType::Line, Qt::darkBlue},   // 线的默认颜色
-    {ObjectType::Lineo, Qt::darkBlue},  // 单向射线的默认颜色
-    {ObjectType::Lineoo, Qt::darkBlue}, // 双向射线的默认颜色
-    {ObjectType::Circle, Qt::black}     // 圆的默认颜色
+    {ObjectType::Point, Qt::red},
+    {ObjectType::Line, Qt::darkBlue},
+    {ObjectType::Lineo, Qt::darkBlue},
+    {ObjectType::Lineoo, Qt::darkBlue},
+    {ObjectType::Circle, Qt::black}
 };
 
 // 默认大小/粗细映射表
 std::map<ObjectType, double> GetDefaultSize = {
     {ObjectType::Point, 4.0},  // 点的默认大小
-    {ObjectType::Line, 2.0},   // 线的默认粗细
-    {ObjectType::Lineo, 2.0},  // 单向射线的默认粗细
-    {ObjectType::Lineoo, 2.0}, // 双向射线的默认粗细
-    {ObjectType::Circle, 2.0}  // 圆的默认粗细
+    {ObjectType::Line, 2.0},
+    {ObjectType::Lineo, 2.0},
+    {ObjectType::Lineoo, 2.0},
+    {ObjectType::Circle, 2.0}
 };
 
 // 默认形状/线型映射表
 std::map<ObjectType, int> GetDefaultShape = {
     {ObjectType::Point, LineStyle::Solid},  // 点的默认形状 (通常不适用线型，但为保持一致性)
-    {ObjectType::Line, LineStyle::Solid},   // 线的默认线型 (实线)
-    {ObjectType::Lineo, LineStyle::Solid},  // 单向射线的默认线型 (实线)
-    {ObjectType::Lineoo, LineStyle::Solid}, // 双向射线的默认线型 (实线)
-    {ObjectType::Circle, LineStyle::Solid}  // 圆的默认线型 (实线)
-    // ... 其他类型
+    {ObjectType::Line, LineStyle::Solid},
+    {ObjectType::Lineo, LineStyle::Solid},
+    {ObjectType::Lineoo, LineStyle::Solid},
+    {ObjectType::Circle, LineStyle::Solid}
 };
 
 
