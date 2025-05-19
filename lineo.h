@@ -20,11 +20,11 @@ public:
     void draw(QPainter* painter) const override; // 绘制函数
     bool isNear(const QPointF& pos) const override; // 判断点是否在线附近
     QPointF position() const override; // 返回 startPoint_s
+    std::pair<const QPointF, const QPointF> getTwoPoint() const;
 
 protected:
     // isNear 计算的辅助函数 (点到线段的距离)
     Qt::PenStyle getPenStyle()const;
-    std::pair<const QPointF, const QPointF> getTwoPoint() const;
     double distanceToLineo(const QPointF& p,const std::pair<QPointF,QPointF>& Points) const;
 };
 

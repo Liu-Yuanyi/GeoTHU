@@ -19,11 +19,11 @@ public:
     void draw(QPainter* painter) const override; // 绘制函数
     bool isNear(const QPointF& pos) const override; // 判断点是否在线附近
     QPointF position() const override; // 返回 startPoint_
+    std::pair<const QPointF, const QPointF> getTwoPoint() const;
 
 protected:
     // isNear 计算的辅助函数 (点到线段的距离)
     Qt::PenStyle getPenStyle()const;
-    std::pair<const QPointF, const QPointF> getTwoPoint() const;
     double distanceToLine(const QPointF& p,const std::pair<QPointF,QPointF>& Points) const;
 };
 
@@ -31,7 +31,7 @@ protected:
 //0实线, 1虚线, 2点线
 
 //line的生成方式:
-//0:两点连线, 1两点中垂线, 2线段中垂线, 3平行线, (4圆上一点的切线)
+//0:两点连线, 1两点中垂线, 2线段中垂线, 3平行线, (4圆上一点的切线), 5两线的角平分线
 class LineCreator: public Operation{//两点连线
 public:
     LineCreator();

@@ -1,0 +1,20 @@
+#include "tools.h"
+#include"point.h"
+#include"line.h"
+#include"lineo.h"
+#include"lineoo.h"
+#include"circle.h"
+
+PerpendicularBisectorCreator::PerpendicularBisectorCreator(){
+    inputType.push_back(std::vector<ObjectType>{ObjectType::Point,ObjectType::Point});
+    inputType.push_back(std::vector<ObjectType>{ObjectType::Lineoo});
+    operationName="PerpendicularBisectorCreator";
+}
+
+std::set<GeometricObject*> PerpendicularBisectorCreator::apply(std::vector<GeometricObject*> objs,
+                                         QPointF position)const{
+    int generation=PerpendicularBisectorCreator::getInputIndex(objs);
+    Line *pLine=new Line(objs,1+generation);
+    std::set<GeometricObject*> ret{pLine};
+    return ret;
+}

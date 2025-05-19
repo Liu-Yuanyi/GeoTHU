@@ -156,7 +156,9 @@ std::pair<const QPointF,const QPointF> Line::getTwoPoint() const{
     case 1:{
         return zhongchui(std::make_pair(parents_[0]->position(),parents_[1]->position()));
     }
-    case 2:
+    case 2:{
+        return zhongchui(((Lineoo*)parents_[0])->getTwoPoint());
+    }
 
     default:
         break;
