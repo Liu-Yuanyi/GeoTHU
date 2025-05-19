@@ -77,4 +77,31 @@ protected:
     ObjectName name_;
 };
 
+inline QString nextLable(const QString& input) {
+    // 从后往前找到第一个非数字字符的位置
+    int i = input.length();
+    while (i > 0 && input[i-1].isDigit()) {
+        --i;
+    }
+
+    // 如果没有数字部分，直接返回原字符串
+    if (i == input.length()) {
+        return input;
+    }
+
+    // 分离单词和数字部分
+    QString word = input.left(i);
+    QString numStr = input.mid(i);
+
+    // 将数字部分转为整数并加1
+    bool ok;
+    int num = numStr.toInt(&ok);
+    if (!ok) {
+        return input;  // 转换失败时返回原字符串
+    }
+
+    // 拼接结果
+    return word + QString::number(num + 1);
+}
+
 #endif // GEOMETRICOBJECT_H

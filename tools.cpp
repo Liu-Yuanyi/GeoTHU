@@ -20,8 +20,9 @@ std::set<GeometricObject*> PerpendicularBisectorCreator::apply(std::vector<Geome
 }
 
 ParallelLineCreator::ParallelLineCreator(){
-    inputType.push_back(std::vector<ObjectType>{ObjectType::Point,ObjectType::Point});
-    inputType.push_back(std::vector<ObjectType>{ObjectType::Lineoo});
+    inputType.push_back(std::vector<ObjectType>{ObjectType::Lineoo,ObjectType::Point});
+    inputType.push_back(std::vector<ObjectType>{ObjectType::Lineo,ObjectType::Point});
+    inputType.push_back(std::vector<ObjectType>{ObjectType::Line,ObjectType::Point});
     operationName="ParallelLineCreator";
 }
 

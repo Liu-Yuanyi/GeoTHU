@@ -5,6 +5,7 @@ Lineoo::Lineoo(const std::vector<GeometricObject*>& parents,const int& generatio
     : GeometricObject(ObjectName::Line){
     parents_=parents;
     generation_=generation;
+    GetDefaultLable[ObjectType::Lineoo]=nextLable(GetDefaultLable[ObjectType::Lineoo]);
 }
 
 Qt::PenStyle Lineoo::getPenStyle()const{

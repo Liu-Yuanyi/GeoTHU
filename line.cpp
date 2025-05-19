@@ -3,6 +3,7 @@
 #include <QPen>
 #include <cmath>       // 用于 sqrt, fabs, pow
 #include "lineoo.h"
+#include "geometricobject.h"
 
 void drawExtendedLine(QPainter* painter, const QPointF& p1, const QPointF& p2) {
     QRectF bounds = painter->viewport();
@@ -78,7 +79,7 @@ Line::Line(const std::vector<GeometricObject*>& parents,const int& generation)
     : GeometricObject(ObjectName::Line){
     parents_=parents;
     generation_=generation;
-
+    GetDefaultLable[ObjectType::Line]=nextLable(GetDefaultLable[ObjectType::Line]);
 }
 
 Qt::PenStyle Line::getPenStyle()const{
@@ -159,7 +160,12 @@ std::pair<const QPointF,const QPointF> Line::getTwoPoints() const{
     case 2:{
         return zhongchui(parents_[0]->getTwoPoints());
     }
-
+    case 3:{
+        const auto ppp=parents_[0]->getTwoPoints();
+        const QPointF P1=ppp.first,P2=ppp.second;
+        auto P3=parents_[1]->position();
+        return std::make_pair(P3,QPointF(P3.x()+P1.x()-P2.x(),P3.y()+P1.y()-P2.y()));
+    }
     default:
         break;
     }
