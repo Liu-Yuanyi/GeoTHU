@@ -78,6 +78,7 @@ Line::Line(const std::vector<GeometricObject*>& parents,const int& generation)
     : GeometricObject(ObjectName::Line){
     parents_=parents;
     generation_=generation;
+
 }
 
 Qt::PenStyle Line::getPenStyle()const{
