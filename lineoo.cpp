@@ -2,7 +2,7 @@
 #include <QMessageBox>
 
 Lineoo::Lineoo(const std::vector<GeometricObject*>& parents,const int& generation)
-    : GeometricObject(ObjectName::Line){
+    : GeometricObject(ObjectName::Lineoo){
     parents_=parents;
     generation_=generation;
     GetDefaultLable[ObjectType::Lineoo]=nextLable(GetDefaultLable[ObjectType::Lineoo]);
