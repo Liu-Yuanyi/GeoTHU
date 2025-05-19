@@ -2,7 +2,7 @@
 #define GEOMETRICOBJECT_CPP
 
 #include "geometricobject.h"
-
+#include <qmessagebox.h>
 // 默认标签映射表
 std::map<ObjectType, QString> GetDefaultLable = {
     {ObjectType::Point, "A"},       // 点的默认标签
@@ -147,6 +147,15 @@ bool GeometricObject::hasChild(GeometricObject* child) const {
 bool GeometricObject::hasParent(GeometricObject* parent) const {
     if (!parent) return false; // 如果检查的父对象为空，则返回 false
     return std::find(parents_.begin(), parents_.end(), parent) != parents_.end(); // 检查是否存在指定的父对象
+}
+
+std::pair<const QPointF, const QPointF> GeometricObject::getTwoPoints() const{
+    QMessageBox::warning(
+        nullptr,
+        "警告",
+        QString::fromStdString(std::string(GetObjectNameString(this->getObjectType()))+"没有getTwoPoint方法!")
+        );
+    return std::make_pair(QPointF(),QPointF());
 }
 
 #endif

@@ -20,7 +20,7 @@ public:
     void draw(QPainter* painter) const override; // 绘制函数
     bool isNear(const QPointF& pos) const override; // 判断点是否在线附近
     QPointF position() const override; // 返回 startPoint_s
-    std::pair<const QPointF, const QPointF> getTwoPoint() const;
+    std::pair<const QPointF, const QPointF> getTwoPoints() const override;
 
 protected:
     // isNear 计算的辅助函数 (点到线段的距离)

@@ -27,6 +27,7 @@ public:
     virtual void draw(QPainter* painter) const = 0;
     virtual bool isNear(const QPointF& Pos) const = 0;
     virtual QPointF position() const = 0;
+    virtual std::pair<const QPointF, const QPointF> getTwoPoints() const;
 
     // --- Status Getters ---
     bool isSelected() const { return selected_; }

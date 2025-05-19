@@ -82,15 +82,15 @@ void Lineo::draw(QPainter* painter) const {
     if (hidden_) {
         return;
     }
+    auto ppp=getTwoPoints();
+    auto P1=ppp.first,P2=ppp.second;
+
     if (label_ != "") {
         painter->setPen(Qt::black);
-        painter->drawText((getTwoPoint().first.x()+getTwoPoint().second.x())/2 + 6,
-                          (getTwoPoint().first.y()+getTwoPoint().second.y())/2 - 6,
+        painter->drawText((P1.x()+P2.x())/2 + 6,
+                          (P1.y()+P2.y())/2 - 6,
                           label_);
     }
-
-    auto ppp=getTwoPoint();
-    auto P1=ppp.first,P2=ppp.second;
 
     QPen pen; // 创建一个QPen对象用于绘制
 
@@ -125,11 +125,11 @@ double Lineo::distanceToLineo(const QPointF& p, const std::pair<QPointF,QPointF>
 bool Lineo::isNear(const QPointF& pos) const {
     if (isHidden()) return false; // 如果对象隐藏，则认为不在附近
     // 判断点到线段的距离是否小于容差值 (容差值考虑了线的厚度)
-    return distanceToLineo(pos, getTwoPoint()) < ( 1e-2 + size_ / 2.0);
+    return distanceToLineo(pos, getTwoPoints()) < ( 1e-2 + size_ / 2.0);
 }
 
 QPointF Lineo::position() const {
-    return getTwoPoint().first;
+    return getTwoPoints().first;
 }
 
 inline std::pair<const QPointF,const QPointF> zhongchui(std::pair<const QPointF&,const QPointF&> ppp){
@@ -138,7 +138,7 @@ inline std::pair<const QPointF,const QPointF> zhongchui(std::pair<const QPointF&
                           QPointF((x1+x2)/2.0+y2-y1,(y1+y2)/2.0+x1-x2));
 }
 
-std::pair<const QPointF,const QPointF> Lineo::getTwoPoint() const{
+std::pair<const QPointF,const QPointF> Lineo::getTwoPoints() const{
     switch(generation_){
     case 0:return std::make_pair(parents_[0]->position(),parents_[1]->position());
     case 1:{
