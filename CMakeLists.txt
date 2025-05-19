@@ -36,6 +36,7 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         operation.h operation.cpp
         resources.qrc
         lineoo.h lineoo.cpp
+        lineo.h lineo.cpp
 
     )
 # Define target properties for Android with Qt 6 as:
