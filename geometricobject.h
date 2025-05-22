@@ -4,6 +4,7 @@
 #include <QPainter>
 #include <vector>
 #include "objecttype.h"
+#include<qmessagebox.h>
 
 extern std::map<ObjectType, QString> GetDefaultLable;
 extern std::map<ObjectType, QColor> GetDefaultColor;
@@ -62,6 +63,15 @@ public:
     bool hasChild(GeometricObject* child) const;
 
 protected:
+
+    inline void expectParentNum(size_t num){
+        if(parents_.size()!=num)
+            QMessageBox::warning(
+                nullptr,
+                "警告",
+                label_+"的parents_大小不为"+QString::number(num)+"!");
+    }
+
     bool selected_;
     bool hovered_;
     bool legal_;
