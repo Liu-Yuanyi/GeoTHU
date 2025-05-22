@@ -34,12 +34,3 @@ std::set<GeometricObject*> ParallelLineCreator::apply(std::vector<GeometricObjec
     return ret;
 }
 
-IntersectionCreator::IntersectionCreator(){
-    inputType.push_back(std::vector<ObjectType>{ObjectType::Lineoo,ObjectType::Lineoo});
-    operationName="IntersectionCreator";
-}
-
-std::set<GeometricObject*> IntersectionCreator::apply(std::vector<GeometricObject*> objs,
-                                                       QPointF position)const{
-
-}
