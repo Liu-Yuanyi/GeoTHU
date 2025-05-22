@@ -33,3 +33,9 @@ std::set<GeometricObject*> ParallelLineCreator::apply(std::vector<GeometricObjec
     std::set<GeometricObject*> ret{pLine};
     return ret;
 }
+
+IntersectionCreator::IntersectionCreator(){
+    inputType.push_back(std::vector<ObjectType>{ObjectType::Lineoo,ObjectType::Lineoo});
+
+    operationName="IntersectionCreator";
+}

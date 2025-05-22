@@ -16,4 +16,10 @@ public:
                                       QPointF position = QPointF()) const override;
 };
 
+class IntersectionCreator: public Operation{
+    IntersectionCreator();
+    std::set<GeometricObject*> apply(std::vector<GeometricObject*> objs,
+                                      QPointF position = QPointF()) const override;
+};
+
 #endif // TOOLS_H
