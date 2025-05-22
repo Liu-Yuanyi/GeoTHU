@@ -20,7 +20,7 @@ public:
     explicit Lineoo(const std::vector<GeometricObject*>& parents,const int& generation);
 
     // 重写 GeometricObject 中的纯虚函数
-    ObjectType getObjectType() const override{return ObjectType::Line;}
+    ObjectType getObjectType() const override{return ObjectType::Lineoo;}
     void draw(QPainter* painter) const override; // 绘制函数
     bool isNear(const QPointF& pos) const override; // 判断点是否在线附近
     QPointF position() const override; // 返回 startPoint_
