@@ -276,6 +276,8 @@ void MainWindow::onToolSelected(QAbstractButton *abstractButton)
         m_canvas->setOperation(3);
     } else if (toolId == tr("Parallel Line")){
         m_canvas->setOperation(4);
+    } else if (toolId == tr("Ray")){
+        m_canvas->setOperation(5);
     }
 }
 

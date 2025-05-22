@@ -17,6 +17,11 @@ int Operation::getInputIndex(std::vector<GeometricObject*> objs) const {
     return -1; // This line should never be executed.
 }
 
+//0 找到完美符合
+//1 确定不可能符合
+//2 有可能符合，且下一个一定是点
+//3 有可能符合，且下一个不可能是点
+//4 有可能符合，且下一个有可能是点，但不一定是点
 int Operation::isValidInput(std::vector<GeometricObject*> objs) const {
     std::vector<ObjectType> types;
     for (auto obj : objs){
@@ -24,8 +29,11 @@ int Operation::isValidInput(std::vector<GeometricObject*> objs) const {
     }
     for (int i = 0; i < inputType.size(); ++i){
         if (types == inputType[i]){
-            return 1;
+            return 0;
         }
+    }
+    std::set<ObjectType> possibleNext = {};
+    for (int i = 0; i < inputType.size(); ++i){
         if (types.size() > inputType[i].size()){
             continue;
         }
@@ -34,8 +42,19 @@ int Operation::isValidInput(std::vector<GeometricObject*> objs) const {
             partialInput.push_back(inputType[i][j]);
         }
         if (types == partialInput){
-            return 0;
+            possibleNext.insert(inputType[i][types.size()]);
         }
     }
-    return -1;
+    if (possibleNext.empty()){
+        return 1;
+    } else if (possibleNext.find(ObjectType::Point) == possibleNext.end()){
+        return 3;
+    } else {
+        if (possibleNext.size() == 1){
+            return 2;
+        }
+        else {
+            return 4;
+        }
+    }
 }

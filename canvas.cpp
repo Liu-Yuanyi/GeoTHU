@@ -6,6 +6,7 @@
 #include <algorithm>    // For std::remove if deleting objects
 #include "circle.h"
 #include "line.h"
+#include "lineo.h"
 #include "lineoo.h"
 #include "tools.h"
 
@@ -23,6 +24,7 @@ Canvas::Canvas(QWidget* parent) : QWidget(parent) {
     operations.push_back(new LineooCreator());
     operations.push_back(new PerpendicularBisectorCreator());
     operations.push_back(new ParallelLineCreator());
+    operations.push_back(new LineoCreator());
     // TODO: add other operations here.
 }
 
@@ -107,22 +109,67 @@ void Canvas::mousePressEvent(QMouseEvent* event) {
                 selectedObjs_.insert(existingPoint);
             }
             deselectPermitted_ = false;
-        } else if (currentMode == OperationMode) {
+        }
+
+
+        //0 找到完美符合
+        //1 确定不可能符合
+        //2 有可能符合，且下一个一定是点
+        //3 有可能符合，且下一个不可能是点
+        //4 有可能符合，且下一个有可能是点，但不一定是点
+        else if (currentMode == OperationMode) {
             clearSelections(); // 创建新对象前清除选择
             deselectPermitted_ = false; // 正在创建，释放时不取消选择
-            Point* targetPoint = findPointNear(mousePos_);
-            if (!targetPoint) { // 如果附近没有点，则创建新点
-                Point* newPoint = new Point(mousePos_);
-                objects_.push_back(newPoint);
-                targetPoint = newPoint;
-            }
-            targetPoint->setSelected(true);
-            selectedObjs_.insert(targetPoint);
-            operationSelections_.push_back(targetPoint);
-            if (currentOperation_->isValidInput(operationSelections_) == -1){ //不可能符合
+            if (currentOperation_->isValidInput(operationSelections_) == 1){ //不可能符合
                 clearSelections();
                 operationSelections_.clear();
-            } else if (currentOperation_->isValidInput(operationSelections_) == 1){
+            } else if (currentOperation_->isValidInput(operationSelections_) == 2){ //下一个一定是点
+                Point* targetPoint = findPointNear(mousePos_);
+                if (!targetPoint) { // 如果附近没有点，则创建新点
+                    Point* newPoint = new Point(mousePos_);
+                    objects_.push_back(newPoint);
+                    targetPoint = newPoint;
+                }
+                targetPoint->setSelected(true);
+                selectedObjs_.insert(targetPoint);
+                operationSelections_.push_back(targetPoint);
+            } else if (currentOperation_->isValidInput(operationSelections_) == 3){
+                GeometricObject* targetObj = findObjNear(mousePos_);
+                if (!targetObj) {
+                    clearSelections();
+                    operationSelections_.clear();
+                }
+                else{
+                    targetObj->setSelected(true);
+                    selectedObjs_.insert(targetObj);
+                    operationSelections_.push_back(targetObj);
+                    if (currentOperation_->isValidInput(operationSelections_) == 1){
+                        clearSelections();
+                        operationSelections_.clear();
+                    }
+                }
+            } else if (currentOperation_->isValidInput(operationSelections_) == 4){
+                Point* targetPoint = findPointNear(mousePos_);
+                if (targetPoint){
+                    targetPoint->setSelected(true);
+                    selectedObjs_.insert(targetPoint);
+                    operationSelections_.push_back(targetPoint);
+                }
+                else{
+                    GeometricObject* targetObj = findObjNear(mousePos_);
+                    if (targetObj){
+                        targetObj->setSelected(true);
+                        selectedObjs_.insert(targetObj);
+                        operationSelections_.push_back(targetObj);
+                    }
+                    else{
+                        Point* newPoint = new Point(mousePos_);
+                        objects_.push_back(newPoint);
+                        targetPoint = newPoint;
+                    }
+                }
+            }
+            if (currentOperation_->isValidInput(operationSelections_) == 0){ //已经符合
                 clearSelections();
                 std::set<GeometricObject*> newObject = currentOperation_->apply(operationSelections_);
                 operationSelections_.clear();
@@ -134,7 +181,11 @@ void Canvas::mousePressEvent(QMouseEvent* event) {
             }
         }
         update();
-    } else if (event->button() == Qt::RightButton) { // 右键点击
+    }
+
+
+
+    else if (event->button() == Qt::RightButton) { // 右键点击
         clearSelections();
         GeometricObject* clickedObj = findObjNear(mousePos_);
         if (clickedObj) {
