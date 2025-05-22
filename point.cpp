@@ -1,6 +1,8 @@
 #include "point.h"
 
-Point::Point(const QPointF& position) : GeometricObject(ObjectName::Point), position_(position) {}
+Point::Point(const QPointF& position) : GeometricObject(ObjectName::Point), position_(position) {
+    GetDefaultLable[ObjectType::Point]=nextPointLable(GetDefaultLable[ObjectType::Point]);
+}
 
 void Point::setPosition(const QPointF& pos) {
     position_ = pos;

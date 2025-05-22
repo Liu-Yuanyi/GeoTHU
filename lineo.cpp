@@ -66,7 +66,7 @@ Lineo::Lineo(const std::vector<GeometricObject*>& parents,const int& generation)
     : GeometricObject(ObjectName::Lineo){
     parents_=parents;
     generation_=generation;
-    GetDefaultLable[ObjectType::Lineo]=nextLable(GetDefaultLable[ObjectType::Lineo]);
+    GetDefaultLable[ObjectType::Lineo]=nextLineLable(GetDefaultLable[ObjectType::Lineo]);
 
 }
 

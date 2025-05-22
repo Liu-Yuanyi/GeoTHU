@@ -79,7 +79,7 @@ Line::Line(const std::vector<GeometricObject*>& parents,const int& generation)
     : GeometricObject(ObjectName::Line){
     parents_=parents;
     generation_=generation;
-    GetDefaultLable[ObjectType::Line]=nextLable(GetDefaultLable[ObjectType::Line]);
+    GetDefaultLable[ObjectType::Line]=nextLineLable(GetDefaultLable[ObjectType::Line]);
 }
 
 Qt::PenStyle Line::getPenStyle()const{
