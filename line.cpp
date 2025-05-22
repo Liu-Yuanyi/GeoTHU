@@ -161,10 +161,19 @@ std::pair<const QPointF,const QPointF> Line::getTwoPoints() const{
         return zhongchui(parents_[0]->getTwoPoints());
     }
     case 3:{//缺少三点
-        expectParentNum(2);
-        const auto ppp=parents_[0]->getTwoPoints();
-        const QPointF P1=ppp.first,P2=ppp.second;
-        auto P3=parents_[1]->position();
+        QPointF P1,P2,P3;
+        if(parents_[0]->getObjectType()==ObjectType::Point){
+            expectParentNum(3);
+            P1=parents_[0]->position();
+            P2=parents_[1]->position();
+            P3=parents_[2]->position();
+        }
+        else{
+            expectParentNum(2);
+            auto ppp=parents_[0]->getTwoPoints();
+            P1=ppp.first,P2=ppp.second;
+            P3=parents_[1]->position();
+        }
         return std::make_pair(P3,QPointF(P3.x()+P1.x()-P2.x(),P3.y()+P1.y()-P2.y()));
     }
     default:
