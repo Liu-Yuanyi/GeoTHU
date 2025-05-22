@@ -7,6 +7,7 @@
 #include "circle.h"
 #include "line.h"
 #include "lineoo.h"
+#include "tools.h"
 
 // 假设你的 ObjectType 和 ObjectName 在 "objecttype.h" (或其他地方) 定义，并且 GetDefault... 映射存在
 // extern std::map<ObjectType, QColor> GetDefaultColor;
@@ -20,6 +21,8 @@ Canvas::Canvas(QWidget* parent) : QWidget(parent) {
     operations.push_back(new TwoPointCircleCreator());
     operations.push_back(new LineCreator());
     operations.push_back(new LineooCreator());
+    operations.push_back(new PerpendicularBisectorCreator());
+    operations.push_back(new ParallelLineCreator());
     // TODO: add other operations here.
 }
 

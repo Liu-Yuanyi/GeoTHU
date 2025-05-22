@@ -271,6 +271,10 @@ void MainWindow::onToolSelected(QAbstractButton *abstractButton)
         m_canvas->setOperation(1);
     } else if (toolId == tr("Segment")){
         m_canvas->setOperation(2);
+    } else if (toolId == tr("Perpendicular Bisector")){
+        m_canvas->setOperation(3);
+    } else if (toolId == tr("Parallel Line")){
+        m_canvas->setOperation(4);
     }
 }
 
