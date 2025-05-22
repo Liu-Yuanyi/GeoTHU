@@ -18,8 +18,7 @@
 class Canvas : public QWidget {
     Q_OBJECT
 public:
-    // Mode 枚举中添加 CreateCircleMode 用于创建圆的模式
-    enum Mode { SelectionMode, CreatePointMode, OperationMode }; // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< 修改：添加创建圆模式
+    enum Mode { SelectionMode, CreatePointMode, OperationMode };
     explicit Canvas(QWidget* parent = nullptr);
     ~Canvas() override;
     void setMode(Mode newMode);

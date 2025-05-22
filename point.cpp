@@ -28,7 +28,36 @@ inline const QPointF footOfPerpendicular(QPointF P, std::pair<QPointF, QPointF> 
     return A + t * AB;
 }
 
+inline const QPointF NearestPointOnCircle(QPointF P, std::pair<QPointF, QPointF> Cir) {
+    const QPointF& center = Cir.first;   // 圆心
+    const QPointF& onCircle = Cir.second; // 圆上一点，用于确定半径向量
+
+    // 计算半径向量（圆心到圆上点的方向）
+    QPointF radiusVector = onCircle - center;
+    qreal radius2 = radiusVector.x()*radiusVector.x()+radiusVector.y()*radiusVector.y(); // 半径长度
+
+    // 若半径为0（退化为点），返回圆心
+    if (radius2 == 0) return center;
+
+    // 计算点P到圆心的向量
+    QPointF toP = P - center;
+    qreal disP= toP.x()*toP.x()+toP.y()*toP.y();
+
+    // 计算点P在半径方向上的投影长度（带符号）
+    QPointF projection = toP*(sqrt(radius2/disP));
+
+    return center+projection;
+}
+
 Point::Point(const QPointF& position) : GeometricObject(ObjectName::Point), position_(position) {
+    generation_=0;
+    GetDefaultLable[ObjectType::Point]=nextPointLable(GetDefaultLable[ObjectType::Point]);
+}
+
+Point::Point(const std::vector<GeometricObject*>& parents,const int& generation)
+    : GeometricObject(ObjectName::Point){
+    parents_=parents;
+    generation_=generation;
     GetDefaultLable[ObjectType::Point]=nextPointLable(GetDefaultLable[ObjectType::Point]);
 }
 
@@ -47,7 +76,9 @@ void Point::setPosition(const QPointF& pos) {
         return;
     }
     case 4:{
-
+        expectParentNum(1);
+        position_=NearestPointOnCircle(pos,parents_[0]->getTwoPoints());
+        return;
     }
     };
 }
