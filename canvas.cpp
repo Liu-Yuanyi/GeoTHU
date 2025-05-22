@@ -135,6 +135,7 @@ void Canvas::mousePressEvent(QMouseEvent* event) {
         }
         update();
     } else if (event->button() == Qt::RightButton) { // 右键点击
+        clearSelections();
         GeometricObject* clickedObj = findObjNear(mousePos_);
         if (clickedObj) {
             if (!clickedObj->isSelected()) { // 如果右键点击的对象未被选中

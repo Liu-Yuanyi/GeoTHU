@@ -179,6 +179,7 @@ void MainWindow::setupToolPanel()
     basicLayout->addWidget(createToolButton(tr("Move/Select"), ":/raw_icons/move.png", tr("Move or select objects")));
     basicLayout->addWidget(createToolButton(tr("Point"), ":/raw_icons/point.png", tr("Draw a point")));
     basicLayout->addWidget(createToolButton(tr("Line"), ":/raw_icons/line.png", tr("Draw a line")));
+    basicLayout->addWidget(createToolButton(tr("Ray"), ":/raw_icons/ray.png", tr("Draw a ray")));
     basicLayout->addWidget(createToolButton(tr("Segment"), ":/raw_icons/segment.png", tr("Draw a line segment")));
     basicLayout->addStretch();
     basicGroup->setLayout(basicLayout);

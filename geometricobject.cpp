@@ -18,7 +18,7 @@ std::map<ObjectType, QColor> GetDefaultColor = {
     {ObjectType::Line, Qt::darkBlue},
     {ObjectType::Lineo, Qt::darkBlue},
     {ObjectType::Lineoo, Qt::darkBlue},
-    {ObjectType::Circle, Qt::black}
+    {ObjectType::Circle, Qt::darkGreen}
 };
 
 // 默认大小/粗细映射表
