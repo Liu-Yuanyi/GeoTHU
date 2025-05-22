@@ -64,7 +64,7 @@ public:
 
 protected:
 
-    inline void expectParentNum(size_t num){
+    inline void expectParentNum(size_t num)const{
         if(parents_.size()!=num)
             QMessageBox::warning(
                 nullptr,

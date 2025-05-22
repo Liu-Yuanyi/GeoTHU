@@ -160,7 +160,8 @@ std::pair<const QPointF,const QPointF> Line::getTwoPoints() const{
     case 2:{
         return zhongchui(parents_[0]->getTwoPoints());
     }
-    case 3:{
+    case 3:{//缺少三点
+        expectParentNum(2);
         const auto ppp=parents_[0]->getTwoPoints();
         const QPointF P1=ppp.first,P2=ppp.second;
         auto P3=parents_[1]->position();
