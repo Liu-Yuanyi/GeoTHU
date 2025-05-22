@@ -13,12 +13,29 @@ public:
     ObjectType getObjectType() const override { return ObjectType::Point; }
     void draw(QPainter* painter) const override;
     bool isNear(const QPointF& Pos) const override;
-    QPointF position() const override { return position_; }
+    QPointF position() const override{return position_;}
 
     void setPosition(const QPointF& pos);
 
 private:
     QPointF position_;
 };
+
+//point的生成方式:
+/* 0自由点
+1,2,3,4 line,lineo,lineoo,circle上的约束点
+
+交点:     line    lineo   lineoo  circle
+line        5       6       7       14,15
+lineo       8       9       10      16,17
+lineoo      11      12      13      18,19
+circle                              20,21
+
+22~30预留
+
+切点:31,32
+圆心:33
+
+*/
 
 #endif // POINT_H
