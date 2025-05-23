@@ -43,10 +43,9 @@ inline const QPointF NearestPointOnCircle(QPointF P, std::pair<QPointF, QPointF>
     QPointF toP = P - center;
     qreal disP= toP.x()*toP.x()+toP.y()*toP.y();
 
-    // 计算点P在半径方向上的投影长度（带符号）
-    QPointF projection = toP*(sqrt(radius2/disP));
+    QPointF delta = toP*(sqrt(radius2/disP));
 
-    return center+projection;
+    return center+delta;
 }
 
 Point::Point(const QPointF& position) : GeometricObject(ObjectName::Point), position_(position) {
@@ -80,6 +79,8 @@ void Point::setPosition(const QPointF& pos) {
         position_=NearestPointOnCircle(pos,parents_[0]->getTwoPoints());
         return;
     }
+    default:
+        return;
     };
 }
 
