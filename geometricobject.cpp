@@ -155,7 +155,7 @@ std::pair<const QPointF, const QPointF> GeometricObject::getTwoPoints() const{
         "警告",
         QString::fromStdString(std::string(GetObjectNameString(this->getObjectType()))+"没有getTwoPoint方法!")
         );
-    return std::make_pair(QPointF(),QPointF());
+    return std::make_pair(QPointF(),QPointF(1,1));
 }
 
 #endif
