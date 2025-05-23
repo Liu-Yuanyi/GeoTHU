@@ -1,6 +1,6 @@
 #include "point.h"
 #include "objecttype.h"
-inline const QPointF footOfPerpendicular(QPointF P, std::pair<QPointF, QPointF> line, ObjectType mode=ObjectType::Line) {
+inline const qreal footRatio(QPointF P, std::pair<QPointF, QPointF> line, ObjectType mode=ObjectType::Line) {
     const QPointF& A = line.first;
     const QPointF& B = line.second;
     // 计算线段AB的向量
@@ -10,22 +10,19 @@ inline const QPointF footOfPerpendicular(QPointF P, std::pair<QPointF, QPointF> 
     // 计算AB的长度平方
     qreal abLengthSquared = AB.x() * AB.x() + AB.y() * AB.y();
     // 如果线段长度为0，返回端点A
-    if (abLengthSquared == 0) return A;
+    if (abLengthSquared == 0) return 0;
     // 计算点积 AP·AB
     qreal dotProduct = AP.x() * AB.x() + AP.y() * AB.y();
     // 计算投影比例 t
     qreal t;
     if(mode==ObjectType::Lineoo){
-       t = qBound(0.0, dotProduct / abLengthSquared, 1.0);
+        return qBound(0.0, dotProduct / abLengthSquared, 1.0);
     }
     else if(mode == ObjectType::Lineo){
-        t= qMax(0.0, dotProduct / abLengthSquared);
+        return qMax(0.0, dotProduct / abLengthSquared);
     }
-    else{
-        t= dotProduct / abLengthSquared;
-    }
-    // 计算垂足H
-    return A + t * AB;
+
+    else return dotProduct / abLengthSquared;
 }
 
 inline const QPointF NearestPointOnCircle(QPointF P, std::pair<QPointF, QPointF> Cir) {
@@ -72,27 +69,12 @@ void Point::setPosition(const QPointF& pos) {
     case 2:
     case 3:{
         expectParentNum(1);
-        position_=footOfPerpendicular(pos,parents_[0]->getTwoPoints(),parents_[0]->getObjectType());
+        position_.rx()=footRatio(pos,parents_[0]->getTwoPoints(),parents_[0]->getObjectType());
         return;
     }
     case 4:{
         expectParentNum(1);
-        position_=NearestPointOnCircle(pos,parents_[0]->getTwoPoints());
-        return;
-    }
-    case 30:{
-        QPointF P1, P2;
-        if(parents_[0]->getObjectType()==ObjectType::Point){
-            expectParentNum(2);
-            P1=parents_[0]->position();
-            P2=parents_[1]->position();
-        } else {
-            expectParentNum(1);
-            auto p = parents_[0]->getTwoPoints();
-            P1 = p.first;
-            P2 = p.second;
-        }
-        position_ = QPointF((P1.x() + P2.x()) / 2, (P1.y() + P2.y()) / 2);
+        position_=NearestPointOnCircle(pos,parents_[0]->getTwoPoints())-parents_[0]->getTwoPoints().first;
         return;
     }
     default:
@@ -141,4 +123,40 @@ bool Point::isNear(const QPointF& clickPos) const {
     qreal dx = clickPos.x() - position().x();
     qreal dy = clickPos.y() - position().y();
     return (dx * dx + dy * dy) <= (size_ + 2) * (size_ + 2);
+}
+
+QPointF Point::position() const{
+    switch(generation_){
+    case 0:{
+        return position_;
+    }
+    case 1:
+    case 2:
+    case 3:{
+        expectParentNum(1);
+        auto ppp=parents_[0]->getTwoPoints();
+        return ppp.first+position_.x()*(ppp.second-ppp.first);
+    }
+    case 4:{
+        expectParentNum(1);
+        auto ppp=parents_[0]->getTwoPoints();
+        return ppp.first+position_*len(ppp.second-ppp.first)/len(position_);
+    }
+    case 30:{
+        QPointF P1, P2;
+        if(parents_[0]->getObjectType()==ObjectType::Point){
+            expectParentNum(2);
+            P1=parents_[0]->position();
+            P2=parents_[1]->position();
+        } else {
+            expectParentNum(1);
+            auto p = parents_[0]->getTwoPoints();
+            P1 = p.first;
+            P2 = p.second;
+        }
+        return QPointF((P1.x() + P2.x()) / 2, (P1.y() + P2.y()) / 2);
+    }
+    default:
+        return QPointF();
+    };
 }

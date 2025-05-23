@@ -5,6 +5,10 @@
 #include <QPointF>
 #include <QColor>
 
+inline qreal len(QPointF p){
+    return sqrt(p.x()*p.x()+p.y()+p.y());
+}
+
 class Point : public GeometricObject {
 public:
 
@@ -14,12 +18,12 @@ public:
     ObjectType getObjectType() const override { return ObjectType::Point; }
     void draw(QPainter* painter) const override;
     bool isNear(const QPointF& Pos) const override;
-    QPointF position() const override{return position_;}
+    QPointF position() const override;
 
     void setPosition(const QPointF& pos = QPointF());
 
 private:
-    QPointF position_;
+    QPointF position_;//如果是1,2,3 返回一个比例常数放在x(), 如果是4, 则为所在半径的方向向量
 };
 
 //point的生成方式:
