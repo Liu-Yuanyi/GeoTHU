@@ -58,6 +58,7 @@ Point::Point(const std::vector<GeometricObject*>& parents,const int& generation)
     parents_=parents;
     generation_=generation;
     GetDefaultLable[ObjectType::Point]=nextPointLable(GetDefaultLable[ObjectType::Point]);
+    setPosition();
 }
 
 void Point::setPosition(const QPointF& pos) {
@@ -77,6 +78,21 @@ void Point::setPosition(const QPointF& pos) {
     case 4:{
         expectParentNum(1);
         position_=NearestPointOnCircle(pos,parents_[0]->getTwoPoints());
+        return;
+    }
+    case 30:{
+        QPointF P1, P2;
+        if(parents_[0]->getObjectType()==ObjectType::Point){
+            expectParentNum(2);
+            P1=parents_[0]->position();
+            P2=parents_[1]->position();
+        } else {
+            expectParentNum(1);
+            auto p = parents_[0]->getTwoPoints();
+            P1 = p.first;
+            P2 = p.second;
+        }
+        position_ = QPointF((P1.x() + P2.x()) / 2, (P1.y() + P2.y()) / 2);
         return;
     }
     default:

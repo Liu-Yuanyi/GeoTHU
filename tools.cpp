@@ -34,3 +34,16 @@ std::set<GeometricObject*> ParallelLineCreator::apply(std::vector<GeometricObjec
     return ret;
 }
 
+MidpointCreator::MidpointCreator() {
+    inputType.push_back(std::vector<ObjectType>{ObjectType::Lineoo});
+    inputType.push_back(std::vector<ObjectType>{ObjectType::Point, ObjectType::Point});
+    operationName = "MidPointCreator";
+}
+
+std::set<GeometricObject*> MidpointCreator::apply(std::vector<GeometricObject*> objs,
+                                                       QPointF position) const {
+    Point* newPoint = new Point(objs, 30);
+    std::set<GeometricObject*> ret{newPoint};
+    return ret;
+}
+

@@ -25,6 +25,7 @@ Canvas::Canvas(QWidget* parent) : QWidget(parent) {
     operations.push_back(new PerpendicularBisectorCreator());
     operations.push_back(new ParallelLineCreator());
     operations.push_back(new LineoCreator());
+    operations.push_back(new MidpointCreator());
     // TODO: add other operations here.
 }
 
@@ -165,7 +166,8 @@ void Canvas::mousePressEvent(QMouseEvent* event) {
                     else{
                         Point* newPoint = new Point(mousePos_);
                         objects_.push_back(newPoint);
-                        targetPoint = newPoint;
+                        selectedObjs_.insert(newPoint);
+                        operationSelections_.push_back(newPoint);
                     }
                 }
             }

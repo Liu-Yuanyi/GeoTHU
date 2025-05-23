@@ -278,6 +278,8 @@ void MainWindow::onToolSelected(QAbstractButton *abstractButton)
         m_canvas->setOperation(4);
     } else if (toolId == tr("Ray")){
         m_canvas->setOperation(5);
+    } else if (toolId == tr("Midpoint")){
+        m_canvas->setOperation(6);
     }
 }
 

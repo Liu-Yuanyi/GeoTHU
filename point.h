@@ -16,7 +16,7 @@ public:
     bool isNear(const QPointF& Pos) const override;
     QPointF position() const override{return position_;}
 
-    void setPosition(const QPointF& pos);
+    void setPosition(const QPointF& pos = QPointF());
 
 private:
     QPointF position_;
@@ -32,8 +32,9 @@ lineo       8       9       10      16,17
 lineoo      11      12      13      18,19
 circle                              20,21
 
-22~30预留
+22~29预留
 
+中点:30
 切点:31,32
 圆心:33
 
