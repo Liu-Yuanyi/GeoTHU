@@ -176,6 +176,17 @@ std::pair<const QPointF,const QPointF> Line::getTwoPoints() const{
         }
         return std::make_pair(P3,QPointF(P3.x()+P1.x()-P2.x(),P3.y()+P1.y()-P2.y()));
     }
+    case 6:{
+        expectParentNum(2);
+        QPointF P1 = parents_[0]->position();
+        auto p=parents_[1]->getTwoPoints();
+        QPointF P2 = p.first, P3 = p.second;
+        if (P2.y() == P3.y()){
+            return std::make_pair(P1, QPointF(P1.x(), P2.y() + 200));
+        } else {
+            return std::make_pair(P1, QPointF(P3.y() - P2.y() + P1.x(), P1.y() + P2.x() - P3.x()));
+        }
+    }
     default:
         break;
     }

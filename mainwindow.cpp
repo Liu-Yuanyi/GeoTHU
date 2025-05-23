@@ -280,6 +280,8 @@ void MainWindow::onToolSelected(QAbstractButton *abstractButton)
         m_canvas->setOperation(5);
     } else if (toolId == tr("Midpoint")){
         m_canvas->setOperation(6);
+    } else if (toolId == tr("Perpendicular Line")){
+        m_canvas->setOperation(7);
     }
 }
 

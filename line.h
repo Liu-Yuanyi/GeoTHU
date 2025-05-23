@@ -32,6 +32,7 @@ protected:
 
 //line的生成方式:
 //0:两点连线, 1两点中垂线, 2线段中垂线, 3平行线, (4圆上一点的切线), 5两线的角平分线
+//6:垂线
 class LineCreator: public Operation{//两点连线
 public:
     LineCreator();

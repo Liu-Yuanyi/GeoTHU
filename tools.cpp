@@ -47,3 +47,16 @@ std::set<GeometricObject*> MidpointCreator::apply(std::vector<GeometricObject*> 
     return ret;
 }
 
+PerpendicularLineCreator::PerpendicularLineCreator() {
+    inputType.push_back(std::vector<ObjectType>{ObjectType::Point, ObjectType::Lineoo});
+    inputType.push_back(std::vector<ObjectType>{ObjectType::Point, ObjectType::Lineo});
+    inputType.push_back(std::vector<ObjectType>{ObjectType::Point, ObjectType::Line});
+    operationName = "PerpendicularLineCreator";
+}
+
+std::set<GeometricObject*> PerpendicularLineCreator::apply(std::vector<GeometricObject*> objs,
+                                                   QPointF position) const {
+    Line* newLine = new Line(objs, 6);
+    std::set<GeometricObject*> ret{newLine};
+    return ret;
+}

@@ -26,6 +26,7 @@ Canvas::Canvas(QWidget* parent) : QWidget(parent) {
     operations.push_back(new ParallelLineCreator());
     operations.push_back(new LineoCreator());
     operations.push_back(new MidpointCreator());
+    operations.push_back(new PerpendicularLineCreator());
     // TODO: add other operations here.
 }
 
