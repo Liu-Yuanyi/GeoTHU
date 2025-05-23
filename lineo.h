@@ -32,7 +32,7 @@ protected:
 //0实线, 1虚线, 2点线
 
 //Lineo的生成方式:
-//0:两点连线, 1三点的角平分线 2线段-点-线段的角平分线
+//0:两点连线, 1角平分线
 
 class LineoCreator: public Operation{//两点连线
 public:

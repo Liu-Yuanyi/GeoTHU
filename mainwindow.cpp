@@ -282,6 +282,8 @@ void MainWindow::onToolSelected(QAbstractButton *abstractButton)
         m_canvas->setOperation(6);
     } else if (toolId == tr("Perpendicular Line")){
         m_canvas->setOperation(7);
+    } else if (toolId == tr("Angle Bisector")){
+        m_canvas->setOperation(8);
     }
 }
 

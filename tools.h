@@ -30,4 +30,18 @@ public:
                                       QPointF position = QPointF()) const override;
 };
 
+class AngleBisectorCreator: public Operation {
+public:
+    AngleBisectorCreator();
+    std::set<GeometricObject*> apply(std::vector<GeometricObject*> objs,
+                                      QPointF position = QPointF()) const override;
+};
+
+class TangentLineCreator: public Operation {
+public:
+    TangentLineCreator();
+    std::set<GeometricObject*> apply(std::vector<GeometricObject*> objs,
+                                      QPointF position = QPointF()) const override;
+};
+
 #endif // TOOLS_H

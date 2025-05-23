@@ -60,3 +60,17 @@ std::set<GeometricObject*> PerpendicularLineCreator::apply(std::vector<Geometric
     std::set<GeometricObject*> ret{newLine};
     return ret;
 }
+
+AngleBisectorCreator::AngleBisectorCreator(){
+    inputType.push_back(std::vector<ObjectType>{ObjectType::Point, ObjectType::Point, ObjectType::Point});
+    operationName = "AngleBisectorCreator";
+}
+
+std::set<GeometricObject*> AngleBisectorCreator::apply(std::vector<GeometricObject*> objs,
+                            QPointF position) const {
+    Lineo* newLineo = new Lineo(objs, 1);
+    std::set<GeometricObject*> ret{newLineo};
+    return ret;
+}
+
+

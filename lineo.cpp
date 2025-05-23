@@ -143,7 +143,14 @@ std::pair<const QPointF,const QPointF> Lineo::getTwoPoints() const{
     switch(generation_){
     case 0:return std::make_pair(parents_[0]->position(),parents_[1]->position());
     case 1:{
-        return zhongchui(std::make_pair(parents_[0]->position(),parents_[1]->position()));
+        expectParentNum(3);
+        QPointF p1 = parents_[1]->position();
+        QPointF a = parents_[0]->position(), b = parents_[2]->position();
+        double l1 = std::sqrt(std::pow(p1.x() - a.x(), 2) + std::pow(p1.y() - a.y(), 2));
+        double l2 = std::sqrt(std::pow(p1.x() - b.x(), 2) + std::pow(p1.y() - b.y(), 2));
+        a = p1 + (a - p1) / l1;
+        b = p1 + (b - p1) / l2;
+        return std::make_pair(p1, (a + b) / 2);
     }
     case 2:
 

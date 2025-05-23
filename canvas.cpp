@@ -27,6 +27,7 @@ Canvas::Canvas(QWidget* parent) : QWidget(parent) {
     operations.push_back(new LineoCreator());
     operations.push_back(new MidpointCreator());
     operations.push_back(new PerpendicularLineCreator());
+    operations.push_back(new AngleBisectorCreator());
     // TODO: add other operations here.
 }
 
@@ -120,11 +121,9 @@ void Canvas::mousePressEvent(QMouseEvent* event) {
         //3 有可能符合，且下一个不可能是点
         //4 有可能符合，且下一个有可能是点，但不一定是点
         else if (currentMode == OperationMode) {
-            clearSelections(); // 创建新对象前清除选择
             deselectPermitted_ = false; // 正在创建，释放时不取消选择
             if (currentOperation_->isValidInput(operationSelections_) == 1){ //不可能符合
                 clearSelections();
-                operationSelections_.clear();
             } else if (currentOperation_->isValidInput(operationSelections_) == 2){ //下一个一定是点
                 Point* targetPoint = findPointNear(mousePos_);
                 if (!targetPoint) { // 如果附近没有点，则创建新点
@@ -139,7 +138,6 @@ void Canvas::mousePressEvent(QMouseEvent* event) {
                 GeometricObject* targetObj = findObjNear(mousePos_);
                 if (!targetObj) {
                     clearSelections();
-                    operationSelections_.clear();
                 }
                 else{
                     targetObj->setSelected(true);
@@ -147,7 +145,6 @@ void Canvas::mousePressEvent(QMouseEvent* event) {
                     operationSelections_.push_back(targetObj);
                     if (currentOperation_->isValidInput(operationSelections_) == 1){
                         clearSelections();
-                        operationSelections_.clear();
                     }
                 }
             } else if (currentOperation_->isValidInput(operationSelections_) == 4){
@@ -173,9 +170,8 @@ void Canvas::mousePressEvent(QMouseEvent* event) {
                 }
             }
             if (currentOperation_->isValidInput(operationSelections_) == 0){ //已经符合
-                clearSelections();
                 std::set<GeometricObject*> newObject = currentOperation_->apply(operationSelections_);
-                operationSelections_.clear();
+                clearSelections();
                 for (auto obj : newObject){
                     obj->setSelected(true);
                     objects_.push_back(obj);
@@ -450,5 +446,6 @@ void Canvas::clearSelections() {
         if(obj) obj->setSelected(false);
     }
     selectedObjs_.clear();
+    operationSelections_.clear();
 }
 
