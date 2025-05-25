@@ -93,7 +93,7 @@ Qt::PenStyle Line::getPenStyle()const{
 }
 
 void Line::draw(QPainter* painter) const {
-    if (isHidden()) {
+    if (!isShown()) {
         return;
     }
     auto ppp=getTwoPoints();
@@ -137,7 +137,7 @@ double Line::distanceToLine(const QPointF& p, const std::pair<QPointF,QPointF>& 
 
 
 bool Line::isNear(const QPointF& pos) const {
-    if (isHidden()) return false; // 如果对象隐藏，则认为不在附近
+    if (!isShown()) return false; // 如果对象隐藏，则认为不在附近
     // 判断点到线段的距离是否小于容差值 (容差值考虑了线的厚度)
     return distanceToLine(pos, getTwoPoints()) < ( 1e-2 + size_ / 2.0);
 }
