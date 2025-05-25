@@ -5,26 +5,26 @@
 
 struct linelineIntersectionResult{
     QPointF p;
-    double t1,t2;
-    bool legal;
+    double t[2];//占两个线段的比例
+    bool exist;
 };
 
 struct linecircleIntersectionResult{
-    QPointF p1,p2;
-    double t1,t2;
-    bool legal;
+    QPointF p[2];//前面那个是generation_小的
+    double t[2];//两个点在线端上的比例
+    bool exist;
 };
 
 struct circlecircleIntersectionResult{
-    QPointF p1,p2;
-    bool legal;
+    QPointF p[2];//前面那个是generation_小的
+    bool exist;
 };
 
 inline linelineIntersectionResult linelineintersection(
     const std::pair<QPointF, QPointF>& AB,
     const std::pair<QPointF, QPointF>& CD)
 {
-    linelineIntersectionResult ret{QPointF(), 0.0, 0.0, false};
+    linelineIntersectionResult ret{QPointF(), {0.0, 0.0}, false};
 
     const QPointF A = AB.first;
     const QPointF B = AB.second;
@@ -49,10 +49,10 @@ inline linelineIntersectionResult linelineintersection(
     double u_numerator = AC.x() * r.y() - AC.y() * r.x();
 
     // 计算比例参数
-    ret.t1 = t_numerator / denominator;
-    ret.t2 = u_numerator / denominator;
-    ret.p = A + r * ret.t1;
-    ret.legal=true;
+    ret.t[0] = t_numerator / denominator;
+    ret.t[1] = u_numerator / denominator;
+    ret.p = A + r * ret.t[0];
+    ret.exist=true;
     return ret;
 }
 
@@ -60,7 +60,7 @@ inline linecircleIntersectionResult linecircleintersection(
     const std::pair<QPointF, QPointF>& AB,
     const std::pair<QPointF, QPointF>& OR)
 {
-    linecircleIntersectionResult result = {QPointF(), QPointF(), 0.0, 0.0, false};
+    linecircleIntersectionResult result = {{QPointF(), QPointF()},{ 0.0, 0.0}, false};
 
     // 提取直线AB的端点
     QPointF A = AB.first;
@@ -96,15 +96,15 @@ inline linecircleIntersectionResult linecircleintersection(
     double t2 = (-b - sqrtDiscriminant) / (2.0 * a);
 
     // 计算交点坐标
-    result.p1 = A + t1 * dir;
-    result.p2 = A + t2 * dir;
+    result.p[0] = A + t1 * dir;
+    result.p[1] = A + t2 * dir;
 
     // 存储参数值
-    result.t1 = t1;
-    result.t2 = t2;
+    result.t[0] = t1;
+    result.t[1] = t2;
 
     // 判断是否有有效交点（至少有一个交点在直线上）
-    result.legal = true;
+    result.exist = true;
     return result;
 }
 
@@ -112,7 +112,7 @@ inline circlecircleIntersectionResult circlecircleintersection(
     const std::pair<QPointF, QPointF>& AB,
     const std::pair<QPointF, QPointF>& OR)
 {
-    circlecircleIntersectionResult result = {QPointF(), QPointF(), false};
+    circlecircleIntersectionResult result = {{QPointF(), QPointF()}, false};
 
     // 提取圆心和半径
     QPointF A = AB.first;
@@ -144,22 +144,22 @@ inline circlecircleIntersectionResult circlecircleintersection(
 
     // 计算两个交点
     QPointF p = A + a * N;
-    result.p1 = p + h * T;
-    result.p2 = p - h * T;
+    result.p[0] = p + h * T;
+    result.p[1] = p - h * T;
 
     // 确保向量p1p2和向量AO的叉乘垂直于屏幕朝外
-    QPointF p1p2 = result.p2 - result.p1;
+    QPointF p1p2 = result.p[1] - result.p[0];
     double cross = AO.x() * p1p2.y() - AO.y() * p1p2.x();
 
     if (cross < 0) {
         // 如果叉乘方向相反，则交换p1和p2
         qDebug()<<"圆圆交点交换!";
-        std::swap(result.p1, result.p2);
+        std::swap(result.p[0], result.p[1]);
     }
     else{
         qDebug()<<"圆圆交点不换!";
     }
-    result.legal=true;
+    result.exist=true;
     return result;
 }
 
