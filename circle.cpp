@@ -4,7 +4,7 @@
 #include <QPainter>
 #include <cmath> // For std::pow, std::sqrt
 #include <QMessageBox>
-
+#include "lineoo.h"
 // 初始化全局默认值 (如果需要，这些通常在主程序或特定初始化函数中完成，
 // 但这里作为示例，假设你需要在objecttype.cpp或类似地方添加Circle的默认值)
 // extern std::map<ObjectType, QString> GetDefaultLable;
@@ -30,6 +30,24 @@ Circle::Circle(Point* centerPoint, double radius, ObjectName name)
     }
 }
 
+Qt::PenStyle Circle::getPenStyle() const {
+    // 将整数值转换为 Qt::PenStyle
+    switch (shape_) {
+    case 0: // Solid
+        return Qt::SolidLine;
+    case 1: // Dash
+        return Qt::DashLine;
+    case 2: // Dot
+        return Qt::DotLine;
+    default:
+        return Qt::SolidLine;
+    }
+}
+
+void Circle::setLineStyle(int style) {
+    shape_ = style;
+    // 可以在这里添加更新/重绘的通知
+}
 
 
 Circle::Circle(const QPointF& centerPos, double radius, ObjectName name)
@@ -63,16 +81,67 @@ void Circle::draw(QPainter* painter) const {
     QPointF center = points.first;
     double radius = QLineF(points.first, points.second).length();
 
+
+
     // 设置画笔
     QPen pen;
+
+    // 根据 hovered 状态增加线宽
+    double add = ((int)hovered_) * HOVER_ADD_WIDTH;
+
+    // 如果被选中，先绘制一个较宽的选中效果
+    if (selected_) {
+        QColor selectcolor = getColor().lighter(250);
+        selectcolor.setAlpha(128);
+        pen.setColor(selectcolor);
+        pen.setWidthF(getSize() + add + SELECTED_WIDTH);
+        pen.setStyle(Qt::SolidLine);
+        painter->setPen(pen);
+
+        // 根据圆的类型绘制选中效果
+        switch (circleType_) {
+        case CircleType::FULL_CIRCLE:
+            painter->drawEllipse(center, radius, radius);
+            // 添加标签绘制（如果有）
+            if (label_ != "") {
+                painter->setPen(Qt::black);
+                painter->drawText(center.x() + radius + 6,
+                                  center.y() - 6,
+                                  label_);
+            }
+            break;
+        case CircleType::SEMICIRCLE:
+        {
+            QRectF rect(center.x() - radius, center.y() - radius, 2 * radius, 2 * radius);
+            painter->drawArc(rect, static_cast<int>(-startAngle_ * 16), static_cast<int>(-spanAngle_ * 16));
+            break;
+        }
+        case CircleType::ARC:
+        {
+            QRectF rect(center.x() - radius, center.y() - radius, 2 * radius, 2 * radius);
+            painter->drawArc(rect, static_cast<int>(startAngle_ * 16), static_cast<int>(spanAngle_ * 16));
+            break;
+        }
+        }
+    }
+
+    // 设置正常绘制的画笔
     pen.setColor(getColor());
-    pen.setWidthF(getSize());
+    pen.setWidthF(getSize() + add); // 添加 hovered 状态的额外宽度
+    pen.setStyle(getPenStyle());    // 假设您有 getPenStyle() 方法
     painter->setPen(pen);
 
     // 根据圆的类型绘制不同形状
     switch (circleType_) {
     case CircleType::FULL_CIRCLE:
         painter->drawEllipse(center, radius, radius);
+        // 添加标签绘制（如果有）
+        if (label_ != "") {
+            painter->setPen(Qt::black);
+            painter->drawText(center.x() + radius + 6,
+                              center.y() - 6,
+                              label_);
+        }
         break;
     case CircleType::SEMICIRCLE:
         // 绘制半圆 - 使用startAngle_和spanAngle_
@@ -86,12 +155,11 @@ void Circle::draw(QPainter* painter) const {
         // Qt中角度是以1/16度为单位的，所以需要乘以16
         {
             QRectF rect(center.x() - radius, center.y() - radius, 2 * radius, 2 * radius);
-            painter->drawArc(rect, static_cast<int>(-startAngle_ * 16), static_cast<int>(-spanAngle_ * 16));
+            painter->drawArc(rect, static_cast<int>(startAngle_ * 16), static_cast<int>(spanAngle_ * 16));
             break;
         }
     }
 }
-
 
 
 bool Circle::isNear(const QPointF& pos) const {
@@ -224,26 +292,58 @@ std::set<GeometricObject*> TwoPointCircleCreator::apply(std::vector<GeometricObj
 
 
 // 1. 圆心和半径作圆
+
+
 CenterRadiusCircleCreator::CenterRadiusCircleCreator() {
-    inputType.push_back({ObjectType::Point}); // 只需要一个点作为圆心
+    // 需要三个点：前两点距离作为半径，第三点为圆心
+    inputType.push_back({ObjectType::Point, ObjectType::Point, ObjectType::Point});
     operationName = "CenterRadiusCircleCreator";
 }
+
+
 
 std::set<GeometricObject*> CenterRadiusCircleCreator::apply(std::vector<GeometricObject*> objs,
                                                              QPointF position) const {
     std::set<GeometricObject*> s;
-    if (objs.size() < 1) return s;
 
-    Point* center = dynamic_cast<Point*>(objs[0]);
-    if (!center) return s;
+    if (objs.size() < 3) {
+        qDebug() << "对象数量不足3个，返回空集";
+        return s;
+    }
 
-    // 使用position作为半径点
-    double radius = QLineF(center->position(), position).length();
+    for (int i = 0; i < objs.size(); i++) {
+        qDebug() << "对象" << i << "类型:" << static_cast<int>(objs[i]->getObjectType());
+    }
+
+    Point* p1 = dynamic_cast<Point*>(objs[0]);
+    Point* p2 = dynamic_cast<Point*>(objs[1]);
+    Point* center = dynamic_cast<Point*>(objs[2]);
+    if (!p1 || !p2 || !center) {
+        qDebug() << "类型转换失败，返回空集";
+        return s;
+    }
+
+    // 计算半径
+    double radius = QLineF(p1->position(), p2->position()).length();
+    qDebug() << "计算半径:" << radius;
+
+    // 创建圆
     Circle* circle = new Circle(center, radius);
     circle->setCircleType(CircleType::FULL_CIRCLE);
+
+    // 添加依赖关系
+    circle->addParent(p1);
+    circle->addParent(p2);
+
+    qDebug() << "创建圆对象:" << circle;
     s.insert(circle);
+    qDebug() << "返回集合大小:" << s.size();
+
     return s;
 }
+
+
+
 
 // 2. 三点作圆
 ThreePointCircleCreator::ThreePointCircleCreator() {
@@ -324,29 +424,41 @@ std::set<GeometricObject*> ArcCreator::apply(std::vector<GeometricObject*> objs,
     Circle* arc = new Circle(center, radius);
     arc->setCircleType(CircleType::ARC);
 
-    // 直接使用Qt的角度系统计算角度
+    // 计算起始点和终点的角度
     QLineF startLine(center->position(), startPoint->position());
     double startAngle = startLine.angle();
 
     QLineF endLine(center->position(), endPoint->position());
     double endAngle = endLine.angle();
 
-    // 确保结束角度大于起始角度（顺时针方向）
-    if (endAngle < startAngle) {
-        endAngle += 360.0;
-    }
+    // 计算角度差（确保在0-360度范围内）
+    double angleDiff = std::fmod(endAngle - startAngle + 360.0, 360.0);
 
-    double spanAngle = endAngle - startAngle;
+    // 计算逆时针方向的角度差
+    double ccwAngleDiff = std::fmod(startAngle - endAngle + 360.0, 360.0);
+
+    // 选择较小的角度差（小于180度的弧）
+    double spanAngle;
+    if (angleDiff <= 180.0) {
+        // 顺时针方向的弧小于180度
+        spanAngle = angleDiff;
+    } else {
+        // 逆时针方向的弧小于180度
+        // 在Qt中，负的spanAngle表示逆时针方向
+        spanAngle = -ccwAngleDiff;
+    }
 
     arc->setArcAngles(startAngle, spanAngle);
 
     // 添加依赖关系
+    arc->addParent(center);  // 添加圆心作为依赖
     arc->addParent(startPoint);
     arc->addParent(endPoint);
 
     s.insert(arc);
     return s;
 }
+
 
 
 // 4. 半圆

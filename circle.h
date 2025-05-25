@@ -11,6 +11,8 @@ enum class CircleType {
     SEMICIRCLE,       // 半圆
     ARC,              // 圆弧
 };
+
+
 class Circle : public GeometricObject {
 public:
     // 构造函数: 可以有多种，例如通过圆心点对象和半径，或通过圆心坐标和半径
@@ -72,6 +74,8 @@ public:
         startAngle_ = startAngleDegrees;
         spanAngle_ = spanAngleDegrees;
     }
+    Qt::PenStyle getPenStyle() const;
+    void setLineStyle(int style);
 
 
 private:
@@ -100,9 +104,11 @@ public:
 class CenterRadiusCircleCreator : public Operation {
 public:
     CenterRadiusCircleCreator();
+    int isValidInput(std::vector<GeometricObject*> objs) const ; // 添加这行
     std::set<GeometricObject*> apply(std::vector<GeometricObject*> objs,
-                                      QPointF position = QPointF()) const;
+                                      QPointF position = QPointF()) const override;
 };
+
 
 // 2. 三点作圆
 class ThreePointCircleCreator : public Operation {
