@@ -267,7 +267,7 @@ void MainWindow::onToolSelected(QAbstractButton *abstractButton)
         qDebug() << "模式设置为: OperationMode (工具: " << toolId << ")";
     }
 
-    if (toolId == tr("Circle (Center, Radius)") || toolId == tr("Circle (Center, Point)")){
+    if (toolId == tr("Circle (Center, Point)")){
         m_canvas->setOperation(0);
     } else if (toolId == tr("Line")){
         m_canvas->setOperation(1);
@@ -298,6 +298,5 @@ void MainWindow::onToolSelected(QAbstractButton *abstractButton)
     } else if (toolId == tr("Semicircle")){
         m_canvas->setOperation(14);
     }
-
 }
 

@@ -31,6 +31,10 @@ Canvas::Canvas(QWidget* parent) : QWidget(parent) {
     operations.push_back(new AngleBisectorCreator());
     operations.push_back(new TangentLineCreator());
     operations.push_back(new IntersectionCreator());
+    operations.push_back(new CenterRadiusCircleCreator()); // 索引11
+    operations.push_back(new ThreePointCircleCreator());   // 索引12
+    operations.push_back(new ArcCreator());               // 索引13
+    operations.push_back(new SemicircleCreator());        // 索引14
     // TODO: add other operations here.
 }
 
@@ -308,13 +312,13 @@ void Canvas::contextMenuEvent(QContextMenuEvent* event) {
         Point* point = dynamic_cast<Point*>(contextMenuObj);
         if (!point) return;
 
-        QMenu* colorMenu = menu.addMenu(tr("颜色")); // tr() 用于国际化
-        colorMenu->addAction(tr("红色"), [this, point]() { point->setColor(Qt::red); update(); });
-        colorMenu->addAction(tr("蓝色"), [this, point]() { point->setColor(Qt::blue); update(); });
-        colorMenu->addAction(tr("绿色"), [this, point]() { point->setColor(Qt::green); update(); });
-        colorMenu->addAction(tr("黑色"), [this, point]() { point->setColor(Qt::black); update(); });
-        colorMenu->addAction(tr("自定义..."), [this, point]() {
-            QColor color = QColorDialog::getColor(point->getColor(), this, tr("选择点颜色"));
+        QMenu* colorMenu = menu.addMenu(tr("color")); // tr() 用于国际化
+        colorMenu->addAction(tr("red"), [this, point]() { point->setColor(Qt::red); update(); });
+        colorMenu->addAction(tr("blue"), [this, point]() { point->setColor(Qt::blue); update(); });
+        colorMenu->addAction(tr("green"), [this, point]() { point->setColor(Qt::green); update(); });
+        colorMenu->addAction(tr("black"), [this, point]() { point->setColor(Qt::black); update(); });
+        colorMenu->addAction(tr("customize..."), [this, point]() {
+            QColor color = QColorDialog::getColor(point->getColor(), this, tr("select color"));
             if (color.isValid()) {
                 point->setColor(color);
                 update();
@@ -322,57 +326,83 @@ void Canvas::contextMenuEvent(QContextMenuEvent* event) {
         });
 
         QMenu* sizeMenu = menu.addMenu(tr("大小"));
-        sizeMenu->addAction(tr("极小"), [this, point]() { point->setSize(2); update(); });
-        sizeMenu->addAction(tr("小"),   [this, point]() { point->setSize(3); update(); });
-        sizeMenu->addAction(tr("中"),   [this, point]() { point->setSize(4); update(); });
-        sizeMenu->addAction(tr("大"),   [this, point]() { point->setSize(5); update(); });
+        sizeMenu->addAction(tr("tiny"), [this, point]() { point->setSize(2); update(); });
+        sizeMenu->addAction(tr("small"),   [this, point]() { point->setSize(3); update(); });
+        sizeMenu->addAction(tr("medium"),   [this, point]() { point->setSize(4); update(); });
+        sizeMenu->addAction(tr("large"),   [this, point]() { point->setSize(5); update(); });
 
-        menu.addAction(tr("标签..."), [this, point]() {
+        menu.addAction(tr("label..."), [this, point]() {
             bool ok;
-            QString text = QInputDialog::getText(this, tr("设置标签"), tr("标签文本:"), QLineEdit::Normal, point->getLabel(), &ok);
+            QString text = QInputDialog::getText(this, tr("set label"), tr("label:"), QLineEdit::Normal, point->getLabel(), &ok);
             if (ok) {
                 point->setLabel(text);
                 update();
             }
         });
 
-    } else if (contextMenuObj->getObjectType() == ObjectType::Circle) { // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< 新增：圆的上下文菜单
+    } else if (contextMenuObj->getObjectType() == ObjectType::Line or
+               contextMenuObj->getObjectType() == ObjectType::Lineo or
+               contextMenuObj->getObjectType() == ObjectType::Lineoo){
+
+        QMenu* colorMenu = menu.addMenu(tr("color")); // tr() 用于国际化
+        colorMenu->addAction(tr("red"), [this, contextMenuObj]() { contextMenuObj->setColor(Qt::red); update(); });
+        colorMenu->addAction(tr("blue"), [this, contextMenuObj]() { contextMenuObj->setColor(Qt::blue); update(); });
+        colorMenu->addAction(tr("green"), [this, contextMenuObj]() { contextMenuObj->setColor(Qt::green); update(); });
+        colorMenu->addAction(tr("black"), [this, contextMenuObj]() { contextMenuObj->setColor(Qt::black); update(); });
+        colorMenu->addAction(tr("customize..."), [this, contextMenuObj]() {
+            QColor color = QColorDialog::getColor(contextMenuObj->getColor(), this, tr("select color"));
+            if (color.isValid()) {
+                contextMenuObj->setColor(color);
+                update();
+            }
+        });
+
+        QMenu* sizeMenu = menu.addMenu(tr("thickness"));
+        sizeMenu->addAction(tr("thin"), [this, contextMenuObj]() { contextMenuObj->setSize(1); update(); });
+        sizeMenu->addAction(tr("medium"),   [this, contextMenuObj]() { contextMenuObj->setSize(2); update(); });
+        sizeMenu->addAction(tr("thick"),   [this, contextMenuObj]() { contextMenuObj->setSize(3); update(); });
+        sizeMenu->addAction(tr("ultra-thick"),   [this, contextMenuObj]() { contextMenuObj->setSize(4); update(); });
+
+        QMenu* shapeMenu = menu.addMenu(tr("linestyle"));
+        shapeMenu->addAction(tr("solid"), [this, contextMenuObj]() { contextMenuObj->setShape(0); update(); });
+        shapeMenu->addAction(tr("dashed"),   [this, contextMenuObj]() { contextMenuObj->setShape(1); update(); });
+        shapeMenu->addAction(tr("dotted"),   [this, contextMenuObj]() { contextMenuObj->setShape(2); update(); });
+
+        menu.addAction(tr("label..."), [this, contextMenuObj]() {
+            bool ok;
+            QString text = QInputDialog::getText(this, tr("set label"), tr("label:"), QLineEdit::Normal, contextMenuObj->getLabel(), &ok);
+            if (ok) {
+                contextMenuObj->setLabel(text);
+                update();
+            }
+        });
+    }
+    else if (contextMenuObj->getObjectType() == ObjectType::Circle) { // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< 新增：圆的上下文菜单
         Circle* circle = dynamic_cast<Circle*>(contextMenuObj);
         if (!circle) return;
 
-        QMenu* colorMenu = menu.addMenu(tr("线条颜色"));
-        colorMenu->addAction(tr("红色"), [this, circle]() { circle->setColor(Qt::red); update(); });
-        colorMenu->addAction(tr("蓝色"), [this, circle]() { circle->setColor(Qt::blue); update(); });
-        colorMenu->addAction(tr("绿色"), [this, circle]() { circle->setColor(Qt::green); update(); });
-        colorMenu->addAction(tr("黑色"), [this, circle]() { circle->setColor(Qt::black); update(); });
-        colorMenu->addAction(tr("自定义..."), [this, circle]() {
-            QColor color = QColorDialog::getColor(circle->getColor(), this, tr("选择圆线条颜色"));
+        QMenu* colorMenu = menu.addMenu(tr("color"));
+        colorMenu->addAction(tr("red"), [this, circle]() { circle->setColor(Qt::red); update(); });
+        colorMenu->addAction(tr("blue"), [this, circle]() { circle->setColor(Qt::blue); update(); });
+        colorMenu->addAction(tr("green"), [this, circle]() { circle->setColor(Qt::green); update(); });
+        colorMenu->addAction(tr("black"), [this, circle]() { circle->setColor(Qt::black); update(); });
+        colorMenu->addAction(tr("customize..."), [this, circle]() {
+            QColor color = QColorDialog::getColor(circle->getColor(), this, tr("select color"));
             if (color.isValid()) {
                 circle->setColor(color);
                 update();
             }
         });
 
-        QMenu* lineWidthMenu = menu.addMenu(tr("线条宽度"));
-        lineWidthMenu->addAction("1px", [this, circle]() { circle->setSize(1.0); update(); });
-        lineWidthMenu->addAction("2px", [this, circle]() { circle->setSize(2.0); update(); });
-        lineWidthMenu->addAction("3px", [this, circle]() { circle->setSize(3.0); update(); });
-        lineWidthMenu->addAction("5px", [this, circle]() { circle->setSize(5.0); update(); });
+        QMenu* lineWidthMenu = menu.addMenu(tr("thickness"));
+        lineWidthMenu->addAction("thin", [this, circle]() { circle->setSize(1.0); update(); });
+        lineWidthMenu->addAction("medium", [this, circle]() { circle->setSize(2.0); update(); });
+        lineWidthMenu->addAction("thick", [this, circle]() { circle->setSize(3.0); update(); });
+        lineWidthMenu->addAction("ultra-thick", [this, circle]() { circle->setSize(4.0); update(); });
 
-
-        menu.addAction(tr("编辑半径..."), [this, circle]() {
+        menu.addAction(tr("label..."), [this, circle]() {
             bool ok;
-            double currentRadius = circle->getRadius();
-            double newRadius = QInputDialog::getDouble(this, tr("设置半径"), tr("半径:"), currentRadius, 0.1, 10000.0, 2, &ok);
-            if (ok && newRadius > 0) {
-                circle->setRadius(newRadius);
-                update();
-            }
-        });
-
-        menu.addAction(tr("标签..."), [this, circle]() {
-            bool ok;
-            QString text = QInputDialog::getText(this, tr("设置标签"), tr("标签文本:"), QLineEdit::Normal, circle->getLabel(), &ok);
+            QString text = QInputDialog::getText(this, tr("set label"), tr("label:"), QLineEdit::Normal, circle->getLabel(), &ok);
             if (ok) {
                 circle->setLabel(text);
                 update();
