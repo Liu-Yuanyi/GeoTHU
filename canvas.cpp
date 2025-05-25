@@ -273,12 +273,18 @@ void Canvas::paintEvent(QPaintEvent* event) {
 
     // 绘制所有正式的几何对象
     for (const auto* obj : objects_) {
-        if (obj && !obj->isHidden()) { // 检查对象是否存在且未隐藏
+        obj->position();
+    }
+    for (const auto* obj : objects_) {
+        if (!obj->isHidden() and obj->getObjectType() != ObjectType::Point){
             obj->draw(&painter);
         }
     }
-
-    // 未来可以添加其他预览元素的绘制，如选择框、辅助线等
+    for (const auto* obj : objects_) {
+        if (!obj->isHidden() and obj->getObjectType() == ObjectType::Point){
+            obj->draw(&painter);
+        }
+    }
 }
 
 void Canvas::contextMenuEvent(QContextMenuEvent* event) {
