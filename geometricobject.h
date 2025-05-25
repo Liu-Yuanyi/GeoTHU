@@ -31,7 +31,7 @@ public:
     virtual std::pair<const QPointF, const QPointF> getTwoPoints() const;
 
     // --- Status Getters ---
-    bool isShown()const {return !legal_ && !hidden_;}
+    bool isShown()const {return legal_ && !hidden_;}
     bool isSelected() const { return selected_; }
     bool isHidden() const { return hidden_; }
     bool isLegal() const { return legal_; }
