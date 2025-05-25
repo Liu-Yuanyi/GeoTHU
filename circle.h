@@ -76,7 +76,8 @@ public:
     }
     Qt::PenStyle getPenStyle() const;
     void setLineStyle(int style);
-
+    // 设置三点作圆模式
+    void setThreePointMode(Point* p1, Point* p2, Point* p3);
 
 private:
     Point* centerPoint_;     // 可选：如果圆心是一个独立的Point对象
@@ -91,6 +92,9 @@ private:
 
     // 辅助函数，用于更新centerPosition_（如果centerPoint_存在）
     void updateCenterPositionFromPoint();
+
+    bool threePointMode_ = false;
+    Point* threePoints_[3] = {nullptr, nullptr, nullptr};
 };
 
 class TwoPointCircleCreator: public Operation {
@@ -104,7 +108,6 @@ public:
 class CenterRadiusCircleCreator : public Operation {
 public:
     CenterRadiusCircleCreator();
-    int isValidInput(std::vector<GeometricObject*> objs) const ; // 添加这行
     std::set<GeometricObject*> apply(std::vector<GeometricObject*> objs,
                                       QPointF position = QPointF()) const override;
 };

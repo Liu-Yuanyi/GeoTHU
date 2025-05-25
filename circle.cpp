@@ -206,6 +206,49 @@ std::pair<const QPointF, const QPointF> Circle::getTwoPoints() const {
         }
     }
 
+    // 三点作圆特殊处理
+    if (threePointMode_ && threePoints_[0] && threePoints_[1] && threePoints_[2]) {
+        QPointF pos1 = threePoints_[0]->position();
+        QPointF pos2 = threePoints_[1]->position();
+        QPointF pos3 = threePoints_[2]->position();
+
+        // 使用三点确定圆的公式计算圆心
+        double A = pos1.x() * (pos2.y() - pos3.y()) - pos1.y() * (pos2.x() - pos3.x()) + pos2.x() * pos3.y() - pos3.x() * pos2.y();
+
+        // 检查三点是否共线
+        if (std::abs(A) < 1e-10) {
+            legal_ = false;
+            return std::make_pair(QPointF(), QPointF(1, 1));
+        }
+
+        double B = (pos1.x() * pos1.x() + pos1.y() * pos1.y()) * (pos3.y() - pos2.y()) +
+                   (pos2.x() * pos2.x() + pos2.y() * pos2.y()) * (pos1.y() - pos3.y()) +
+                   (pos3.x() * pos3.x() + pos3.y() * pos3.y()) * (pos2.y() - pos1.y());
+        double C = (pos1.x() * pos1.x() + pos1.y() * pos1.y()) * (pos2.x() - pos3.x()) +
+                   (pos2.x() * pos2.x() + pos2.y() * pos2.y()) * (pos3.x() - pos1.x()) +
+                   (pos3.x() * pos3.x() + pos3.y() * pos3.y()) * (pos1.x() - pos2.x());
+
+        QPointF calculatedCenter(-B / (2 * A), -C / (2 * A));
+        double calculatedRadius = QLineF(calculatedCenter, pos1).length();
+
+        return std::make_pair(calculatedCenter, QPointF(calculatedCenter.x() + calculatedRadius, calculatedCenter.y()));
+    }
+    //点加半径情况
+    else if (parents_.size() == 3) {
+        // 尝试获取三个父对象作为点
+        Point* p1 = dynamic_cast<Point*>(parents_[2]);
+        Point* p2 = dynamic_cast<Point*>(parents_[1]);
+        Point* center = dynamic_cast<Point*>(parents_[0]);
+
+        if (p1 && p2 && center) {
+            // 计算半径
+            double dynamicRadius = QLineF(p1->position(), p2->position()).length();
+            // 返回圆心和半径点
+            QPointF centerPos = center->position();
+            return std::make_pair(centerPos, QPointF(centerPos.x() + dynamicRadius, centerPos.y()));
+        }
+    }
+
     QPointF center;
     QPointF radiusPoint;
 
@@ -263,6 +306,8 @@ void Circle::setCenterCoordinates(const QPointF& centerPos) {
     // 触发重绘或更新
 }
 
+
+
 void Circle::setRadius(double radius) {
     if (radius > 0) {
         radius_ = radius;
@@ -311,10 +356,6 @@ std::set<GeometricObject*> CenterRadiusCircleCreator::apply(std::vector<Geometri
         return s;
     }
 
-    for (int i = 0; i < objs.size(); i++) {
-        qDebug() << "对象" << i << "类型:" << static_cast<int>(objs[i]->getObjectType());
-    }
-
     Point* p1 = dynamic_cast<Point*>(objs[0]);
     Point* p2 = dynamic_cast<Point*>(objs[1]);
     Point* center = dynamic_cast<Point*>(objs[2]);
@@ -331,13 +372,11 @@ std::set<GeometricObject*> CenterRadiusCircleCreator::apply(std::vector<Geometri
     Circle* circle = new Circle(center, radius);
     circle->setCircleType(CircleType::FULL_CIRCLE);
 
-    // 添加依赖关系
-    circle->addParent(p1);
-    circle->addParent(p2);
-
+    circle->addParent(p1);     // 添加第一个点作为父对象
+    circle->addParent(p2);     // 添加第二个点作为父对象
+    circle->addParent(center); // 这个已经在Circle构造函数中添加了
     qDebug() << "创建圆对象:" << circle;
     s.insert(circle);
-    qDebug() << "返回集合大小:" << s.size();
 
     return s;
 }
@@ -345,7 +384,20 @@ std::set<GeometricObject*> CenterRadiusCircleCreator::apply(std::vector<Geometri
 
 
 
+
 // 2. 三点作圆
+void Circle::setThreePointMode(Point* p1, Point* p2, Point* p3) {
+    threePointMode_ = true;
+    threePoints_[0] = p1;
+    threePoints_[1] = p2;
+    threePoints_[2] = p3;
+
+    // 添加父子关系
+    this->addParent(p1);
+    this->addParent(p2);
+    this->addParent(p3);
+}
+
 ThreePointCircleCreator::ThreePointCircleCreator() {
     inputType.push_back({ObjectType::Point, ObjectType::Point, ObjectType::Point});
     operationName = "ThreePointCircleCreator";
@@ -362,44 +414,21 @@ std::set<GeometricObject*> ThreePointCircleCreator::apply(std::vector<GeometricO
 
     if (!p1 || !p2 || !p3) return s;
 
-    // 计算三点确定的圆的圆心和半径
-    QPointF pos1 = p1->position();
-    QPointF pos2 = p2->position();
-    QPointF pos3 = p3->position();
-
-    // 使用三点确定圆的公式计算圆心
-    double A = pos1.x() * (pos2.y() - pos3.y()) - pos1.y() * (pos2.x() - pos3.x()) + pos2.x() * pos3.y() - pos3.x() * pos2.y();
-    double B = (pos1.x() * pos1.x() + pos1.y() * pos1.y()) * (pos3.y() - pos2.y()) +
-               (pos2.x() * pos2.x() + pos2.y() * pos2.y()) * (pos1.y() - pos3.y()) +
-               (pos3.x() * pos3.x() + pos3.y() * pos3.y()) * (pos2.y() - pos1.y());
-    double C = (pos1.x() * pos1.x() + pos1.y() * pos1.y()) * (pos2.x() - pos3.x()) +
-               (pos2.x() * pos2.x() + pos2.y() * pos2.y()) * (pos3.x() - pos1.x()) +
-               (pos3.x() * pos3.x() + pos3.y() * pos3.y()) * (pos1.x() - pos2.x());
-
-    // 检查三点是否共线（A接近0）
-    if (std::abs(A) < 1e-10) return s;
-
-    double centerX = -B / (2 * A);
-    double centerY = -C / (2 * A);
-    QPointF center(centerX, centerY);
-
-    // 计算半径
-    double radius = QLineF(center, pos1).length();
+    // 创建一个临时圆心点（可以放在任意位置，因为会被动态计算覆盖）
+    Point* tempCenter = new Point(QPointF(0, 0));
 
     // 创建圆
-    Point* centerPoint = new Point(center);
-    Circle* circle = new Circle(centerPoint, radius);
+    Circle* circle = new Circle(tempCenter, 1.0);  // 半径也会被动态计算覆盖
     circle->setCircleType(CircleType::FULL_CIRCLE);
 
-    // 添加依赖关系
-    circle->addParent(p1);
-    circle->addParent(p2);
-    circle->addParent(p3);
+    // 设置为三点模式
+    circle->setThreePointMode(p1, p2, p3);
 
-    s.insert(centerPoint);
+    s.insert(tempCenter);
     s.insert(circle);
     return s;
 }
+
 
 // 3. 圆弧
 ArcCreator::ArcCreator() {

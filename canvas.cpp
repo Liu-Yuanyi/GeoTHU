@@ -232,8 +232,12 @@ void Canvas::mouseMoveEvent(QMouseEvent* event) {
                         // 那么圆的位置应该通过其父 Point 对象的移动来更新。
                         // 这里处理的是直接拖动圆对象本身（如果它的圆心不是一个独立的、被选中的 Point）。
                         if (!circle->getCenterPoint() || !selectedObjs_.count(circle->getCenterPoint())) {
-                            // 假设 Circle 有 setCenterCoordinates 方法
-                            circle->setCenterCoordinates(newPos); // newPos 在这里代表圆心的新位置
+                            // 获取当前圆心位置
+                            QPointF currentCenter = circle->getCenterCoordinates();
+                            // 计算新的圆心位置 = 当前圆心 + 拖动偏移量
+                            QPointF newCenter = currentCenter + delta;
+                            // 更新圆心位置
+                            circle->setCenterCoordinates(newCenter);
                         }
                     }
                 }
