@@ -60,50 +60,44 @@ inline linecircleIntersectionResult linecircleintersection(
     const std::pair<QPointF, QPointF>& AB,
     const std::pair<QPointF, QPointF>& OR)
 {
-    linecircleIntersectionResult result = {{QPointF(), QPointF()},{ 0.0, 0.0}, false};
+    linecircleIntersectionResult result = {{QPointF(), QPointF()}, {0.0, 0.0}, false};
 
-    // 提取直线AB的端点
+    // 直线上两点
     QPointF A = AB.first;
     QPointF B = AB.second;
-
-    // 提取圆心O和半径向量R
+    // 圆心和圆上某点：用来确定半径
     QPointF O = OR.first;
     QPointF R = OR.second;
-    double radius = len(R-O);
+    double radius = len(R - O);
 
-    // 计算直线参数方程 P = A + t(B-A) 中的向量
+    // 使用 A - O 形成正确的一元二次方程：|A + t(B-A) - O|^2 = r^2
     QPointF dir = B - A;
-    QPointF AO = O - A;
-
-    // 计算参数方程中的系数
+    QPointF AO = A - O;
     double a = QPointF::dotProduct(dir, dir);
-    double b = 2.0 * QPointF::dotProduct(AO, dir);
+    double b = 2.0 * QPointF::dotProduct(dir, AO);
     double c = QPointF::dotProduct(AO, AO) - radius * radius;
 
-    // 计算判别式
     double discriminant = b * b - 4 * a * c;
-
-    // 处理判别式的情况
     if (discriminant < 0) {
-        // 无交点
         return result;
     }
 
     double sqrtDiscriminant = std::sqrt(discriminant);
-
-    // 计算参数t1和t2
     double t1 = (-b + sqrtDiscriminant) / (2.0 * a);
     double t2 = (-b - sqrtDiscriminant) / (2.0 * a);
 
-    // 计算交点坐标
-    result.p[0] = A + t1 * dir;
-    result.p[1] = A + t2 * dir;
-
-    // 存储参数值
-    result.t[0] = t1;
-    result.t[1] = t2;
-
-    // 判断是否有有效交点（至少有一个交点在直线上）
+    // 按 t 值排序，确保 p[0] 对应较小的 t
+    if (t1 <= t2) {
+        result.t[0] = t1;
+        result.t[1] = t2;
+        result.p[0] = A + t1 * dir;
+        result.p[1] = A + t2 * dir;
+    } else {
+        result.t[0] = t2;
+        result.t[1] = t1;
+        result.p[0] = A + t2 * dir;
+        result.p[1] = A + t1 * dir;
+    }
     result.exist = true;
     return result;
 }
