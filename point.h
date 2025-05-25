@@ -5,7 +5,7 @@
 #include <QPointF>
 #include <QColor>
 
-inline qreal len(QPointF p){
+inline qreal len(const QPointF& p){
     return sqrt(p.x()*p.x()+p.y()+p.y());
 }
 
