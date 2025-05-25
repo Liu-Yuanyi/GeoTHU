@@ -74,7 +74,7 @@ protected:
 
     bool selected_;
     bool hovered_;
-    bool legal_;
+    mutable bool legal_;
     bool hidden_;
     std::vector<GeometricObject*> parents_ = {};
     std::vector<GeometricObject*> children_ = {};

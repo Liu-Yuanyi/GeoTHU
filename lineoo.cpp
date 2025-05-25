@@ -95,6 +95,13 @@ QPointF Lineoo::position() const {
 }
 
 std::pair<const QPointF,const QPointF> Lineoo::getTwoPoints() const{
+    legal_=true;
+    for(auto iter:parents_){
+        if(!iter->isLegal()){
+            legal_=false;
+            return std::make_pair(QPointF(),QPointF(1,1));
+        }
+    }
     switch(generation_){
     case 0:return std::make_pair(parents_[0]->position(),parents_[1]->position());
     default:

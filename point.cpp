@@ -1,5 +1,6 @@
 #include "point.h"
 #include "objecttype.h"
+#include "intersectioncalculator.h"
 inline const qreal footRatio(QPointF P, std::pair<QPointF, QPointF> line, ObjectType mode=ObjectType::Line) {
     const QPointF& A = line.first;
     const QPointF& B = line.second;
@@ -126,6 +127,13 @@ bool Point::isNear(const QPointF& clickPos) const {
 }
 
 QPointF Point::position() const{
+    legal_=true;
+    for(auto iter:parents_){
+        if(!iter->isLegal()){
+            legal_=false;
+            return QPointF();
+        }
+    }
     switch(generation_){
     case 0:{
         return position_;
@@ -141,6 +149,19 @@ QPointF Point::position() const{
         expectParentNum(1);
         auto ppp=parents_[0]->getTwoPoints();
         return ppp.first+position_*len(ppp.second-ppp.first)/len(position_);
+    }
+    case 5:case 6:case 7:case 8:case 9:case 10:case 11:case 12:case 13:{
+        expectParentNum(2);
+        int range1=(generation_-5)/3,range2=(generation_-5)%3;//两根line的限度
+        auto res=linelineintersection(parents_[0]->getTwoPoints(),parents_[1]->getTwoPoints());
+
+        if(
+            range1==1&&res.t1<0 || range1==2&&(res.t1<0||res.t1>1)
+            ||  range2==1&&res.t2<0 || range2==2&&(res.t2<0||res.t2>1)){
+            legal_=false;
+        }
+        return res.p;
+        break;
     }
     case 30:{
         QPointF P1, P2;
