@@ -284,6 +284,8 @@ void MainWindow::onToolSelected(QAbstractButton *abstractButton)
         m_canvas->setOperation(7);
     } else if (toolId == tr("Angle Bisector")){
         m_canvas->setOperation(8);
+    } else if (toolId == tr("Tangents")){
+        m_canvas->setOperation(9);
     }
 }
 

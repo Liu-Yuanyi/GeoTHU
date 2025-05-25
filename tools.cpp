@@ -73,4 +73,22 @@ std::set<GeometricObject*> AngleBisectorCreator::apply(std::vector<GeometricObje
     return ret;
 }
 
+TangentLineCreator::TangentLineCreator(){
+    inputType.push_back(std::vector<ObjectType>{ObjectType::Point, ObjectType::Circle});
+    operationName = "TangentLineCreator";
+}
 
+std::set<GeometricObject*> TangentLineCreator::apply(std::vector<GeometricObject*> objs,
+                                                        QPointF position) const {
+    Circle* circle = dynamic_cast<Circle*>(objs[1]);
+    QPointF p1 = objs[0]->position(), p2 = circle->position();
+    double radius = circle->getRadius();
+    double dist = std::sqrt(std::pow(p1.x() - p2.x(), 2) + std::pow(p1.y() - p2.y(), 2));
+    if (radius > dist) {
+        return std::set<GeometricObject*>();
+    } else if (radius == dist) {
+        return std::set<GeometricObject*>{new Line(objs, 7)};
+    } else {
+        return std::set<GeometricObject*>{new Line(objs, 8), new Line(objs, 9)};
+    }
+}

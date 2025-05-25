@@ -28,6 +28,7 @@ Canvas::Canvas(QWidget* parent) : QWidget(parent) {
     operations.push_back(new MidpointCreator());
     operations.push_back(new PerpendicularLineCreator());
     operations.push_back(new AngleBisectorCreator());
+    operations.push_back(new TangentLineCreator());
     // TODO: add other operations here.
 }
 

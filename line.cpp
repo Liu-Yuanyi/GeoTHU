@@ -4,6 +4,7 @@
 #include <cmath>       // 用于 sqrt, fabs, pow
 #include "lineoo.h"
 #include "geometricobject.h"
+#include "circle.h"
 
 void drawExtendedLine(QPainter* painter, const QPointF& p1, const QPointF& p2) {
     QRectF bounds = painter->viewport();
@@ -179,13 +180,45 @@ std::pair<const QPointF,const QPointF> Line::getTwoPoints() const{
     case 6:{
         expectParentNum(2);
         QPointF P1 = parents_[0]->position();
-        auto p=parents_[1]->getTwoPoints();
+        auto p = parents_[1]->getTwoPoints();
         QPointF P2 = p.first, P3 = p.second;
         if (P2.y() == P3.y()){
             return std::make_pair(P1, QPointF(P1.x(), P2.y() + 200));
         } else {
             return std::make_pair(P1, QPointF(P3.y() - P2.y() + P1.x(), P1.y() + P2.x() - P3.x()));
         }
+    }
+    case 7:{
+        expectParentNum(2);
+        QPointF P2 = parents_[1]->position(), P3 = parents_[0]->position();
+        QPointF P1 = P3;
+        if (P2.y() == P3.y()){
+            return std::make_pair(P1, QPointF(P1.x(), P2.y() + 200));
+        } else {
+            return std::make_pair(P1, QPointF(P3.y() - P2.y() + P1.x(), P1.y() + P2.x() - P3.x()));
+        }
+    }
+    case 8:{
+        expectParentNum(2);
+        Circle* circle = dynamic_cast<Circle*>(parents_[1]);
+        QPointF P1 = parents_[0]->position(), P2 = circle->position();
+        double radius = circle->getRadius();
+        double dist1 = std::sqrt(std::pow(P1.x() - P2.x(), 2) + std::pow(P1.y() - P2.y(), 2));
+        double dist2 = std::sqrt(dist1 * dist1 - radius * radius);
+        QPointF direction1 = P2 - P1, direction2 = QPointF(-direction1.y(), direction1.x());
+        QPointF P3 = P1 + direction1 * dist2 / dist1 + direction2 * radius / dist1;
+        return std::make_pair(P1, P3);
+    }
+    case 9:{
+        expectParentNum(2);
+        Circle* circle = dynamic_cast<Circle*>(parents_[1]);
+        QPointF P1 = parents_[0]->position(), P2 = circle->position();
+        double radius = circle->getRadius();
+        double dist1 = std::sqrt(std::pow(P1.x() - P2.x(), 2) + std::pow(P1.y() - P2.y(), 2));
+        double dist2 = std::sqrt(dist1 * dist1 - radius * radius);
+        QPointF direction1 = P2 - P1, direction2 = QPointF(-direction1.y(), direction1.x());
+        QPointF P3 = P1 + direction1 * dist2 / dist1 - direction2 * radius / dist1;
+        return std::make_pair(P1, P3);
     }
     default:
         break;
