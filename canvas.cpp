@@ -10,6 +10,7 @@
 #include "lineoo.h"
 #include "tools.h"
 #include "intersectioncreator.h"
+#include <stack>
 
 // 假设你的 ObjectType 和 ObjectName 在 "objecttype.h" (或其他地方) 定义，并且 GetDefault... 映射存在
 // extern std::map<ObjectType, QColor> GetDefaultColor;
@@ -325,7 +326,7 @@ void Canvas::contextMenuEvent(QContextMenuEvent* event) {
             }
         });
 
-        QMenu* sizeMenu = menu.addMenu(tr("大小"));
+        QMenu* sizeMenu = menu.addMenu(tr("size"));
         sizeMenu->addAction(tr("tiny"), [this, point]() { point->setSize(2); update(); });
         sizeMenu->addAction(tr("small"),   [this, point]() { point->setSize(3); update(); });
         sizeMenu->addAction(tr("medium"),   [this, point]() { point->setSize(4); update(); });
@@ -413,42 +414,42 @@ void Canvas::contextMenuEvent(QContextMenuEvent* event) {
     // --- 通用菜单项 (适用于所有可选中的对象) ---
     menu.addSeparator(); // 分隔线
 
-    if (contextMenuObj->isHidden()) {
-        menu.addAction(tr("显示对象"), [this, contextMenuObj]() {
-            contextMenuObj->setHidden(false);
-            update();
-        });
-    } else {
-        menu.addAction(tr("隐藏对象"), [this, contextMenuObj]() {
-            contextMenuObj->setHidden(true);
-            // 如果隐藏了对象，可能需要取消其选中状态
-            // contextMenuObj->setSelected(false);
-            // selectedObjs_.erase(contextMenuObj);
-            update();
-        });
-    }
+    menu.addAction(tr("hide"), [this, contextMenuObj]() {
+        contextMenuObj->setHidden(true);
+        contextMenuObj->setSelected(false);
+        selectedObjs_.erase(contextMenuObj);
+        update();
+    });
+
 
     // 删除操作 (作用于所有当前选中的对象)
-    if (!selectedObjs_.empty()) {
-        menu.addAction(tr("删除选中对象"), [this]() {
-            // 创建一个要删除对象的副本，因为在遍历时修改集合可能导致问题
-            std::vector<GeometricObject*> toDelete(selectedObjs_.begin(), selectedObjs_.end());
-            selectedObjs_.clear(); // 清空选中集合
 
-            for (GeometricObject* obj : toDelete) {
-                // 从 objects_ 列表中移除
-                objects_.erase(std::remove(objects_.begin(), objects_.end(), obj), objects_.end());
-                // 如果 obj 是 hoveredObj_，重置它
-                if (hoveredObj_ == obj) {
-                    hoveredObj_ = nullptr;
+    menu.addAction(tr("delete"), [this]() {
+        // 创建一个要删除对象的副本，因为在遍历时修改集合可能导致问题
+        std::vector<GeometricObject*> toDelete(selectedObjs_.begin(), selectedObjs_.end());
+        selectedObjs_.clear(); // 清空选中集合
+
+        for (GeometricObject* obj : toDelete) {
+            // 从 objects_ 列表中移除
+            std::stack<GeometricObject*> s;
+            s.push(obj);
+            while (!s.empty()){
+                GeometricObject* curObj = s.top();
+                s.pop();
+                auto iter = std::find(objects_.begin(), objects_.end(), curObj);
+                if (iter != objects_.end()){
+                    objects_.erase(iter);
+                    auto children = curObj->getChildren();
+                    for (auto child : children){
+                        s.push(child);
+                    }
+                    delete curObj;
                 }
-                // TODO: 处理父子关系解除！如果被删除的对象是其他对象的父对象（例如点是圆心），
-                // 需要通知子对象。GeometricObject的析构函数或removeParent/Child应该处理。
-                delete obj; // 释放对象内存
             }
-            update();
-        });
-    }
+        }
+        update();
+    });
+
 
 
     if (!menu.isEmpty()) { // 如果菜单中有任何项，则显示它
@@ -487,4 +488,3 @@ void Canvas::clearSelections() {
     selectedObjs_.clear();
     operationSelections_.clear();
 }
-
