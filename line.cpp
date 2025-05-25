@@ -224,7 +224,7 @@ std::pair<const QPointF,const QPointF> Line::getTwoPoints() const{
         break;
     }
     QMessageBox::warning(nullptr, "警告", "lineoo的getTwoPoint方法没有完成!");
-    return std::make_pair(QPointF(),QPointF());
+    return std::make_pair(QPointF(),QPointF(1,1));
 }
 
 LineCreator::LineCreator(){
