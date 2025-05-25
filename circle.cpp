@@ -1,6 +1,7 @@
 #include "circle.h"
 #include <QPen>
 #include <QBrush>
+#include <QPainter>
 #include <cmath> // For std::pow, std::sqrt
 #include <QMessageBox>
 
@@ -13,16 +14,23 @@
 // ... 你可能需要在某处初始化这些map中关于Circle的条目 ...
 
 Circle::Circle(Point* centerPoint, double radius, ObjectName name)
-    : GeometricObject(name), centerPoint_(centerPoint), pointOnCircle_(nullptr), centerPosition_(), radius_(radius > 0 ? radius : 10.0) { // 半径至少为正
+    : GeometricObject(name),
+    centerPoint_(centerPoint),
+    pointOnCircle_(nullptr),
+    centerPosition_(),
+    radius_(radius > 0 ? radius : 10.0),
+    circleType_(CircleType::FULL_CIRCLE),
+    startAnglePoint_(),
+    endAnglePoint_(),
+    startAngle_(0.0),
+    spanAngle_(360.0) {
     if (centerPoint_) {
-        this->addParent(centerPoint_); // 将圆心点设为父对象
+        this->addParent(centerPoint_);
         updateCenterPositionFromPoint();
     }
-    // 从全局默认值或特定逻辑设置颜色、标签等
-    // color_ = GetDefaultColor[getObjectType()]; // 示例
-    // label_ = GetDefaultLable[getObjectType()]; // 示例
-    // size_ = GetDefaultSize[getObjectType()];   // 示例 (可能代表线宽)
 }
+
+
 
 Circle::Circle(const QPointF& centerPos, double radius, ObjectName name)
     : GeometricObject(name), centerPoint_(nullptr), pointOnCircle_(nullptr), centerPosition_(centerPos), radius_(radius > 0 ? radius : 10.0) {
@@ -47,37 +55,43 @@ Circle::~Circle() {
 }
 
 void Circle::draw(QPainter* painter) const {
-    if (!painter || isHidden()) {
-        return;
-    }
+    if (isHidden()) return;
 
-    // 使用 getTwoPoints 获取圆心和半径点
+    // 获取圆心和半径
     auto points = getTwoPoints();
-    QPointF currentCenter = points.first;
-    double currentRadius = QLineF(points.first, points.second).length();
+    QPointF center = points.first;
+    double radius = QLineF(points.first, points.second).length();
 
-    QPen pen(getColor());
+    // 设置画笔
+    QPen pen;
+    pen.setColor(getColor());
     pen.setWidthF(getSize());
-    int lineStyle = getShape(); // 获取存储的线型
-    if (lineStyle == 1) { // LineStyle::Dashed
-        pen.setStyle(Qt::DashLine);
-    } else if (lineStyle == 2) { // LineStyle::Dotted
-        pen.setStyle(Qt::DotLine);
-    }
-    else { // 默认为 LineStyle::Solid 或 0
-        pen.setStyle(Qt::SolidLine);
-    }
-
     painter->setPen(pen);
-    painter->setBrush(Qt::NoBrush); // 圆通常不填充
 
-    double diameter = 2 * currentRadius;
-    painter->drawEllipse(currentCenter.x() - currentRadius, currentCenter.y() - currentRadius, diameter, diameter);
-
-    if (!getLabel().isEmpty()) {
-        painter->drawText(currentCenter + QPointF(currentRadius / 2, -currentRadius / 2), getLabel());
+    // 根据圆的类型绘制不同形状
+    switch (circleType_) {
+    case CircleType::FULL_CIRCLE:
+        painter->drawEllipse(center, radius, radius);
+        break;
+    case CircleType::SEMICIRCLE:
+        // 绘制半圆 - 使用startAngle_和spanAngle_
+        {
+            QRectF rect(center.x() - radius, center.y() - radius, 2 * radius, 2 * radius);
+            painter->drawArc(rect, static_cast<int>(-startAngle_ * 16), static_cast<int>(-spanAngle_ * 16));
+            break;
+        }
+    case CircleType::ARC:
+        // 绘制圆弧 - 使用startAngle_和spanAngle_
+        // Qt中角度是以1/16度为单位的，所以需要乘以16
+        {
+            QRectF rect(center.x() - radius, center.y() - radius, 2 * radius, 2 * radius);
+            painter->drawArc(rect, static_cast<int>(-startAngle_ * 16), static_cast<int>(-spanAngle_ * 16));
+            break;
+        }
     }
 }
+
+
 
 bool Circle::isNear(const QPointF& pos) const {
     if (isHidden()) return false;
@@ -206,3 +220,182 @@ std::set<GeometricObject*> TwoPointCircleCreator::apply(std::vector<GeometricObj
     s.insert(new Circle(p1, p2));
     return s;
 }
+
+
+// 1. 圆心和半径作圆
+CenterRadiusCircleCreator::CenterRadiusCircleCreator() {
+    inputType.push_back({ObjectType::Point}); // 只需要一个点作为圆心
+    operationName = "CenterRadiusCircleCreator";
+}
+
+std::set<GeometricObject*> CenterRadiusCircleCreator::apply(std::vector<GeometricObject*> objs,
+                                                             QPointF position) const {
+    std::set<GeometricObject*> s;
+    if (objs.size() < 1) return s;
+
+    Point* center = dynamic_cast<Point*>(objs[0]);
+    if (!center) return s;
+
+    // 使用position作为半径点
+    double radius = QLineF(center->position(), position).length();
+    Circle* circle = new Circle(center, radius);
+    circle->setCircleType(CircleType::FULL_CIRCLE);
+    s.insert(circle);
+    return s;
+}
+
+// 2. 三点作圆
+ThreePointCircleCreator::ThreePointCircleCreator() {
+    inputType.push_back({ObjectType::Point, ObjectType::Point, ObjectType::Point});
+    operationName = "ThreePointCircleCreator";
+}
+
+std::set<GeometricObject*> ThreePointCircleCreator::apply(std::vector<GeometricObject*> objs,
+                                                           QPointF position) const {
+    std::set<GeometricObject*> s;
+    if (objs.size() < 3) return s;
+
+    Point* p1 = dynamic_cast<Point*>(objs[0]);
+    Point* p2 = dynamic_cast<Point*>(objs[1]);
+    Point* p3 = dynamic_cast<Point*>(objs[2]);
+
+    if (!p1 || !p2 || !p3) return s;
+
+    // 计算三点确定的圆的圆心和半径
+    QPointF pos1 = p1->position();
+    QPointF pos2 = p2->position();
+    QPointF pos3 = p3->position();
+
+    // 使用三点确定圆的公式计算圆心
+    double A = pos1.x() * (pos2.y() - pos3.y()) - pos1.y() * (pos2.x() - pos3.x()) + pos2.x() * pos3.y() - pos3.x() * pos2.y();
+    double B = (pos1.x() * pos1.x() + pos1.y() * pos1.y()) * (pos3.y() - pos2.y()) +
+               (pos2.x() * pos2.x() + pos2.y() * pos2.y()) * (pos1.y() - pos3.y()) +
+               (pos3.x() * pos3.x() + pos3.y() * pos3.y()) * (pos2.y() - pos1.y());
+    double C = (pos1.x() * pos1.x() + pos1.y() * pos1.y()) * (pos2.x() - pos3.x()) +
+               (pos2.x() * pos2.x() + pos2.y() * pos2.y()) * (pos3.x() - pos1.x()) +
+               (pos3.x() * pos3.x() + pos3.y() * pos3.y()) * (pos1.x() - pos2.x());
+
+    // 检查三点是否共线（A接近0）
+    if (std::abs(A) < 1e-10) return s;
+
+    double centerX = -B / (2 * A);
+    double centerY = -C / (2 * A);
+    QPointF center(centerX, centerY);
+
+    // 计算半径
+    double radius = QLineF(center, pos1).length();
+
+    // 创建圆
+    Point* centerPoint = new Point(center);
+    Circle* circle = new Circle(centerPoint, radius);
+    circle->setCircleType(CircleType::FULL_CIRCLE);
+
+    // 添加依赖关系
+    circle->addParent(p1);
+    circle->addParent(p2);
+    circle->addParent(p3);
+
+    s.insert(centerPoint);
+    s.insert(circle);
+    return s;
+}
+
+// 3. 圆弧
+ArcCreator::ArcCreator() {
+    inputType.push_back({ObjectType::Point, ObjectType::Point, ObjectType::Point});
+    operationName = "ArcCreator";
+}
+std::set<GeometricObject*> ArcCreator::apply(std::vector<GeometricObject*> objs,
+                                              QPointF position) const {
+    std::set<GeometricObject*> s;
+    if (objs.size() < 3) return s;
+
+    Point* center = dynamic_cast<Point*>(objs[0]);
+    Point* startPoint = dynamic_cast<Point*>(objs[1]);
+    Point* endPoint = dynamic_cast<Point*>(objs[2]);
+
+    if (!center || !startPoint || !endPoint) return s;
+
+    // 使用圆心和起始点的距离作为半径
+    double radius = QLineF(center->position(), startPoint->position()).length();
+
+    // 创建圆弧
+    Circle* arc = new Circle(center, radius);
+    arc->setCircleType(CircleType::ARC);
+
+    // 直接使用Qt的角度系统计算角度
+    QLineF startLine(center->position(), startPoint->position());
+    double startAngle = startLine.angle();
+
+    QLineF endLine(center->position(), endPoint->position());
+    double endAngle = endLine.angle();
+
+    // 确保结束角度大于起始角度（顺时针方向）
+    if (endAngle < startAngle) {
+        endAngle += 360.0;
+    }
+
+    double spanAngle = endAngle - startAngle;
+
+    arc->setArcAngles(startAngle, spanAngle);
+
+    // 添加依赖关系
+    arc->addParent(startPoint);
+    arc->addParent(endPoint);
+
+    s.insert(arc);
+    return s;
+}
+
+
+// 4. 半圆
+SemicircleCreator::SemicircleCreator() {
+    inputType.push_back({ObjectType::Point, ObjectType::Point});
+    operationName = "SemicircleCreator";
+}
+std::set<GeometricObject*> SemicircleCreator::apply(std::vector<GeometricObject*> objs,
+                                                     QPointF position) const {
+    std::set<GeometricObject*> s;
+    if (objs.size() < 2) return s;  // 只需要两个点：直径的两端
+
+    Point* pointA = dynamic_cast<Point*>(objs[0]);
+    Point* pointB = dynamic_cast<Point*>(objs[1]);
+
+    if (!pointA || !pointB) return s;
+
+    // 获取点的位置
+    QPointF posA = pointA->position();
+    QPointF posB = pointB->position();
+
+    // 计算圆心 - 两点的中点
+    QPointF center((posA.x() + posB.x()) / 2.0, (posA.y() + posB.y()) / 2.0);
+
+    // 创建圆心点
+    Point* centerPoint = new Point(center);
+
+    // 计算半径 - 中点到任一点的距离
+    double radius = QLineF(center, posA).length();
+
+    // 创建半圆
+    Circle* semicircle = new Circle(centerPoint, radius);
+    semicircle->setCircleType(CircleType::SEMICIRCLE);
+
+    // 计算半圆的方向 - 从A到B的向量垂直方向
+    double dx = posB.x() - posA.x();
+    double dy = posB.y() - posA.y();
+
+    // 计算从A到B的角度
+    double angle = std::atan2(dy, dx) * 180.0 / M_PI;
+
+    // 设置半圆的起始角度为垂直于AB的方向，扫过180度
+    semicircle->setArcAngles(angle, 180.0);
+
+    // 添加依赖关系
+    semicircle->addParent(pointA);
+    semicircle->addParent(pointB);
+    s.insert(centerPoint);
+    s.insert(semicircle);
+
+    return s;
+}
+
