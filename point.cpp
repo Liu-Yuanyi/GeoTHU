@@ -126,7 +126,7 @@ bool Point::isNear(const QPointF& clickPos) const {
     if(!isShown())return false;
     qreal dx = clickPos.x() - position().x();
     qreal dy = clickPos.y() - position().y();
-    return (dx * dx + dy * dy) <= (size_ + 2) * (size_ + 2);
+    return (dx * dx + dy * dy) <= (size_ + 4) * (size_ + 4);
 }
 
 QPointF Point::position() const{
