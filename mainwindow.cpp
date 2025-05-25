@@ -286,6 +286,8 @@ void MainWindow::onToolSelected(QAbstractButton *abstractButton)
         m_canvas->setOperation(8);
     } else if (toolId == tr("Tangents")){
         m_canvas->setOperation(9);
+    } else if (toolId == tr("Delete")){
+        m_canvas->setOperation(10);
     }
 }
 

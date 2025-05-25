@@ -6,6 +6,7 @@
 #include"objecttype.h"
 
 class IntersectionCreator: public Operation{
+public:
     IntersectionCreator();
     std::set<GeometricObject*> apply(std::vector<GeometricObject*> objs,
                                       QPointF position = QPointF()) const override;

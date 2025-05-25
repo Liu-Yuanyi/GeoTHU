@@ -9,6 +9,7 @@
 #include "lineo.h"
 #include "lineoo.h"
 #include "tools.h"
+#include "intersectioncreator.h"
 
 // 假设你的 ObjectType 和 ObjectName 在 "objecttype.h" (或其他地方) 定义，并且 GetDefault... 映射存在
 // extern std::map<ObjectType, QColor> GetDefaultColor;
@@ -29,6 +30,7 @@ Canvas::Canvas(QWidget* parent) : QWidget(parent) {
     operations.push_back(new PerpendicularLineCreator());
     operations.push_back(new AngleBisectorCreator());
     operations.push_back(new TangentLineCreator());
+    operations.push_back(new IntersectionCreator());
     // TODO: add other operations here.
 }
 
