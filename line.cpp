@@ -93,7 +93,7 @@ Qt::PenStyle Line::getPenStyle()const{
 }
 
 void Line::draw(QPainter* painter) const {
-    if (hidden_) {
+    if (isHidden()) {
         return;
     }
     auto ppp=getTwoPoints();

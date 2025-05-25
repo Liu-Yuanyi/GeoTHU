@@ -84,7 +84,7 @@ void Point::setPosition(const QPointF& pos) {
 }
 
 void Point::draw(QPainter* painter) const {
-    if (hidden_) {
+    if (!isShown()) {
         return;
     }
 
@@ -121,6 +121,7 @@ void Point::draw(QPainter* painter) const {
 }
 
 bool Point::isNear(const QPointF& clickPos) const {
+    if(!isShown())return false;
     qreal dx = clickPos.x() - position().x();
     qreal dy = clickPos.y() - position().y();
     return (dx * dx + dy * dy) <= (size_ + 2) * (size_ + 2);
