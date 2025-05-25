@@ -68,12 +68,6 @@ GeometricObject::~GeometricObject() {
         }
     }
 
-    // 删除所有子对象
-    // 注意：这里直接 delete 子对象，意味着 GeometricObject 拥有其子对象的所有权。
-    // 这在某些设计中是合适的，但也可能导致双重删除，如果子对象也由其他地方管理。
-    for (GeometricObject* c : children_) {
-        delete c;  // 删除子对象
-    }
     children_.clear();  // 清空子对象列表
     parents_.clear();   // 清空父对象列表
 }
