@@ -462,11 +462,21 @@ GeometricObject* Canvas::findObjNear(const QPointF& pos) const {
     // 为了让用户更容易选中，可以考虑优先返回选中的对象（如果多个对象重叠）
     // 或者优先返回最上层的对象（如果你的对象有层级/绘制顺序）
     // 当前实现是返回第一个检测到的对象
+
+    std::vector<GeometricObject*> v = {};
     for (auto it = objects_.rbegin(); it != objects_.rend(); ++it) { // 从后往前遍历，模拟点击最上层对象
         GeometricObject* obj = *it;
         if (obj && !obj->isHidden() && obj->isNear(pos)) {
+            v.push_back(obj);
+        }
+    }
+    for (auto obj : v){
+        if (obj->getObjectType() == ObjectType::Point){
             return obj;
         }
+    }
+    if (!v.empty()){
+        return v[0];
     }
     return nullptr;
 }

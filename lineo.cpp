@@ -157,8 +157,8 @@ std::pair<const QPointF,const QPointF> Lineo::getTwoPoints() const{
         QPointF a = parents_[0]->position(), b = parents_[2]->position();
         double l1 = std::sqrt(std::pow(p1.x() - a.x(), 2) + std::pow(p1.y() - a.y(), 2));
         double l2 = std::sqrt(std::pow(p1.x() - b.x(), 2) + std::pow(p1.y() - b.y(), 2));
-        a = p1 + (a - p1) / l1;
-        b = p1 + (b - p1) / l2;
+        a = p1 + (a - p1) * 300 / l1;
+        b = p1 + (b - p1) * 300 / l2;
         return std::make_pair(p1, (a + b) / 2);
     }
     case 2:
