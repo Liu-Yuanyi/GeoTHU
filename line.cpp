@@ -211,6 +211,11 @@ std::pair<const QPointF,const QPointF> Line::getTwoPoints() const{
         QPointF P1 = parents_[0]->position(), P2 = circle->position();
         double radius = circle->getRadius();
         double dist1 = std::sqrt(std::pow(P1.x() - P2.x(), 2) + std::pow(P1.y() - P2.y(), 2));
+        if (dist1 * dist1 - radius * radius < 0){
+            legal_ = false;
+            return std::make_pair(QPointF(1, 1), QPointF(2, 2));
+        }
+        legal_ = true;
         double dist2 = std::sqrt(dist1 * dist1 - radius * radius);
         QPointF direction1 = P2 - P1, direction2 = QPointF(-direction1.y(), direction1.x());
         QPointF P3 = P1 + direction1 * dist2 / dist1 + direction2 * radius / dist1;
@@ -222,6 +227,11 @@ std::pair<const QPointF,const QPointF> Line::getTwoPoints() const{
         QPointF P1 = parents_[0]->position(), P2 = circle->position();
         double radius = circle->getRadius();
         double dist1 = std::sqrt(std::pow(P1.x() - P2.x(), 2) + std::pow(P1.y() - P2.y(), 2));
+        if (dist1 * dist1 - radius * radius < 0){
+            legal_ = false;
+            return std::make_pair(QPointF(1, 1), QPointF(2, 2));
+        }
+        legal_ = true;
         double dist2 = std::sqrt(dist1 * dist1 - radius * radius);
         QPointF direction1 = P2 - P1, direction2 = QPointF(-direction1.y(), direction1.x());
         QPointF P3 = P1 + direction1 * dist2 / dist1 - direction2 * radius / dist1;

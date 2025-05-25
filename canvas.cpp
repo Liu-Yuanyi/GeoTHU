@@ -276,12 +276,12 @@ void Canvas::paintEvent(QPaintEvent* event) {
         obj->position();
     }
     for (const auto* obj : objects_) {
-        if (!obj->isHidden() and obj->getObjectType() != ObjectType::Point){
+        if (obj->isShown() and obj->getObjectType() != ObjectType::Point){
             obj->draw(&painter);
         }
     }
     for (const auto* obj : objects_) {
-        if (!obj->isHidden() and obj->getObjectType() == ObjectType::Point){
+        if (obj->isShown() and obj->getObjectType() == ObjectType::Point){
             obj->draw(&painter);
         }
     }
