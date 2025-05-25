@@ -6,7 +6,7 @@
 #include <QColor>
 
 inline qreal len(const QPointF& p){
-    return sqrt(p.x()*p.x()+p.y()+p.y());
+    return sqrt(p.x()*p.x()+p.y()*p.y());
 }
 
 class Point : public GeometricObject {
