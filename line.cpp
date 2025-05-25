@@ -78,7 +78,10 @@ void drawExtendedLine(QPainter* painter, const QPointF& p1, const QPointF& p2) {
 }
 Line::Line(const std::vector<GeometricObject*>& parents,const int& generation)
     : GeometricObject(ObjectName::Line){
-    parents_=parents;
+    for(auto iter: parents){
+        addParent(iter);
+    }
+
     generation_=generation;
     GetDefaultLable[ObjectType::Line]=nextLineLable(GetDefaultLable[ObjectType::Line]);
 }

@@ -3,7 +3,9 @@
 
 Lineoo::Lineoo(const std::vector<GeometricObject*>& parents,const int& generation)
     : GeometricObject(ObjectName::Lineoo){
-    parents_=parents;
+    for(auto iter: parents){
+        addParent(iter);
+    }
     generation_=generation;
     GetDefaultLable[ObjectType::Lineoo]=nextLineLable(GetDefaultLable[ObjectType::Lineoo]);
 }

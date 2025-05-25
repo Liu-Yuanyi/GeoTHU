@@ -64,7 +64,9 @@ void drawExtendedLineo(QPainter* painter, const QPointF& p1, const QPointF& p2) 
 
 Lineo::Lineo(const std::vector<GeometricObject*>& parents,const int& generation)
     : GeometricObject(ObjectName::Lineo){
-    parents_=parents;
+    for(auto iter: parents){
+        addParent(iter);
+    }
     generation_=generation;
     GetDefaultLable[ObjectType::Lineo]=nextLineLable(GetDefaultLable[ObjectType::Lineo]);
 

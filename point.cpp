@@ -53,7 +53,9 @@ Point::Point(const QPointF& position) : GeometricObject(ObjectName::Point), posi
 
 Point::Point(const std::vector<GeometricObject*>& parents,const int& generation)
     : GeometricObject(ObjectName::Point){
-    parents_=parents;
+    for(auto iter: parents){
+        addParent(iter);
+    }
     generation_=generation;
     GetDefaultLable[ObjectType::Point]=nextPointLable(GetDefaultLable[ObjectType::Point]);
     setPosition();
