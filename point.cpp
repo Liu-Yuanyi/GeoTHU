@@ -156,12 +156,28 @@ QPointF Point::position() const{
         auto res=linelineintersection(parents_[0]->getTwoPoints(),parents_[1]->getTwoPoints());
 
         if(
-            range1==1&&res.t1<0 || range1==2&&(res.t1<0||res.t1>1)
-            ||  range2==1&&res.t2<0 || range2==2&&(res.t2<0||res.t2>1)){
+            range1==1&&res.t[0]<0 || range1==2&&(res.t[0]<0||res.t[0]>1)
+            ||  range2==1&&res.t[1]<0 || range2==2&&(res.t[1]<0||res.t[1]>1)){
             legal_=false;
         }
         return res.p;
-        break;
+    }
+    case 14: case 15: case 16: case 17: case 18: case 19:{
+        expectParentNum(2);
+        int range=(generation_-14)/2;
+        auto res=linecircleintersection(parents_[0]->getTwoPoints(),parents_[1]->getTwoPoints());
+        if(res.exist==false || range==1&&res.t[generation_%2]<0 || range==2&&(res.t[generation_%2]<0||res.t[generation_%2]>1)){
+            legal_=false;
+        }
+        return res.p[generation_%2];
+    }
+    case 20: case 21:{
+        expectParentNum(2);
+        auto res=circlecircleintersection(parents_[0]->getTwoPoints(),parents_[1]->getTwoPoints());
+        if(res.exist==false){
+            legal_=false;
+        }
+        return res.p[generation_%2];
     }
     case 30:{
         QPointF P1, P2;
