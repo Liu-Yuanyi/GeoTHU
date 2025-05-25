@@ -44,6 +44,7 @@ Circle::Circle(Point* centerPoint, Point* pointOnCircle)
     updateCenterPositionFromPoint();
     QPointF pos1 = centerPoint->position(), pos2 = pointOnCircle->position();
     radius_ = std::sqrt(std::pow(pos1.x() - pos2.x(), 2) + std::pow(pos1.y() - pos2.y(), 2));
+
 }
 
 Circle::~Circle() {
