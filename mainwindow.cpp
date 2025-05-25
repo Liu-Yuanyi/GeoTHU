@@ -209,6 +209,7 @@ void MainWindow::setupToolPanel()
     constructionLayout->addWidget(createToolButton(tr("Perpendicular Bisector"), ":/raw_icons/perpendicular_bisector.png", tr("Draw perpendicular bisector of a segment")));
     constructionLayout->addWidget(createToolButton(tr("Angle Bisector"), ":/raw_icons/angle_bisector.png", tr("Draw angle bisector")));
     constructionLayout->addWidget(createToolButton(tr("Tangents"), ":/raw_icons/tangents.png", tr("Draw tangents")));
+    constructionLayout->addWidget(createToolButton(tr("Intersect"), ":/raw_icons/intersect.png", tr("Find intersection points")));
     constructionLayout->addStretch();
     constructionGroup->setLayout(constructionLayout);
 
@@ -286,8 +287,9 @@ void MainWindow::onToolSelected(QAbstractButton *abstractButton)
         m_canvas->setOperation(8);
     } else if (toolId == tr("Tangents")){
         m_canvas->setOperation(9);
-    } else if (toolId == tr("Delete")){
+    } else if (toolId == tr("Intersect")){
         m_canvas->setOperation(10);
     }
+
 }
 

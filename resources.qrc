@@ -22,5 +22,6 @@
         <file>raw_icons/show_hide.png</file>
         <file>raw_icons/tangents.png</file>
         <file>raw_icons/ray.png</file>
+        <file>raw_icons/intersect.png</file>
     </qresource>
 </RCC>
