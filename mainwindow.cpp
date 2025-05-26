@@ -260,6 +260,15 @@ void MainWindow::onToolSelected(QAbstractButton *abstractButton)
     } else if (toolId == tr("Point")) {
         m_canvas->setMode(Canvas::CreatePointMode);
         qDebug() << "模式设置为: CreatePointMode";
+    } else if (toolId == tr("Delete")){
+        m_canvas->deleteObjects();
+        if (!m_toolButtonGroup->buttons().isEmpty()) {
+            QAbstractButton* firstButton = m_toolButtonGroup->buttons().first();
+            if (firstButton) {
+                firstButton->setChecked(true); // 选中按钮
+                onToolSelected(firstButton);   // 调用槽函数以应用初始模式
+            }
+        }
     } else {
         // 对于尚未明确处理的工具，可以设置为 OperationMode 或 SelectionMode
         // 或者在 Canvas 中为每个工具实现一个特定的模式

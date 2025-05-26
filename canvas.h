@@ -18,11 +18,12 @@
 class Canvas : public QWidget {
     Q_OBJECT
 public:
-    enum Mode { SelectionMode, CreatePointMode, OperationMode };
+    enum Mode { SelectionMode, CreatePointMode, OperationMode, DeletionMode };
     explicit Canvas(QWidget* parent = nullptr);
     ~Canvas() override;
     void setMode(Mode newMode);
     void setOperation(const int index);
+    void deleteObjects();
 
 protected:
     void mousePressEvent(QMouseEvent* event) override;

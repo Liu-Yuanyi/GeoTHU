@@ -455,29 +455,7 @@ void Canvas::contextMenuEvent(QContextMenuEvent* event) {
     // 删除操作 (作用于所有当前选中的对象)
 
     menu.addAction(tr("delete"), [this]() {
-        // 创建一个要删除对象的副本，因为在遍历时修改集合可能导致问题
-        std::vector<GeometricObject*> toDelete(selectedObjs_.begin(), selectedObjs_.end());
-        selectedObjs_.clear(); // 清空选中集合
-
-        for (GeometricObject* obj : toDelete) {
-            // 从 objects_ 列表中移除
-            std::stack<GeometricObject*> s;
-            s.push(obj);
-            while (!s.empty()){
-                GeometricObject* curObj = s.top();
-                s.pop();
-                auto iter = std::find(objects_.begin(), objects_.end(), curObj);
-                if (iter != objects_.end()){
-                    objects_.erase(iter);
-                    auto children = curObj->getChildren();
-                    for (auto child : children){
-                        s.push(child);
-                    }
-                    delete curObj;
-                }
-            }
-        }
-        update();
+        deleteObjects();
     });
 
 
@@ -485,6 +463,31 @@ void Canvas::contextMenuEvent(QContextMenuEvent* event) {
     if (!menu.isEmpty()) { // 如果菜单中有任何项，则显示它
         menu.exec(event->globalPos()); // 在鼠标光标的全局位置显示菜单
     }
+}
+
+void Canvas::deleteObjects(){
+    std::vector<GeometricObject*> toDelete(selectedObjs_.begin(), selectedObjs_.end());
+    selectedObjs_.clear(); // 清空选中集合
+
+    for (GeometricObject* obj : toDelete) {
+        // 从 objects_ 列表中移除
+        std::stack<GeometricObject*> s;
+        s.push(obj);
+        while (!s.empty()){
+            GeometricObject* curObj = s.top();
+            s.pop();
+            auto iter = std::find(objects_.begin(), objects_.end(), curObj);
+            if (iter != objects_.end()){
+                objects_.erase(iter);
+                auto children = curObj->getChildren();
+                for (auto child : children){
+                    s.push(child);
+                }
+                delete curObj;
+            }
+        }
+    }
+    update();
 }
 
 
