@@ -141,18 +141,10 @@ inline circlecircleIntersectionResult circlecircleintersection(
     result.p[0] = p + h * T;
     result.p[1] = p - h * T;
 
-    // 确保向量p1p2和向量AO的叉乘垂直于屏幕朝外
+    // 确保向量p1p2和向量AO的叉乘垂直于屏幕朝内
     QPointF p1p2 = result.p[1] - result.p[0];
     double cross = AO.x() * p1p2.y() - AO.y() * p1p2.x();
 
-    if (cross < 0) {
-        // 如果叉乘方向相反，则交换p1和p2
-        qDebug()<<"圆圆交点交换!";
-        std::swap(result.p[0], result.p[1]);
-    }
-    else{
-        qDebug()<<"圆圆交点不换!";
-    }
     result.exist=true;
     return result;
 }

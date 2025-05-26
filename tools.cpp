@@ -89,6 +89,6 @@ std::set<GeometricObject*> TangentLineCreator::apply(std::vector<GeometricObject
     } else if (abs(radius - dist) <= 1e-4) {
         return std::set<GeometricObject*>{new Line(objs, 7)};
     } else {
-        return std::set<GeometricObject*>{new Line(objs, 8), new Line(objs, 9)};
+        return std::set<GeometricObject*>{new Line(objs, 8), new Line(objs, 9), new Point(objs,31), new Point(objs,32)};
     }
 }

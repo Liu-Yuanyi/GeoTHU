@@ -196,7 +196,41 @@ QPointF Point::position() const{
         }
         return QPointF((P1.x() + P2.x()) / 2, (P1.y() + P2.y()) / 2);
     }
+    case 31:case 32:{
+        const QPointF& center = parents_[1]->getTwoPoints().first;    // 圆心
+        const QPointF& pointOnCircle = parents_[1]->getTwoPoints().second;  // 圆上一点
+        const QPointF& A =parents_[0]->position();
+        // 计算点A到圆心的向量
+        qreal radius = len(center-pointOnCircle);
+        QPointF AC = A - center;
+        qreal dist_squared = AC.x() * AC.x() + AC.y() * AC.y();
+        qreal dist = std::sqrt(dist_squared);
+
+        // 如果点A在圆内，则没有切线
+        if (dist <= radius) {
+            legal_=false;
+            return QPointF();
+        }
+
+        // 计算辅助值
+        qreal h = std::sqrt(dist_squared - radius * radius);
+
+        // 计算旋转矩阵（顺时针和逆时针）
+        qreal cos_theta = radius / dist;
+        qreal sin_theta = h / dist;
+
+        if(generation_==31) return QPointF(
+                center.x() + (AC.x() * cos_theta - AC.y() * sin_theta) * radius / dist,
+                center.y() + (AC.x() * sin_theta + AC.y() * cos_theta) * radius / dist
+            );
+
+        else return QPointF(
+                center.x() + (AC.x() * cos_theta + AC.y() * sin_theta) * radius / dist,
+                center.y() + (-AC.x() * sin_theta + AC.y() * cos_theta) * radius / dist
+            );
+    }
     default:
+        QMessageBox::warning(nullptr, "警告", "lineoo的getTwoPoint方法没有完成!");
         return QPointF();
     };
 }
