@@ -122,6 +122,19 @@ void Canvas::mousePressEvent(QMouseEvent* event) {
             clearSelections(); // 创建新对象前通常清除选择
             Point* existingPoint = findPointNear(mousePos_);
             if (!existingPoint) { // 如果附近没有点，则创建新点
+                std::vector<GeometricObject*> objsNear = findObjectsNear(mousePos_);
+                if (objsNear.size() >= 2){
+                    std::vector<GeometricObject*> v = {objsNear[0], objsNear[1]};
+                    auto newObjects = operations[10]->apply(v);
+                    for (auto obj : newObjects){
+                        if (obj->isNear(mousePos_)) {
+                            objects_.push_back(obj);
+                            obj->setSelected(true);
+                            selectedObjs_.insert(obj);
+                            return;
+                        }
+                    }
+                }
                 Point* newPoint = new Point(mousePos_);
                 // newPoint->setColor(GetDefaultColor[ObjectType::Point]); // 设置默认颜色
                 // newPoint->setSize(GetDefaultSize[ObjectType::Point]);   // 设置默认大小

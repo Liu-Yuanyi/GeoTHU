@@ -84,9 +84,9 @@ std::set<GeometricObject*> TangentLineCreator::apply(std::vector<GeometricObject
     QPointF p1 = objs[0]->position(), p2 = circle->position();
     double radius = circle->getRadius();
     double dist = std::sqrt(std::pow(p1.x() - p2.x(), 2) + std::pow(p1.y() - p2.y(), 2));
-    if (radius > dist) {
+    if (radius > dist + 1e-4) {
         return std::set<GeometricObject*>();
-    } else if (radius == dist) {
+    } else if (abs(radius - dist) <= 1e-4) {
         return std::set<GeometricObject*>{new Line(objs, 7)};
     } else {
         return std::set<GeometricObject*>{new Line(objs, 8), new Line(objs, 9)};
