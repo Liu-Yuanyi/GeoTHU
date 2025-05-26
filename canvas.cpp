@@ -79,6 +79,19 @@ void Canvas::mousePressEvent(QMouseEvent* event) {
         initialPositions_.clear(); // 清空，为新的拖拽或点选操作做准备
 
         if (currentMode == SelectionMode) {
+            std::vector<GeometricObject*> objsNear = findObjectsNear(mousePos_);
+            if (objsNear.size() >= 2){
+                std::vector<GeometricObject*> v = {objsNear[0], objsNear[1]};
+                auto newObjects = operations[10]->apply(v);
+                for (auto obj : newObjects){
+                    if (obj->isNear(mousePos_)) {
+                        objects_.push_back(obj);
+                        obj->setSelected(true);
+                        selectedObjs_.insert(obj);
+                        return;
+                    }
+                }
+            }
             GeometricObject* clickedObj = findObjNear(mousePos_);
             if (clickedObj) { // 点击到了对象
                 if (!clickedObj->isSelected()) { // 如果对象未被选中
@@ -483,6 +496,22 @@ GeometricObject* Canvas::findObjNear(const QPointF& pos) const {
         return v[0];
     }
     return nullptr;
+}
+
+std::vector<GeometricObject*> Canvas::findObjectsNear(const QPointF& pos) const {
+    std::vector<GeometricObject*> v = {};
+    for (auto it = objects_.rbegin(); it != objects_.rend(); ++it) { // 从后往前遍历，模拟点击最上层对象
+        GeometricObject* obj = *it;
+        if (obj && !obj->isHidden() && obj->isNear(pos)) {
+            v.push_back(obj);
+        }
+    }
+    for (auto obj : v){
+        if (obj->getObjectType() == ObjectType::Point){
+            return std::vector<GeometricObject*>{};
+        }
+    }
+    return v;
 }
 
 Point* Canvas::findPointNear(const QPointF& pos) const {

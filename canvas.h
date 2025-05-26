@@ -47,6 +47,7 @@ private:
     // --- 私有辅助函数 ---
     void updateHoverState(const QPointF& pos);                  // 更新鼠标悬停状态
     GeometricObject* findObjNear(const QPointF& pos) const;     // 查找指定位置附近的对象
+    std::vector<GeometricObject*> findObjectsNear(const QPointF& pos) const;
     Point* findPointNear(const QPointF& pos) const;           // 查找指定位置附近的点对象
     void clearSelections();                                     // 清除所有对象的选中状态
 };
