@@ -80,7 +80,10 @@ void Circle::draw(QPainter* painter) const {
     auto points = getTwoPoints();
     QPointF center = points.first;
     double radius = QLineF(points.first, points.second).length();
-
+    // 如果是半圆，调整半径
+    if (circleType_ == CircleType::SEMICIRCLE) {
+        radius /= 2.0;
+    }
 
 
     // 设置画笔
@@ -233,6 +236,20 @@ std::pair<const QPointF, const QPointF> Circle::getTwoPoints() const {
 
         return std::make_pair(calculatedCenter, QPointF(calculatedCenter.x() + calculatedRadius, calculatedCenter.y()));
     }
+    //圆弧情况
+    else if (arcmode_){
+        Point* p1 = dynamic_cast<Point*>(parents_[2]);
+        Point* p2 = dynamic_cast<Point*>(parents_[1]);
+        Point* center = dynamic_cast<Point*>(parents_[0]);
+
+        if (p1 && p2 && center) {
+            // 计算半径
+            double dynamicRadius = QLineF(center->position(), p2->position()).length();
+            // 返回圆心和半径点
+            QPointF centerPos = center->position();
+            return std::make_pair(centerPos, QPointF(centerPos.x() + dynamicRadius, centerPos.y()));
+        }
+    }
     //点加半径情况
     else if (parents_.size() == 3) {
         // 尝试获取三个父对象作为点
@@ -268,7 +285,6 @@ std::pair<const QPointF, const QPointF> Circle::getTwoPoints() const {
         center = centerPosition_;
         radiusPoint = QPointF(center.x() + radius_, center.y());
     }
-
     return std::make_pair(center, radiusPoint);
 }
 
@@ -415,7 +431,7 @@ std::set<GeometricObject*> ThreePointCircleCreator::apply(std::vector<GeometricO
     if (!p1 || !p2 || !p3) return s;
 
     // 创建一个临时圆心点（可以放在任意位置，因为会被动态计算覆盖）
-    Point* tempCenter = new Point(QPointF(0, 0));
+    QPointF tempCenter = QPointF(QPointF(0, 0));
 
     // 创建圆
     Circle* circle = new Circle(tempCenter, 1.0);  // 半径也会被动态计算覆盖
@@ -424,13 +440,15 @@ std::set<GeometricObject*> ThreePointCircleCreator::apply(std::vector<GeometricO
     // 设置为三点模式
     circle->setThreePointMode(p1, p2, p3);
 
-    s.insert(tempCenter);
     s.insert(circle);
     return s;
 }
 
 
 // 3. 圆弧
+void Circle::setArcMode(){
+    arcmode_=true;
+}
 ArcCreator::ArcCreator() {
     inputType.push_back({ObjectType::Point, ObjectType::Point, ObjectType::Point});
     operationName = "ArcCreator";
@@ -483,7 +501,7 @@ std::set<GeometricObject*> ArcCreator::apply(std::vector<GeometricObject*> objs,
     arc->addParent(center);  // 添加圆心作为依赖
     arc->addParent(startPoint);
     arc->addParent(endPoint);
-
+    arc->setArcMode();
     s.insert(arc);
     return s;
 }
@@ -517,7 +535,6 @@ std::set<GeometricObject*> SemicircleCreator::apply(std::vector<GeometricObject*
 
     // 计算半径 - 中点到任一点的距离
     double radius = QLineF(center, posA).length();
-
     // 创建半圆
     Circle* semicircle = new Circle(centerPoint, radius);
     semicircle->setCircleType(CircleType::SEMICIRCLE);

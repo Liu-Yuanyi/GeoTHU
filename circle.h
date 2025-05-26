@@ -78,6 +78,7 @@ public:
     void setLineStyle(int style);
     // 设置三点作圆模式
     void setThreePointMode(Point* p1, Point* p2, Point* p3);
+    void setArcMode();
 
 private:
     Point* centerPoint_;     // 可选：如果圆心是一个独立的Point对象
@@ -95,6 +96,7 @@ private:
 
     bool threePointMode_ = false;
     Point* threePoints_[3] = {nullptr, nullptr, nullptr};
+    bool arcmode_=false;
 };
 
 class TwoPointCircleCreator: public Operation {
