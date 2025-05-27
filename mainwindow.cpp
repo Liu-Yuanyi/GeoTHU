@@ -219,7 +219,7 @@ void MainWindow::setupToolPanel()
     transformUtilLayout->setSpacing(5);
     transformUtilLayout->setContentsMargins(5,5,5,5);
     transformUtilLayout->addWidget(createToolButton(tr("Reflect Point"), ":/raw_icons/reflect_point.png", tr("Reflect point across a line or point")));
-    transformUtilLayout->addWidget(createToolButton(tr("Reflect Line"), ":/raw_icons/reflect_line.png", tr("Reflect line across a line or point")));
+    transformUtilLayout->addWidget(createToolButton(tr("Axial Symmetry"), ":/raw_icons/reflect_line.png", tr("Reflect line across a line or point")));
     transformUtilLayout->addWidget(createToolButton(tr("Reflect Circle"), ":/raw_icons/reflect_circle.png", tr("Reflect circle across a line or point")));
     transformUtilLayout->addWidget(createToolButton(tr("Show/Hide"), ":/raw_icons/show_hide.png", tr("Show or hide objects")));
     transformUtilLayout->addWidget(createToolButton(tr("Delete"), ":/raw_icons/delete.png", tr("Delete objects")));
@@ -306,7 +306,7 @@ void MainWindow::onToolSelected(QAbstractButton *abstractButton)
         m_canvas->setOperation(13);
     } else if (toolId == tr("Semicircle")){
         m_canvas->setOperation(14);
-    }else if (toolId == tr("Reflect Line")){
+    }else if (toolId == tr("Axial Symmetry")){
         m_canvas->setOperation(15);
     }
 }
