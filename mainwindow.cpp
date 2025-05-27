@@ -306,6 +306,8 @@ void MainWindow::onToolSelected(QAbstractButton *abstractButton)
         m_canvas->setOperation(13);
     } else if (toolId == tr("Semicircle")){
         m_canvas->setOperation(14);
+    }else if (toolId == tr("Reflect Line")){
+        m_canvas->setOperation(15);
     }
 }
 

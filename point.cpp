@@ -1,6 +1,6 @@
 #include "point.h"
 #include "objecttype.h"
-#include "intersectioncalculator.h"
+#include "calculator.h"
 inline const qreal footRatio(QPointF P, std::pair<QPointF, QPointF> line, ObjectType mode=ObjectType::Line) {
     const QPointF& A = line.first;
     const QPointF& B = line.second;
@@ -138,6 +138,9 @@ QPointF Point::position() const{
         }
     }
     switch(generation_){
+    case -3:{
+        return reflect(parents_[0]->position(),parents_[1]->getTwoPoints());
+    }
     case 0:{
         return position_;
     }

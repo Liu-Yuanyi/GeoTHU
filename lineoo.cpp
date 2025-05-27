@@ -1,5 +1,6 @@
 #include "lineoo.h"
 #include <QMessageBox>
+#include "calculator.h"
 
 Lineoo::Lineoo(const std::vector<GeometricObject*>& parents,const int& generation)
     : GeometricObject(ObjectName::Lineoo){
@@ -105,6 +106,12 @@ std::pair<const QPointF,const QPointF> Lineoo::getTwoPoints() const{
         }
     }
     switch(generation_){
+    case -3:{
+        return std::make_pair(
+            reflect(parents_[0]->getTwoPoints().first,parents_[1]->getTwoPoints()),
+            reflect(parents_[0]->getTwoPoints().second,parents_[1]->getTwoPoints())
+            );
+    }
     case 0:return std::make_pair(parents_[0]->position(),parents_[1]->position());
     default:
         break;

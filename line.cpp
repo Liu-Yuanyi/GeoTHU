@@ -5,6 +5,7 @@
 #include "lineoo.h"
 #include "geometricobject.h"
 #include "circle.h"
+#include "calculator.h"
 
 void drawExtendedLine(QPainter* painter, const QPointF& p1, const QPointF& p2) {
     QRectF bounds = painter->viewport();
@@ -164,6 +165,12 @@ std::pair<const QPointF,const QPointF> Line::getTwoPoints() const{
         }
     }
     switch(generation_){
+    case -3:{
+        return std::make_pair(
+            reflect(parents_[0]->getTwoPoints().first,parents_[1]->getTwoPoints()),
+            reflect(parents_[0]->getTwoPoints().second,parents_[1]->getTwoPoints())
+            );
+    }
     case 0:return std::make_pair(parents_[0]->position(),parents_[1]->position());
     case 1:{
         return zhongchui(std::make_pair(parents_[0]->position(),parents_[1]->position()));

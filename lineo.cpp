@@ -3,6 +3,7 @@
 #include <QPen>
 #include <cmath>       // 用于 sqrt, fabs, pow
 #include "lineoo.h"
+#include "calculator.h"
 
 void drawExtendedLineo(QPainter* painter, const QPointF& p1, const QPointF& p2) {
     // p1是射线顶点，p2是射线上的一点
@@ -150,6 +151,12 @@ std::pair<const QPointF,const QPointF> Lineo::getTwoPoints() const{
         }
     }
     switch(generation_){
+    case -3:{
+        return std::make_pair(
+            reflect(parents_[0]->getTwoPoints().first,parents_[1]->getTwoPoints()),
+            reflect(parents_[0]->getTwoPoints().second,parents_[1]->getTwoPoints())
+            );
+    }
     case 0:return std::make_pair(parents_[0]->position(),parents_[1]->position());
     case 1:{
         expectParentNum(3);

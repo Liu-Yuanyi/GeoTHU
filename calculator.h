@@ -1,5 +1,5 @@
-#ifndef INTERSECTIONCALCULATOR_H
-#define INTERSECTIONCALCULATOR_H
+#ifndef CALCULATOR_H
+#define CALCULATOR_H
 
 #include"point.h"
 
@@ -149,4 +149,32 @@ inline circlecircleIntersectionResult circlecircleintersection(
     return result;
 }
 
-#endif // INTERSECTIONCALCULATOR_H
+inline QPointF reflect(const QPointF & P, const std::pair<QPointF,QPointF>& line){
+    const QPointF& A = line.first;
+    const QPointF& B = line.second;
+
+    // 计算线段AB的向量
+    QPointF AB = B - A;
+    // 计算点P到点A的向量
+    QPointF AP = P - A;
+
+    // 计算AB的长度平方
+    qreal abLengthSquared = AB.x() * AB.x() + AB.y() * AB.y();
+
+    // 如果线段长度为0，返回点P自身（因为A和B重合，无法定义反射轴）
+    if (abLengthSquared == 0) return P;
+
+    // 计算点积 AP·AB
+    qreal dotProduct = AP.x() * AB.x() + AP.y() * AB.y();
+
+    // 计算投影比例 t
+    qreal t = dotProduct / abLengthSquared;
+
+    // 计算垂足H
+    QPointF H = A + t * AB;
+
+    // 计算反射点R：H + (H - P) = 2H - P
+    return 2.0 * H - P;
+}
+
+#endif // CALCULATOR_H

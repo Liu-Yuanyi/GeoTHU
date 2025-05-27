@@ -44,4 +44,11 @@ public:
                                       QPointF position = QPointF()) const override;
 };
 
+class AxialSymmetry: public Operation {
+public:
+    AxialSymmetry();
+    std::set<GeometricObject*> apply(std::vector<GeometricObject*> objs,
+                                      QPointF position = QPointF()) const override;
+};
+
 #endif // TOOLS_H
