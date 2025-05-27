@@ -139,7 +139,7 @@ QPointF Point::position() const{
     }
     switch(generation_){
     case -4:{
-        return 2*parents_[1]->position()-parents_[0]->position();
+        return 2*parents_[1]->position() - parents_[0]->position();
     }
     case -3:{
         return reflect(parents_[0]->position(),parents_[1]->getTwoPoints());

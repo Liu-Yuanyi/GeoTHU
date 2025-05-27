@@ -39,6 +39,7 @@ Canvas::Canvas(QWidget* parent) : QWidget(parent) {
     operations.push_back(new ArcCreator());               // 索引13
     operations.push_back(new SemicircleCreator());        // 索引14
     operations.push_back(new AxialSymmetry());             //索引15
+    operations.push_back(new CentralSymmetry());
     // TODO: add other operations here.
 }
 

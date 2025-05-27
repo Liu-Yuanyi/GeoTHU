@@ -218,7 +218,7 @@ void MainWindow::setupToolPanel()
     QVBoxLayout *transformUtilLayout = new QVBoxLayout;
     transformUtilLayout->setSpacing(5);
     transformUtilLayout->setContentsMargins(5,5,5,5);
-    transformUtilLayout->addWidget(createToolButton(tr("Central symmetry"), ":/raw_icons/reflect_point.png", tr("Reflect point across a line or point")));
+    transformUtilLayout->addWidget(createToolButton(tr("Central Symmetry"), ":/raw_icons/reflect_point.png", tr("Reflect point across a line or point")));
     transformUtilLayout->addWidget(createToolButton(tr("Axial Symmetry"), ":/raw_icons/reflect_line.png", tr("Reflect line across a line or point")));
     //transformUtilLayout->addWidget(createToolButton(tr("Reflect Circle"), ":/raw_icons/reflect_circle.png", tr("Reflect circle across a line or point")));
     transformUtilLayout->addWidget(createToolButton(tr("Hide"), ":/raw_icons/show_hide.png", tr("Hide selected objects")));
@@ -330,7 +330,7 @@ void MainWindow::onToolSelected(QAbstractButton *abstractButton)
         m_canvas->setOperation(14);
     }else if (toolId == tr("Axial Symmetry")){
         m_canvas->setOperation(15);
-    }else if (toolId == tr("Central symmetry")){
+    }else if (toolId == tr("Central Symmetry")){
         m_canvas->setOperation(16);
     }
 }
