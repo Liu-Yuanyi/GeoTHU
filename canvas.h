@@ -24,6 +24,8 @@ public:
     void setMode(Mode newMode);
     void setOperation(const int index);
     void deleteObjects();
+    void hideObjects();
+    void showObjects();
 
 protected:
     void mousePressEvent(QMouseEvent* event) override;

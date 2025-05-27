@@ -17,6 +17,8 @@
 // extern std::map<ObjectType, double> GetDefaultSize;
 // extern std::map<ObjectType, QString> GetDefaultLable;
 
+std::set<GeometricObject*> showObjectsCache;
+
 Canvas::Canvas(QWidget* parent) : QWidget(parent) {
     setMouseTracking(true); // 开启鼠标跟踪以接收 mouseMoveEvent (即使没有按钮按下)
     currentOperation_ = nullptr; // 初始化
@@ -332,6 +334,14 @@ void Canvas::paintEvent(QPaintEvent* event) {
     QPainter painter(this);
     painter.setRenderHint(QPainter::Antialiasing); // 抗锯齿，使图形更平滑
 
+    if (!showObjectsCache.empty()){
+        for (auto obj : showObjectsCache){
+            obj->setSelected(true);
+            selectedObjs_.insert(obj);
+        }
+        showObjectsCache.clear();
+    }
+
     // 绘制所有正式的几何对象
     for (const auto* obj : objects_) {
         obj->position();
@@ -514,6 +524,24 @@ void Canvas::deleteObjects(){
         }
     }
     update();
+}
+
+void Canvas::hideObjects(){
+    for (auto obj : selectedObjs_){
+        obj->setHidden(true);
+    }
+    selectedObjs_.clear();
+}
+
+void Canvas::showObjects(){
+    clearSelections();
+    showObjectsCache.clear();
+    for (auto obj : objects_){
+        if (obj->isHidden()) {
+            obj->setHidden(false);
+            showObjectsCache.insert(obj);
+        }
+    }
 }
 
 

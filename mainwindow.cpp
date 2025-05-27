@@ -221,7 +221,8 @@ void MainWindow::setupToolPanel()
     transformUtilLayout->addWidget(createToolButton(tr("Reflect Point"), ":/raw_icons/reflect_point.png", tr("Reflect point across a line or point")));
     transformUtilLayout->addWidget(createToolButton(tr("Axial Symmetry"), ":/raw_icons/reflect_line.png", tr("Reflect line across a line or point")));
     transformUtilLayout->addWidget(createToolButton(tr("Reflect Circle"), ":/raw_icons/reflect_circle.png", tr("Reflect circle across a line or point")));
-    transformUtilLayout->addWidget(createToolButton(tr("Show/Hide"), ":/raw_icons/show_hide.png", tr("Show or hide objects")));
+    transformUtilLayout->addWidget(createToolButton(tr("Hide"), ":/raw_icons/show_hide.png", tr("Hide selected objects")));
+    transformUtilLayout->addWidget(createToolButton(tr("Show"), ":/raw_icons/show_hide.png", tr("Show all hidden objects")));
     transformUtilLayout->addWidget(createToolButton(tr("Delete"), ":/raw_icons/delete.png", tr("Delete objects")));
     transformUtilLayout->addStretch();
     transformUtilGroup->setLayout(transformUtilLayout);
@@ -262,6 +263,26 @@ void MainWindow::onToolSelected(QAbstractButton *abstractButton)
         qDebug() << "模式设置为: CreatePointMode";
     } else if (toolId == tr("Delete")){
         m_canvas->deleteObjects();
+        if (!m_toolButtonGroup->buttons().isEmpty()) {
+            QAbstractButton* firstButton = m_toolButtonGroup->buttons().first();
+            if (firstButton) {
+                firstButton->setChecked(true); // 选中按钮
+                onToolSelected(firstButton);   // 调用槽函数以应用初始模式
+            }
+        }
+        m_canvas->setMode(Canvas::SelectionMode);
+    } else if (toolId == tr("Hide")) {
+        m_canvas->hideObjects();
+        if (!m_toolButtonGroup->buttons().isEmpty()) {
+            QAbstractButton* firstButton = m_toolButtonGroup->buttons().first();
+            if (firstButton) {
+                firstButton->setChecked(true); // 选中按钮
+                onToolSelected(firstButton);   // 调用槽函数以应用初始模式
+            }
+        }
+        m_canvas->setMode(Canvas::SelectionMode);
+    } else if (toolId == tr("Show")){
+        m_canvas->showObjects();
         if (!m_toolButtonGroup->buttons().isEmpty()) {
             QAbstractButton* firstButton = m_toolButtonGroup->buttons().first();
             if (firstButton) {
