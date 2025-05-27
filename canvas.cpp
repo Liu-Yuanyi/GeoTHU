@@ -73,6 +73,23 @@ void Canvas::updateHoverState(const QPointF& pos) {
     }
 }
 
+GeometricObject* Canvas::automaticIntersection(){
+    std::vector<GeometricObject*> objsNear = findObjectsNear(mousePos_);
+    if (objsNear.size() >= 2){
+        std::vector<GeometricObject*> v = {objsNear[0], objsNear[1]};
+        auto newObjects = operations[10]->apply(v);
+        for (auto obj : newObjects){
+            if (obj->isNear(mousePos_)) {
+                objects_.push_back(obj);
+                obj->setSelected(true);
+                selectedObjs_.insert(obj);
+                return obj;
+            }
+        }
+    }
+    return nullptr;
+}
+
 void Canvas::mousePressEvent(QMouseEvent* event) {
     mousePos_ = event->position(); // 记录鼠标按下位置，主要用于拖拽计算
 
@@ -80,18 +97,8 @@ void Canvas::mousePressEvent(QMouseEvent* event) {
         initialPositions_.clear(); // 清空，为新的拖拽或点选操作做准备
 
         if (currentMode == SelectionMode) {
-            std::vector<GeometricObject*> objsNear = findObjectsNear(mousePos_);
-            if (objsNear.size() >= 2){
-                std::vector<GeometricObject*> v = {objsNear[0], objsNear[1]};
-                auto newObjects = operations[10]->apply(v);
-                for (auto obj : newObjects){
-                    if (obj->isNear(mousePos_)) {
-                        objects_.push_back(obj);
-                        obj->setSelected(true);
-                        selectedObjs_.insert(obj);
-                        return;
-                    }
-                }
+            if (automaticIntersection()){
+                return;
             }
             GeometricObject* clickedObj = findObjNear(mousePos_);
             if (clickedObj) { // 点击到了对象
@@ -123,22 +130,23 @@ void Canvas::mousePressEvent(QMouseEvent* event) {
             clearSelections(); // 创建新对象前通常清除选择
             Point* existingPoint = findPointNear(mousePos_);
             if (!existingPoint) { // 如果附近没有点，则创建新点
-                std::vector<GeometricObject*> objsNear = findObjectsNear(mousePos_);
-                if (objsNear.size() >= 2){
-                    std::vector<GeometricObject*> v = {objsNear[0], objsNear[1]};
-                    auto newObjects = operations[10]->apply(v);
-                    for (auto obj : newObjects){
-                        if (obj->isNear(mousePos_)) {
-                            objects_.push_back(obj);
-                            obj->setSelected(true);
-                            selectedObjs_.insert(obj);
-                            return;
-                        }
-                    }
+                if (automaticIntersection()){
+                    return;
                 }
-                Point* newPoint = new Point(mousePos_);
-                // newPoint->setColor(GetDefaultColor[ObjectType::Point]); // 设置默认颜色
-                // newPoint->setSize(GetDefaultSize[ObjectType::Point]);   // 设置默认大小
+                std::vector<GeometricObject*> objsNear = findObjectsNear(mousePos_);
+                Point* newPoint;
+                if (objsNear.size() == 1){
+                    GeometricObject* constraintObj = objsNear[0];
+                    if (constraintObj->getObjectType() == ObjectType::Circle) {
+                        newPoint = new Point(objsNear, 4);
+                        newPoint->setPosition(mousePos_);
+                    } else {
+                        newPoint = new Point(objsNear, 3);
+                        newPoint->setPosition(mousePos_);
+                    }
+                } else {
+                    newPoint = new Point(mousePos_);
+                }
                 objects_.push_back(newPoint);
                 newPoint->setSelected(true); // 新创建的点默认为选中状态
                 selectedObjs_.insert(newPoint);
@@ -160,11 +168,28 @@ void Canvas::mousePressEvent(QMouseEvent* event) {
             if (currentOperation_->isValidInput(operationSelections_) == 1){ //不可能符合
                 clearSelections();
             } else if (currentOperation_->isValidInput(operationSelections_) == 2){ //下一个一定是点
-                Point* targetPoint = findPointNear(mousePos_);
-                if (!targetPoint) { // 如果附近没有点，则创建新点
-                    Point* newPoint = new Point(mousePos_);
-                    objects_.push_back(newPoint);
-                    targetPoint = newPoint;
+                GeometricObject* possiblePoint = automaticIntersection();
+                Point* targetPoint;
+                std::vector<GeometricObject*> objsNear = findObjectsNear(mousePos_);
+                if (possiblePoint) {
+                    targetPoint = dynamic_cast<Point*>(possiblePoint);
+                } else if (objsNear.size() == 1) {
+                    GeometricObject* constraintObj = objsNear[0];
+                    if (constraintObj->getObjectType() == ObjectType::Circle) {
+                        targetPoint = new Point(objsNear, 4);
+                        targetPoint->setPosition(mousePos_);
+                    } else {
+                        targetPoint = new Point(objsNear, 3);
+                        targetPoint->setPosition(mousePos_);
+                    }
+                    objects_.push_back(targetPoint);
+                } else {
+                    targetPoint = findPointNear(mousePos_);
+                    if (!targetPoint) { // 如果附近没有点，则创建新点
+                        Point* newPoint = new Point(mousePos_);
+                        objects_.push_back(newPoint);
+                        targetPoint = newPoint;
+                    }
                 }
                 targetPoint->setSelected(true);
                 selectedObjs_.insert(targetPoint);
@@ -346,8 +371,8 @@ void Canvas::contextMenuEvent(QContextMenuEvent* event) {
 
         QMenu* colorMenu = menu.addMenu(tr("color")); // tr() 用于国际化
         colorMenu->addAction(tr("red"), [this, point]() { point->setColor(Qt::red); update(); });
-        colorMenu->addAction(tr("blue"), [this, point]() { point->setColor(Qt::blue); update(); });
-        colorMenu->addAction(tr("green"), [this, point]() { point->setColor(Qt::green); update(); });
+        colorMenu->addAction(tr("blue"), [this, point]() { point->setColor(Qt::darkBlue); update(); });
+        colorMenu->addAction(tr("green"), [this, point]() { point->setColor(Qt::darkGreen); update(); });
         colorMenu->addAction(tr("black"), [this, point]() { point->setColor(Qt::black); update(); });
         colorMenu->addAction(tr("customize..."), [this, point]() {
             QColor color = QColorDialog::getColor(point->getColor(), this, tr("select color"));
@@ -378,8 +403,8 @@ void Canvas::contextMenuEvent(QContextMenuEvent* event) {
 
         QMenu* colorMenu = menu.addMenu(tr("color")); // tr() 用于国际化
         colorMenu->addAction(tr("red"), [this, contextMenuObj]() { contextMenuObj->setColor(Qt::red); update(); });
-        colorMenu->addAction(tr("blue"), [this, contextMenuObj]() { contextMenuObj->setColor(Qt::blue); update(); });
-        colorMenu->addAction(tr("green"), [this, contextMenuObj]() { contextMenuObj->setColor(Qt::green); update(); });
+        colorMenu->addAction(tr("blue"), [this, contextMenuObj]() { contextMenuObj->setColor(Qt::darkBlue); update(); });
+        colorMenu->addAction(tr("green"), [this, contextMenuObj]() { contextMenuObj->setColor(Qt::darkGreen); update(); });
         colorMenu->addAction(tr("black"), [this, contextMenuObj]() { contextMenuObj->setColor(Qt::black); update(); });
         colorMenu->addAction(tr("customize..."), [this, contextMenuObj]() {
             QColor color = QColorDialog::getColor(contextMenuObj->getColor(), this, tr("select color"));
@@ -415,8 +440,8 @@ void Canvas::contextMenuEvent(QContextMenuEvent* event) {
 
         QMenu* colorMenu = menu.addMenu(tr("color"));
         colorMenu->addAction(tr("red"), [this, circle]() { circle->setColor(Qt::red); update(); });
-        colorMenu->addAction(tr("blue"), [this, circle]() { circle->setColor(Qt::blue); update(); });
-        colorMenu->addAction(tr("green"), [this, circle]() { circle->setColor(Qt::green); update(); });
+        colorMenu->addAction(tr("blue"), [this, circle]() { circle->setColor(Qt::darkBlue); update(); });
+        colorMenu->addAction(tr("green"), [this, circle]() { circle->setColor(Qt::darkGreen); update(); });
         colorMenu->addAction(tr("black"), [this, circle]() { circle->setColor(Qt::black); update(); });
         colorMenu->addAction(tr("customize..."), [this, circle]() {
             QColor color = QColorDialog::getColor(circle->getColor(), this, tr("select color"));

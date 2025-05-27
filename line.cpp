@@ -143,7 +143,7 @@ double Line::distanceToLine(const QPointF& p, const std::pair<QPointF,QPointF>& 
 bool Line::isNear(const QPointF& pos) const {
     if (!isShown()) return false; // 如果对象隐藏，则认为不在附近
     // 判断点到线段的距离是否小于容差值 (容差值考虑了线的厚度)
-    return distanceToLine(pos, getTwoPoints()) < ( 1e-2 + size_ / 2.0);
+    return distanceToLine(pos, getTwoPoints()) < ( 1e-2 + size_);
 }
 
 QPointF Line::position() const {
