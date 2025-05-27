@@ -34,7 +34,7 @@ public:
     double getRadius() const;
 
     // 新增：获取圆的两个点（圆心和半径点）
-    std::pair<const QPointF, const QPointF> getTwoPoints() const;
+    std::pair<const QPointF, const QPointF> getTwoPoints() const override;
 
     void setCenterPoint(Point* centerPoint); // 如果圆心是Point对象，需要考虑父子关系
     void setCenterCoordinates(const QPointF& centerPos);

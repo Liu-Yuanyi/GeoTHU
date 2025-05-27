@@ -269,6 +269,7 @@ void MainWindow::onToolSelected(QAbstractButton *abstractButton)
                 onToolSelected(firstButton);   // 调用槽函数以应用初始模式
             }
         }
+        m_canvas->setMode(Canvas::SelectionMode);
     } else {
         // 对于尚未明确处理的工具，可以设置为 OperationMode 或 SelectionMode
         // 或者在 Canvas 中为每个工具实现一个特定的模式

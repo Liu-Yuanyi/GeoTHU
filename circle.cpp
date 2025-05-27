@@ -270,22 +270,7 @@ std::pair<const QPointF, const QPointF> Circle::getTwoPoints() const {
     QPointF radiusPoint;
 
     // 根据圆的定义方式获取圆心和半径点
-    if (centerPoint_) {
-        center = centerPoint_->position();
-
-        if (pointOnCircle_) {
-            // 如果有圆上的点，使用它计算半径点
-            radiusPoint = pointOnCircle_->position();
-        } else {
-            // 如果只有圆心和半径值，计算一个半径点（例如向右radius_单位）
-            radiusPoint = QPointF(center.x() + radius_, center.y());
-        }
-    } else {
-        // 如果没有centerPoint_，使用存储的centerPosition_
-        center = centerPosition_;
-        radiusPoint = QPointF(center.x() + radius_, center.y());
-    }
-    return std::make_pair(center, radiusPoint);
+    return std::make_pair(parents_[0]->position(), parents_[1]->position());
 }
 
 void Circle::setCenterPoint(Point* centerPoint) {
@@ -345,9 +330,14 @@ TwoPointCircleCreator::TwoPointCircleCreator(){
 std::set<GeometricObject*> TwoPointCircleCreator::apply(std::vector<GeometricObject*> objs,
                                                          QPointF position) const {
     std::set<GeometricObject*> s;
-    Point* p1 = dynamic_cast<Point*>(objs[0]);
-    Point* p2 = dynamic_cast<Point*>(objs[1]);
-    s.insert(new Circle(p1, p2));
+    QPointF p1 = objs[0] -> position();
+    QPointF p2 = objs[1] -> position();
+    double dist = len(p2 - p1);
+    Circle* circle = new Circle(p1, dist);
+    circle->addParent(objs[0]);
+    circle->addParent(objs[1]);
+    circle->setCircleType(CircleType::FULL_CIRCLE);
+    s.insert(circle);
     return s;
 }
 
