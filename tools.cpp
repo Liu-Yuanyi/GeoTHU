@@ -150,3 +150,46 @@ std::set<GeometricObject*> AxialSymmetry::apply(std::vector<GeometricObject*> ob
     }
     }
 }
+
+CentralSymmetry::CentralSymmetry(){
+    inputType.push_back(std::vector<ObjectType>{ObjectType::Point, ObjectType::Point});
+    inputType.push_back(std::vector<ObjectType>{ObjectType::Line, ObjectType::Point});
+    inputType.push_back(std::vector<ObjectType>{ObjectType::Lineo, ObjectType::Point});
+    inputType.push_back(std::vector<ObjectType>{ObjectType::Lineoo, ObjectType::Point});
+    inputType.push_back(std::vector<ObjectType>{ObjectType::Circle, ObjectType::Point});
+
+    operationName = "CentralSymmetry";
+}
+
+std::set<GeometricObject*> CentralSymmetry::apply(std::vector<GeometricObject*> objs,
+                                                 QPointF position) const {
+    GeometricObject *ret;
+    switch(objs[0]->getObjectType()){
+    case ObjectType::Circle:{
+        QMessageBox::warning(nullptr, "警告", "Circle暂时不兼容几何变换!");
+        return std::set<GeometricObject*>();
+        //return std::set<GeometricObject*>{new Circle(objs, 7)};
+        break;
+    }
+    case ObjectType::Line:{
+        return std::set<GeometricObject*>{new Line(objs, -4)};
+        break;
+    }
+    case ObjectType::Lineo:{
+        return std::set<GeometricObject*>{new Lineo(objs, -4)};
+        break;
+    }
+    case ObjectType::Lineoo:{
+        return std::set<GeometricObject*>{new Lineoo(objs, -4)};
+        break;
+    }
+    case ObjectType::Point:{
+        return std::set<GeometricObject*>{new Point(objs, -4)};
+        break;
+    }
+    default:{
+        QMessageBox::warning(nullptr, "警告", "尝试对Any/None对象进行几何变换!");
+        return std::set<GeometricObject*>();
+    }
+    }
+}

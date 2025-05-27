@@ -45,12 +45,17 @@ GeometricObject::GeometricObject(ObjectName name):
     hovered_(false),      // 默认悬停状态
     legal_(true),         // 默认合法状态
     hidden_(false),       // 默认隐藏状态
+    labelhidden_(true),       // 标签默认隐藏状态
     name_(name),          // 对象类型名
     label_(GetDefaultLable[name]),   // 使用映射表获取默认标签
     color_(GetDefaultColor[name]),   // 使用映射表获取默认颜色
     size_(GetDefaultSize[name]),     // 使用映射表获取默认大小
     shape_(GetDefaultShape[name]),   // 使用映射表获取默认形状/线型
-    generation_(0) {}     // 对象的生成代数，初始为0
+    generation_(0) {
+    if(name==ObjectName::Point){
+        labelhidden_=false;
+    }
+}     // 对象的生成代数，初始为0
 
 GeometricObject::~GeometricObject() {
     // 移除父子关系

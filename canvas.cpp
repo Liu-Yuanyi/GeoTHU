@@ -487,6 +487,12 @@ void Canvas::contextMenuEvent(QContextMenuEvent* event) {
         update();
     });
 
+    menu.addAction(tr(contextMenuObj->islablehidden()?"show label":"hide label"), [this, contextMenuObj]() {
+        contextMenuObj->setlabelhidden(1-contextMenuObj->islablehidden());
+        contextMenuObj->setSelected(false);
+        selectedObjs_.erase(contextMenuObj);
+        update();
+    });
 
     // 删除操作 (作用于所有当前选中的对象)
 

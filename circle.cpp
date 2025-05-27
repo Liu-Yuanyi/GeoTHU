@@ -106,7 +106,7 @@ void Circle::draw(QPainter* painter) const {
         case CircleType::FULL_CIRCLE:
             painter->drawEllipse(center, radius, radius);
             // 添加标签绘制（如果有）
-            if (label_ != "") {
+            if (!labelhidden_) {
                 painter->setPen(Qt::black);
                 painter->drawText(center.x() + radius + 6,
                                   center.y() - 6,
@@ -139,7 +139,7 @@ void Circle::draw(QPainter* painter) const {
     case CircleType::FULL_CIRCLE:
         painter->drawEllipse(center, radius, radius);
         // 添加标签绘制（如果有）
-        if (label_ != "") {
+        if (!labelhidden_) {
             painter->setPen(Qt::black);
             painter->drawText(center.x() + radius + 6,
                               center.y() - 6,

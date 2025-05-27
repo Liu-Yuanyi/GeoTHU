@@ -40,12 +40,14 @@ public:
     QColor getColor() const { return color_; }
     double getSize() const { return size_; }
     int getShape() const { return shape_; }
+    bool islablehidden() const {return labelhidden_;}
 
     // --- Status Setters ---
     void setSelected(bool selected) { selected_ = selected; }
     void setHidden(bool hidden) { hidden_ = hidden; }
     void setLegal(bool legal) { legal_ = legal ;}
     void setHovered(bool hovered) { hovered_ = hovered; }
+    void setlabelhidden(bool labelhidden) { labelhidden_ = labelhidden; }
     void setLabel(QString str) { label_ = str; } // update default label to the next char maybe?
     void setColor(QColor color){ color_ = color; GetDefaultColor[name_] = color; }
     void setSize(double size) { size_ = size; GetDefaultSize[name_] = size; }
@@ -77,6 +79,7 @@ protected:
     bool hovered_;
     mutable bool legal_;
     bool hidden_;
+    bool labelhidden_;
     std::vector<GeometricObject*> parents_ = {};
     std::vector<GeometricObject*> children_ = {};
     QString label_;

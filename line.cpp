@@ -82,7 +82,6 @@ Line::Line(const std::vector<GeometricObject*>& parents,const int& generation)
     for(auto iter: parents){
         addParent(iter);
     }
-
     generation_=generation;
     GetDefaultLable[ObjectType::Line]=nextLineLable(GetDefaultLable[ObjectType::Line]);
 }
@@ -103,7 +102,7 @@ void Line::draw(QPainter* painter) const {
     auto ppp=getTwoPoints();
     auto P1=ppp.first,P2=ppp.second;
 
-    if (label_ != "") {
+    if (!labelhidden_) {
         painter->setPen(Qt::black);
         painter->drawText((P1.x()+P2.x())/2 + 6,
                           (P1.y()+P2.y())/2 - 6,
@@ -165,6 +164,12 @@ std::pair<const QPointF,const QPointF> Line::getTwoPoints() const{
         }
     }
     switch(generation_){
+    case -4:{
+        return std::make_pair(
+            2*parents_[1]->position()-parents_[0]->getTwoPoints().first,
+            2*parents_[1]->position()-parents_[0]->getTwoPoints().second
+            );
+    }
     case -3:{
         return std::make_pair(
             reflect(parents_[0]->getTwoPoints().first,parents_[1]->getTwoPoints()),

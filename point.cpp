@@ -90,7 +90,7 @@ void Point::draw(QPainter* painter) const {
         return;
     }
 
-    if (label_ != "") {
+    if (!labelhidden_) {
         painter->setPen(Qt::black);
         painter->drawText(position().x() + 6, position().y() - 6, label_);
     }
@@ -138,6 +138,9 @@ QPointF Point::position() const{
         }
     }
     switch(generation_){
+    case -4:{
+        return 2*parents_[1]->position()-parents_[0]->position();
+    }
     case -3:{
         return reflect(parents_[0]->position(),parents_[1]->getTwoPoints());
     }
