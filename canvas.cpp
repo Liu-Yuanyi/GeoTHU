@@ -63,17 +63,22 @@ void Canvas::setOperation(const int index) {
 }
 
 void Canvas::updateHoverState(const QPointF& pos) {
-    GeometricObject* newHover = findObjNear(pos);
-    if (newHover != hoveredObj_) {
-        if (hoveredObj_) {
-            hoveredObj_->setHovered(false);
-        }
-        hoveredObj_ = newHover;
-        if (hoveredObj_) {
-            hoveredObj_->setHovered(true);
-        }
-        update();
+    for (auto obj : hoveredObjs_) {
+        obj->setHovered(false);
     }
+    hoveredObjs_.clear();
+    Point* p = findPointNear(pos);
+    if (p) {
+        p->setHovered(true);
+        hoveredObjs_.push_back(p);
+        return;
+    }
+    std::vector<GeometricObject*> newHover = findObjectsNear(pos);
+    for (auto obj : newHover) {
+        obj->setHovered(true);
+        hoveredObjs_.push_back(obj);
+    }
+    update();
 }
 
 GeometricObject* Canvas::automaticIntersection(){
