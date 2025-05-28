@@ -495,6 +495,11 @@ void Canvas::contextMenuEvent(QContextMenuEvent* event) {
         lineWidthMenu->addAction("thick", [this, circle]() { circle->setSize(3.0); update(); });
         lineWidthMenu->addAction("ultra-thick", [this, circle]() { circle->setSize(4.0); update(); });
 
+        QMenu* shapeMenu = menu.addMenu(tr("linestyle"));
+        shapeMenu->addAction(tr("solid"), [this, contextMenuObj]() { contextMenuObj->setShape(0); update(); });
+        shapeMenu->addAction(tr("dashed"),   [this, contextMenuObj]() { contextMenuObj->setShape(1); update(); });
+        shapeMenu->addAction(tr("dotted"),   [this, contextMenuObj]() { contextMenuObj->setShape(2); update(); });
+
         menu.addAction(tr("label..."), [this, circle]() {
             bool ok;
             QString text = QInputDialog::getText(this, tr("set label"), tr("label:"), QLineEdit::Normal, circle->getLabel(), &ok);
