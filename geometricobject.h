@@ -65,6 +65,8 @@ public:
     const std::vector<GeometricObject*>& getChildren() const;
     bool hasChild(GeometricObject* child) const;
 
+    void flush();
+
 protected:
 
     inline void expectParentNum(size_t num)const{
