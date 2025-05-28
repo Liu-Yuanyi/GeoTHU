@@ -25,6 +25,9 @@ public:
     bool isNear(const QPointF& pos) const override; // 判断点是否在线附近
     QPointF position() const override; // 返回 startPoint_
     std::pair<const QPointF, const QPointF> getTwoPoints() const override;
+
+    double length() const{return len(getTwoPoints().first-getTwoPoints().second);}
+
 protected:
     // isNear 计算的辅助函数 (点到线段的距离)
     Qt::PenStyle getPenStyle()const;

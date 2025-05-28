@@ -37,8 +37,8 @@ Canvas::Canvas(QWidget* parent) : QWidget(parent) {
     operations.push_back(new IntersectionCreator());
     operations.push_back(new CenterRadiusCircleCreator()); // 索引11
     operations.push_back(new ThreePointCircleCreator());   // 索引12
-    operations.push_back(new ArcCreator());               // 索引13
-    operations.push_back(new SemicircleCreator());        // 索引14
+    operations.push_back(new TwoPointCircleCreator());               // 索引13
+    operations.push_back(new TwoPointCircleCreator());        // 索引14
     operations.push_back(new AxialSymmetry());             //索引15
     operations.push_back(new CentralSymmetry());
     // TODO: add other operations here.
@@ -308,21 +308,6 @@ void Canvas::mouseMoveEvent(QMouseEvent* event) {
                 if (obj->getObjectType() == ObjectType::Point) {
                     Point* point = dynamic_cast<Point*>(obj);
                     if (point) point->setPosition(newPos);
-                } else if (obj->getObjectType() == ObjectType::Circle) { // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< 新增：拖动圆的逻辑
-                    Circle* circle = dynamic_cast<Circle*>(obj);
-                    if (circle) {
-                        // 如果圆的圆心是一个独立的 Point 对象，并且该 Point 对象也被选中并一起拖动，
-                        // 那么圆的位置应该通过其父 Point 对象的移动来更新。
-                        // 这里处理的是直接拖动圆对象本身（如果它的圆心不是一个独立的、被选中的 Point）。
-                        if (!circle->getCenterPoint() || !selectedObjs_.count(circle->getCenterPoint())) {
-                            // 获取当前圆心位置
-                            QPointF currentCenter = circle->getCenterCoordinates();
-                            // 计算新的圆心位置 = 当前圆心 + 拖动偏移量
-                            QPointF newCenter = currentCenter + delta;
-                            // 更新圆心位置
-                            circle->setCenterCoordinates(newCenter);
-                        }
-                    }
                 }
                 // 你可能需要为其他类型的对象（如线、多边形等）添加拖动逻辑
             }

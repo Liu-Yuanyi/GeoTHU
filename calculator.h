@@ -3,6 +3,33 @@
 
 #include"point.h"
 
+inline const QPointF calculateCircleCenter(const QPointF& p1, const QPointF& p2, const QPointF& p3) {
+    // 计算向量 v1 = (p2 - p1) 和 v2 = (p3 - p1)
+    double x1 = p2.x() - p1.x();
+    double y1 = p2.y() - p1.y();
+    double x2 = p3.x() - p1.x();
+    double y2 = p3.y() - p1.y();
+
+    // 计算三点共线检测的叉积
+    double cross = x1 * y2 - x2 * y1;
+
+    // 处理共线或接近共线的情况
+#warning 这里需要修改
+    if (std::abs(cross) < 1e-8) {
+        cross = 1e-8;
+    }
+
+    // 计算垂直平分线交点（圆心）
+    double f = (x1*x1 + y1*y1) / 2.0;
+    double g = (x2*x2 + y2*y2) / 2.0;
+
+    double denominator = cross;
+    double cx = p1.x() + (f*y2 - g*y1) / denominator;
+    double cy = p1.y() + (g*x1 - f*x2) / denominator;
+
+    return QPointF(cx, cy);
+}
+
 inline const qreal footRatio(QPointF P, std::pair<QPointF, QPointF> line, ObjectType mode=ObjectType::Line) {
     const QPointF& A = line.first;
     const QPointF& B = line.second;

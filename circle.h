@@ -28,6 +28,9 @@ protected:
 
 };
 
+//Circle 的产生方式:
+//0圆心+圆周上一点 1:圆心+线段 2:三点
+
 class TwoPointCircleCreator: public Operation {
 public:
     TwoPointCircleCreator();
