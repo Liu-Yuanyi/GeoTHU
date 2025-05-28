@@ -585,24 +585,38 @@ void Canvas::keyPressEvent(QKeyEvent *event) {
 }
 
 void Canvas::wheelEvent(QWheelEvent *event) {
-    double deltay = event->angleDelta().y(); // y() gives vertical scroll
-    for (auto obj : objects_) {
-        if (obj->getObjectType() == ObjectType::Point and obj->getParents().empty()) {
-            auto curPosition = obj->position();
-            Point* point = dynamic_cast<Point*>(obj);
-            point->setPosition(curPosition + QPointF(0, 0.3 * deltay));
+    mousePos_ = event->position();
+    if (!(event->modifiers() & Qt::ControlModifier)){
+        double deltay = event->angleDelta().y(); // y() gives vertical scroll
+        for (auto obj : objects_) {
+            if (obj->getObjectType() == ObjectType::Point and obj->getParents().empty()) {
+                auto curPosition = obj->position();
+                Point* point = dynamic_cast<Point*>(obj);
+                point->setPosition(curPosition + QPointF(0, 0.3 * deltay));
+            }
         }
-    }
-    double deltax = event->angleDelta().x(); // y() gives vertical scroll
-    for (auto obj : objects_) {
-        if (obj->getObjectType() == ObjectType::Point and obj->getParents().empty()) {
-            auto curPosition = obj->position();
-            Point* point = dynamic_cast<Point*>(obj);
-            point->setPosition(curPosition + QPointF(0.3 * deltax, 0));
+        double deltax = event->angleDelta().x(); // y() gives vertical scroll
+        for (auto obj : objects_) {
+            if (obj->getObjectType() == ObjectType::Point and obj->getParents().empty()) {
+                auto curPosition = obj->position();
+                Point* point = dynamic_cast<Point*>(obj);
+                point->setPosition(curPosition + QPointF(0.3 * deltax, 0));
+            }
+        }
+    } else {
+        double deltay = event->angleDelta().y(); // y() gives vertical scroll
+        for (auto obj : objects_) {
+            if (obj->getObjectType() == ObjectType::Point and obj->getParents().empty()) {
+                auto curPosition = obj->position();
+                Point* point = dynamic_cast<Point*>(obj);
+                QPointF center = mousePos_;
+                point->setPosition(curPosition * (1 + deltay / 2000) - center * (deltay / 2000));
+            }
         }
     }
     update();
-    update();
+
+
 
     event->accept();
 }
