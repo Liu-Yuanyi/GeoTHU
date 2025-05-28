@@ -22,6 +22,7 @@ MainWindow::MainWindow(QWidget *parent)
 {
     // 1. 创建 Canvas 实例
     m_canvas = new Canvas(this); // 父对象是 MainWindow
+    m_canvas->setFocus();
 
     // 2. 将 Canvas 设置为主窗口的中央部件
     setCentralWidget(m_canvas); // <--- 这是关键！
@@ -115,7 +116,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     // 9. 设置窗口的初始大小和标题
     resize(1024, 768);
-    setWindowTitle(tr("绘图应用"));
+    setWindowTitle(tr("Sketchpad"));
 
     // 10. 默认选中第一个工具 (如果存在) 并设置初始模式
     if (!m_toolButtonGroup->buttons().isEmpty()) {

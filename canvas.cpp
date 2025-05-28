@@ -23,6 +23,7 @@ Canvas::Canvas(QWidget* parent) : QWidget(parent) {
     setMouseTracking(true); // 开启鼠标跟踪以接收 mouseMoveEvent (即使没有按钮按下)
     currentOperation_ = nullptr; // 初始化
     currentMode = SelectionMode;
+    setFocusPolicy(Qt::StrongFocus);
     operations.push_back(new TwoPointCircleCreator());
     operations.push_back(new LineCreator());
     operations.push_back(new LineooCreator());
@@ -538,6 +539,72 @@ void Canvas::contextMenuEvent(QContextMenuEvent* event) {
     if (!menu.isEmpty()) { // 如果菜单中有任何项，则显示它
         menu.exec(event->globalPos()); // 在鼠标光标的全局位置显示菜单
     }
+}
+
+void Canvas::keyPressEvent(QKeyEvent *event) {
+    if (event->key() == Qt::Key_Up) {
+        for (auto obj : objects_) {
+            if (obj->getObjectType() == ObjectType::Point and obj->getParents().empty()) {
+                auto curPosition = obj->position();
+                Point* point = dynamic_cast<Point*>(obj);
+                point->setPosition(curPosition + QPointF(0, 3));
+            }
+        }
+        update();
+    }
+    if (event->key() == Qt::Key_Down) {
+        for (auto obj : objects_) {
+            if (obj->getObjectType() == ObjectType::Point and obj->getParents().empty()) {
+                auto curPosition = obj->position();
+                Point* point = dynamic_cast<Point*>(obj);
+                point->setPosition(curPosition + QPointF(0, -3));
+            }
+        }
+        update();
+    }
+    if (event->key() == Qt::Key_Right) {
+        for (auto obj : objects_) {
+            if (obj->getObjectType() == ObjectType::Point and obj->getParents().empty()) {
+                auto curPosition = obj->position();
+                Point* point = dynamic_cast<Point*>(obj);
+                point->setPosition(curPosition + QPointF(-3, 0));
+            }
+        }
+        update();
+    }
+    if (event->key() == Qt::Key_Left) {
+        for (auto obj : objects_) {
+            if (obj->getObjectType() == ObjectType::Point and obj->getParents().empty()) {
+                auto curPosition = obj->position();
+                Point* point = dynamic_cast<Point*>(obj);
+                point->setPosition(curPosition + QPointF(3, 0));
+            }
+        }
+        update();
+    }
+}
+
+void Canvas::wheelEvent(QWheelEvent *event) {
+    double deltay = event->angleDelta().y(); // y() gives vertical scroll
+    for (auto obj : objects_) {
+        if (obj->getObjectType() == ObjectType::Point and obj->getParents().empty()) {
+            auto curPosition = obj->position();
+            Point* point = dynamic_cast<Point*>(obj);
+            point->setPosition(curPosition + QPointF(0, 0.3 * deltay));
+        }
+    }
+    double deltax = event->angleDelta().x(); // y() gives vertical scroll
+    for (auto obj : objects_) {
+        if (obj->getObjectType() == ObjectType::Point and obj->getParents().empty()) {
+            auto curPosition = obj->position();
+            Point* point = dynamic_cast<Point*>(obj);
+            point->setPosition(curPosition + QPointF(0.3 * deltax, 0));
+        }
+    }
+    update();
+    update();
+
+    event->accept();
 }
 
 void Canvas::deleteObjects(){
