@@ -116,7 +116,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     // 9. 设置窗口的初始大小和标题
     resize(1024, 768);
-    setWindowTitle(tr("Sketchpad"));
+    setWindowTitle(tr("GeoTHU"));
 
     // 10. 默认选中第一个工具 (如果存在) 并设置初始模式
     if (!m_toolButtonGroup->buttons().isEmpty()) {
@@ -192,7 +192,7 @@ void MainWindow::setupToolPanel()
     circleLayout->setContentsMargins(5,5,5,5);
 
     circleLayout->addWidget(createToolButton(tr("Arc"), ":/raw_icons/circle_arc.png", tr("Draw a circular arc")));
-    circleLayout->addWidget(createToolButton(tr("Circle (Center, Radius)"), ":/raw_icons/circle_center_radius.png", tr("Draw circle with center and radius")));
+    circleLayout->addWidget(createToolButton(tr("Circle (Radius, Center)"), ":/raw_icons/circle_center_radius.png", tr("Draw circle with center and radius")));
     circleLayout->addWidget(createToolButton(tr("Circle (Center, Point)"), ":/raw_icons/circle_center_point.png", tr("Draw circle with center and point on circumference")));
     circleLayout->addWidget(createToolButton(tr("Semicircle"), ":/raw_icons/circle_semi.png", tr("Draw a semicircle")));
     circleLayout->addWidget(createToolButton(tr("Circle (3 Points)"), ":/raw_icons/circle_three_point.png", tr("Draw circle through three points")));
@@ -321,7 +321,7 @@ void MainWindow::onToolSelected(QAbstractButton *abstractButton)
         m_canvas->setOperation(9);
     } else if (toolId == tr("Intersect")){
         m_canvas->setOperation(10);
-    } else if (toolId == tr("Circle (Center, Radius)")){
+    } else if (toolId == tr("Circle (Radius, Center)")){
         m_canvas->setOperation(11);
     } else if (toolId == tr("Circle (3 Points)")){
         m_canvas->setOperation(12);
