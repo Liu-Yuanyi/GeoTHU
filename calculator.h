@@ -3,6 +3,52 @@
 
 #include"point.h"
 
+inline const qreal footRatio(QPointF P, std::pair<QPointF, QPointF> line, ObjectType mode=ObjectType::Line) {
+    const QPointF& A = line.first;
+    const QPointF& B = line.second;
+    // 计算线段AB的向量
+    QPointF AB = B - A;
+    // 计算点P到点A的向量
+    QPointF AP = P - A;
+    // 计算AB的长度平方
+    qreal abLengthSquared = AB.x() * AB.x() + AB.y() * AB.y();
+    // 如果线段长度为0，返回端点A
+    if (abLengthSquared == 0) return 0;
+    // 计算点积 AP·AB
+    qreal dotProduct = AP.x() * AB.x() + AP.y() * AB.y();
+    // 计算投影比例 t
+    qreal t;
+    if(mode==ObjectType::Lineoo){
+        return qBound(0.0, dotProduct / abLengthSquared, 1.0);
+    }
+    else if(mode == ObjectType::Lineo){
+        return qMax(0.0, dotProduct / abLengthSquared);
+    }
+
+    else return dotProduct / abLengthSquared;
+}
+
+inline const QPointF NearestPointOnCircle(QPointF P, std::pair<QPointF, QPointF> Cir) {
+    const QPointF& center = Cir.first;   // 圆心
+    const QPointF& onCircle = Cir.second; // 圆上一点，用于确定半径向量
+
+    // 计算半径向量（圆心到圆上点的方向）
+    QPointF radiusVector = onCircle - center;
+    qreal radius2 = radiusVector.x()*radiusVector.x()+radiusVector.y()*radiusVector.y(); // 半径长度
+
+    // 若半径为0（退化为点），返回圆心
+    if (radius2 == 0) return center;
+
+    // 计算点P到圆心的向量
+    QPointF toP = P - center;
+    qreal disP= toP.x()*toP.x()+toP.y()*toP.y();
+
+    QPointF delta = toP*(sqrt(radius2/disP));
+
+    return center+delta;
+}
+
+
 struct linelineIntersectionResult{
     QPointF p;
     double t[2];//占两个线段的比例
@@ -79,6 +125,13 @@ inline linecircleIntersectionResult linecircleintersection(
 
     double discriminant = b * b - 4 * a * c;
     if (discriminant < 0) {
+        double t=footRatio(O,AB);
+        QPointF foot=A+t*(B-A);
+        if(len(foot-O)-len(R-O)<0.00001){
+            result.p[0]=result.p[1]=foot;
+            result.t[0]=result.t[1]=t;
+            result.exist=true;
+        }
         return result;
     }
 
@@ -143,7 +196,6 @@ inline circlecircleIntersectionResult circlecircleintersection(
 
     // 确保向量p1p2和向量AO的叉乘垂直于屏幕朝内
     QPointF p1p2 = result.p[1] - result.p[0];
-    double cross = AO.x() * p1p2.y() - AO.y() * p1p2.x();
 
     result.exist=true;
     return result;

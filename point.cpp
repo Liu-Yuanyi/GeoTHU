@@ -1,50 +1,6 @@
 #include "point.h"
 #include "objecttype.h"
 #include "calculator.h"
-inline const qreal footRatio(QPointF P, std::pair<QPointF, QPointF> line, ObjectType mode=ObjectType::Line) {
-    const QPointF& A = line.first;
-    const QPointF& B = line.second;
-    // 计算线段AB的向量
-    QPointF AB = B - A;
-    // 计算点P到点A的向量
-    QPointF AP = P - A;
-    // 计算AB的长度平方
-    qreal abLengthSquared = AB.x() * AB.x() + AB.y() * AB.y();
-    // 如果线段长度为0，返回端点A
-    if (abLengthSquared == 0) return 0;
-    // 计算点积 AP·AB
-    qreal dotProduct = AP.x() * AB.x() + AP.y() * AB.y();
-    // 计算投影比例 t
-    qreal t;
-    if(mode==ObjectType::Lineoo){
-        return qBound(0.0, dotProduct / abLengthSquared, 1.0);
-    }
-    else if(mode == ObjectType::Lineo){
-        return qMax(0.0, dotProduct / abLengthSquared);
-    }
-
-    else return dotProduct / abLengthSquared;
-}
-
-inline const QPointF NearestPointOnCircle(QPointF P, std::pair<QPointF, QPointF> Cir) {
-    const QPointF& center = Cir.first;   // 圆心
-    const QPointF& onCircle = Cir.second; // 圆上一点，用于确定半径向量
-
-    // 计算半径向量（圆心到圆上点的方向）
-    QPointF radiusVector = onCircle - center;
-    qreal radius2 = radiusVector.x()*radiusVector.x()+radiusVector.y()*radiusVector.y(); // 半径长度
-
-    // 若半径为0（退化为点），返回圆心
-    if (radius2 == 0) return center;
-
-    // 计算点P到圆心的向量
-    QPointF toP = P - center;
-    qreal disP= toP.x()*toP.x()+toP.y()*toP.y();
-
-    QPointF delta = toP*(sqrt(radius2/disP));
-
-    return center+delta;
-}
 
 Point::Point(const QPointF& position) : GeometricObject(ObjectName::Point), position_(position) {
     generation_=0;
