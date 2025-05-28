@@ -13,23 +13,6 @@
 // extern std::map<ObjectType, int> GetDefaultShape;
 // ... 你可能需要在某处初始化这些map中关于Circle的条目 ...
 
-Circle::Circle(Point* centerPoint, double radius, ObjectName name)
-    : GeometricObject(name),
-    centerPoint_(centerPoint),
-    pointOnCircle_(nullptr),
-    centerPosition_(),
-    radius_(radius > 0 ? radius : 10.0),
-    circleType_(CircleType::FULL_CIRCLE),
-    startAnglePoint_(),
-    endAnglePoint_(),
-    startAngle_(0.0),
-    spanAngle_(360.0) {
-    if (centerPoint_) {
-        this->addParent(centerPoint_);
-        updateCenterPositionFromPoint();
-    }
-}
-
 Qt::PenStyle Circle::getPenStyle() const {
     // 将整数值转换为 Qt::PenStyle
     switch (shape_) {
@@ -44,52 +27,24 @@ Qt::PenStyle Circle::getPenStyle() const {
     }
 }
 
-void Circle::setLineStyle(int style) {
-    shape_ = style;
-    // 可以在这里添加更新/重绘的通知
-}
-
-
-Circle::Circle(const QPointF& centerPos, double radius, ObjectName name)
-    : GeometricObject(name), centerPoint_(nullptr), pointOnCircle_(nullptr), centerPosition_(centerPos), radius_(radius > 0 ? radius : 10.0) {
-    // 同上，设置颜色、标签等
-}
-
-Circle::Circle(Point* centerPoint, Point* pointOnCircle)
-    : GeometricObject(ObjectName::Circle), centerPoint_(centerPoint), pointOnCircle_(pointOnCircle), centerPosition_() {
-    this->addParent(centerPoint_);
-    this->addParent(pointOnCircle_);
-    updateCenterPositionFromPoint();
-    QPointF pos1 = centerPoint->position(), pos2 = pointOnCircle->position();
-    radius_ = std::sqrt(std::pow(pos1.x() - pos2.x(), 2) + std::pow(pos1.y() - pos2.y(), 2));
-
-}
-
-Circle::~Circle() {
-    // 如果在构造函数中建立了需要显式断开的连接，在这里处理
-    // 例如，如果父子关系不仅仅是添加到列表，还有其他逻辑
-    if (centerPoint_) {
-        // removeParent(centerPoint_); // 通常GeometricObject的析构函数或父对象的removeChild会处理
+Circle::Circle(const std::vector<GeometricObject*>& parents,const int& generation)
+    : GeometricObject(ObjectName::Circle){
+    for(auto iter: parents){
+        addParent(iter);
     }
+    generation_=generation;
+    GetDefaultLable[ObjectType::Circle]=nextLineLable(GetDefaultLable[ObjectType::Circle]);
 }
 
 void Circle::draw(QPainter* painter) const {
-    if (isHidden()) return;
+    if (!isShown()) return;
 
     // 获取圆心和半径
     auto points = getTwoPoints();
     QPointF center = points.first;
     double radius = QLineF(points.first, points.second).length();
-    // 如果是半圆，调整半径
-    if (circleType_ == CircleType::SEMICIRCLE) {
-        radius /= 2.0;
-    }
 
-
-    // 设置画笔
     QPen pen;
-
-    // 根据 hovered 状态增加线宽
     double add = ((int)hovered_) * HOVER_ADD_WIDTH;
 
     // 如果被选中，先绘制一个较宽的选中效果
@@ -101,9 +56,6 @@ void Circle::draw(QPainter* painter) const {
         pen.setStyle(Qt::SolidLine);
         painter->setPen(pen);
 
-        // 根据圆的类型绘制选中效果
-        switch (circleType_) {
-        case CircleType::FULL_CIRCLE:
             painter->drawEllipse(center, radius, radius);
             // 添加标签绘制（如果有）
             if (!labelhidden_) {
@@ -112,20 +64,7 @@ void Circle::draw(QPainter* painter) const {
                                   center.y() - 6,
                                   label_);
             }
-            break;
-        case CircleType::SEMICIRCLE:
-        {
-            QRectF rect(center.x() - radius, center.y() - radius, 2 * radius, 2 * radius);
-            painter->drawArc(rect, static_cast<int>(-startAngle_ * 16), static_cast<int>(-spanAngle_ * 16));
-            break;
-        }
-        case CircleType::ARC:
-        {
-            QRectF rect(center.x() - radius, center.y() - radius, 2 * radius, 2 * radius);
-            painter->drawArc(rect, static_cast<int>(startAngle_ * 16), static_cast<int>(spanAngle_ * 16));
-            break;
-        }
-        }
+
     }
 
     // 设置正常绘制的画笔
