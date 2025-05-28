@@ -63,21 +63,23 @@ void Canvas::setOperation(const int index) {
 }
 
 void Canvas::updateHoverState(const QPointF& pos) {
-    for (auto obj : hoveredObjs_) {
-        obj->setHovered(false);
-    }
-    hoveredObjs_.clear();
+    std::vector<GeometricObject*> newHover;
     Point* p = findPointNear(pos);
     if (p) {
         p->setHovered(true);
-        hoveredObjs_.push_back(p);
-        return;
+        newHover.push_back(p);
+    } else {
+        newHover = findObjectsNear(pos);
+        for (auto obj : newHover) {
+            obj->setHovered(true);
+        }
     }
-    std::vector<GeometricObject*> newHover = findObjectsNear(pos);
-    for (auto obj : newHover) {
-        obj->setHovered(true);
-        hoveredObjs_.push_back(obj);
+    for (auto obj : hoveredObjs_) {
+        if (std::find(newHover.begin(), newHover.end(), obj) == newHover.end()){
+            obj->setHovered(false);
+        }
     }
+    hoveredObjs_ = newHover;
     update();
 }
 
@@ -201,7 +203,11 @@ void Canvas::mousePressEvent(QMouseEvent* event) {
                 }
                 targetPoint->setSelected(true);
                 selectedObjs_.insert(targetPoint);
-                operationSelections_.push_back(targetPoint);
+                if (std::find(operationSelections_.begin(), operationSelections_.end(), targetPoint) != operationSelections_.end()){
+                    clearSelections();
+                } else {
+                    operationSelections_.push_back(targetPoint);
+                }
             } else if (currentOperation_->isValidInput(operationSelections_) == 3){
                 GeometricObject* targetObj = findObjNear(mousePos_);
                 if (!targetObj) {
@@ -210,7 +216,11 @@ void Canvas::mousePressEvent(QMouseEvent* event) {
                 else{
                     targetObj->setSelected(true);
                     selectedObjs_.insert(targetObj);
-                    operationSelections_.push_back(targetObj);
+                    if (std::find(operationSelections_.begin(), operationSelections_.end(), targetObj) != operationSelections_.end()){
+                        clearSelections();
+                    } else {
+                        operationSelections_.push_back(targetObj);
+                    }
                     if (currentOperation_->isValidInput(operationSelections_) == 1){
                         clearSelections();
                     }
@@ -220,20 +230,32 @@ void Canvas::mousePressEvent(QMouseEvent* event) {
                 if (targetPoint){
                     targetPoint->setSelected(true);
                     selectedObjs_.insert(targetPoint);
+                    if (std::find(operationSelections_.begin(), operationSelections_.end(), targetPoint) != operationSelections_.end()){
+                        clearSelections();
+                    } else {
                     operationSelections_.push_back(targetPoint);
+                    }
                 }
                 else{
                     GeometricObject* targetObj = findObjNear(mousePos_);
                     if (targetObj){
                         targetObj->setSelected(true);
                         selectedObjs_.insert(targetObj);
+                        if (std::find(operationSelections_.begin(), operationSelections_.end(), targetObj) != operationSelections_.end()){
+                            clearSelections();
+                        } else {
                         operationSelections_.push_back(targetObj);
+                        }
                     }
                     else{
                         Point* newPoint = new Point(mousePos_);
                         objects_.push_back(newPoint);
                         selectedObjs_.insert(newPoint);
+                        if (std::find(operationSelections_.begin(), operationSelections_.end(), newPoint) != operationSelections_.end()){
+                            clearSelections();
+                        } else {
                         operationSelections_.push_back(newPoint);
+                        }
                     }
                 }
             }
