@@ -40,7 +40,8 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         tools.h tools.cpp
         intersectioncreator.h intersectioncreator.cpp
         calculator.h
-
+        icon.qrc
+        app.rc
     )
 # Define target properties for Android with Qt 6 as:
 #    set_property(TARGET test_project APPEND PROPERTY QT_ANDROID_PACKAGE_SOURCE_DIR
