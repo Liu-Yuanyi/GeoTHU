@@ -23,12 +23,18 @@ ParallelLineCreator::ParallelLineCreator(){
     inputType.push_back(std::vector<ObjectType>{ObjectType::Lineoo,ObjectType::Point});
     inputType.push_back(std::vector<ObjectType>{ObjectType::Lineo,ObjectType::Point});
     inputType.push_back(std::vector<ObjectType>{ObjectType::Line,ObjectType::Point});
+    inputType.push_back(std::vector<ObjectType>{ObjectType::Point,ObjectType::Lineoo});
+    inputType.push_back(std::vector<ObjectType>{ObjectType::Point,ObjectType::Lineo});
+    inputType.push_back(std::vector<ObjectType>{ObjectType::Point,ObjectType::Line});
     inputType.push_back(std::vector<ObjectType>{ObjectType::Point,ObjectType::Point,ObjectType::Point});
     operationName="ParallelLineCreator";
 }
 
 std::set<GeometricObject*> ParallelLineCreator::apply(std::vector<GeometricObject*> objs,
                                                                 QPointF position)const{
+    if(objs[0]->getObjectType()==ObjectType::Point && objs.size()==2){
+        std::swap(objs[1],objs[0]);
+    }
     Line *pLine=new Line(objs,3);
     std::set<GeometricObject*> ret{pLine};
     return ret;
@@ -51,11 +57,17 @@ PerpendicularLineCreator::PerpendicularLineCreator() {
     inputType.push_back(std::vector<ObjectType>{ObjectType::Point, ObjectType::Lineoo});
     inputType.push_back(std::vector<ObjectType>{ObjectType::Point, ObjectType::Lineo});
     inputType.push_back(std::vector<ObjectType>{ObjectType::Point, ObjectType::Line});
+    inputType.push_back(std::vector<ObjectType>{ObjectType::Lineoo,ObjectType::Point});
+    inputType.push_back(std::vector<ObjectType>{ObjectType::Lineo, ObjectType::Point});
+    inputType.push_back(std::vector<ObjectType>{ObjectType::Line,  ObjectType::Point});
     operationName = "PerpendicularLineCreator";
 }
 
 std::set<GeometricObject*> PerpendicularLineCreator::apply(std::vector<GeometricObject*> objs,
                                                    QPointF position) const {
+    if(objs[1]->getObjectType()==ObjectType::Point){
+        std::swap(objs[0],objs[1]);
+    }
     Line* newLine = new Line(objs, 6);
     std::set<GeometricObject*> ret{newLine};
     return ret;
