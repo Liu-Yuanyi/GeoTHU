@@ -206,7 +206,7 @@ inline circlecircleIntersectionResult circlecircleintersection(
     // 处理两圆位置关系
     if (d > r1 + r2 || d < qAbs(r1 - r2)) {
         if(0<=(d-r1-r2) && (d-r1-r2)<=Epsilon || qAbs(r1-r2)-d>=0 && qAbs(r1-r2)-d<=Epsilon){
-            result.p[0]=result.p[1]= A + (len(B-A)/len(O-A))*(O-A);
+            result.p[0]=result.p[1]= (len(A-B)>len(O-R)? A + (len(B-A)/len(O-A))*(O-A):O + (len(R-O)/len(O-A))*(A-O));
             result.exist=true;
         }
         return result;
