@@ -142,28 +142,32 @@ inline std::pair<const QPointF,const QPointF> zhongchui(std::pair<const QPointF&
                           QPointF((x1+x2)/2.0+y2-y1,(y1+y2)/2.0+x1-x2));
 }
 
-std::pair<const QPointF,const QPointF> Lineo::getTwoPoints() const{
+void Lineo::flush(){
+    position_.clear();
     legal_=true;
     for(auto iter:parents_){
         if(!iter->isLegal()){
             legal_=false;
-            return std::make_pair(QPointF(),QPointF(1,1));
+            position_.push_back(QPointF());
+            position_.push_back(QPointF(1,1));
+            return;
         }
     }
     switch(generation_){
     case -4:{
-        return std::make_pair(
-            2*parents_[1]->position()-parents_[0]->getTwoPoints().first,
-            2*parents_[1]->position()-parents_[0]->getTwoPoints().second
-            );
+        position_.push_back(2*parents_[1]->position()-parents_[0]->getTwoPoints().first);
+        position_.push_back(2*parents_[1]->position()-parents_[0]->getTwoPoints().second);
+        return;
     }
     case -3:{
-        return std::make_pair(
-            reflect(parents_[0]->getTwoPoints().first,parents_[1]->getTwoPoints()),
-            reflect(parents_[0]->getTwoPoints().second,parents_[1]->getTwoPoints())
-            );
+        position_.push_back(reflect(parents_[0]->getTwoPoints().first,parents_[1]->getTwoPoints()));
+        position_.push_back(reflect(parents_[0]->getTwoPoints().second,parents_[1]->getTwoPoints()));
+        return;
     }
-    case 0:return std::make_pair(parents_[0]->position(),parents_[1]->position());
+    case 0:
+        position_.push_back(parents_[0]->position());
+        position_.push_back(parents_[1]->position());
+        return;
     case 1:{
         expectParentNum(3);
         QPointF p1 = parents_[1]->position();
@@ -172,15 +176,24 @@ std::pair<const QPointF,const QPointF> Lineo::getTwoPoints() const{
         double l2 = std::sqrt(std::pow(p1.x() - b.x(), 2) + std::pow(p1.y() - b.y(), 2));
         a = p1 + (a - p1) * 300 / l1;
         b = p1 + (b - p1) * 300 / l2;
-        return std::make_pair(p1, (a + b) / 2);
+        position_.push_back(p1);
+        position_.push_back((a + b) / 2);
+        return;
     }
     case 2:
-
+        // 保持原有case 2的逻辑不变（为空）
+        break;
     default:
         break;
     }
-    QMessageBox::warning(nullptr, "警告", "lineo的getTwoPoint方法没有完成!");
-    return std::make_pair(QPointF(),QPointF());
+    QMessageBox::warning(nullptr, "警告", "lineo的flush方法没有完成!");
+    position_.push_back(QPointF());
+    position_.push_back(QPointF());
+    return;
+}
+
+std::pair<const QPointF,const QPointF> Lineo::getTwoPoints() const{
+    return std::make_pair(position_[0],position_[1]);
 }
 
 LineoCreator::LineoCreator(){

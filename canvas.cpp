@@ -357,8 +357,8 @@ void Canvas::paintEvent(QPaintEvent* event) {
     }
 
     // 绘制所有正式的几何对象
-    for (const auto* obj : objects_) {
-        obj->position();
+    for (auto* obj : objects_) {
+        obj->flush();
     }
     for (const auto* obj : objects_) {
         if (obj->isShown() and obj->getObjectType() != ObjectType::Point){

@@ -65,7 +65,9 @@ public:
     const std::vector<GeometricObject*>& getChildren() const;
     bool hasChild(GeometricObject* child) const;
 
-    void flush();
+    virtual void flush()=0;
+#warning needing "=0"
+    virtual bool isInRect(QRect rect){return 0;};
 
 protected:
 
@@ -76,7 +78,7 @@ protected:
                 "警告",
                 label_+"的parents_大小不为"+QString::number(num)+"!");
     }
-
+    std::vector<QPointF> position_;
     bool selected_;
     bool hovered_;
     mutable bool legal_;

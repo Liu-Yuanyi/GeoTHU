@@ -97,33 +97,43 @@ QPointF Lineoo::position() const {
     return getTwoPoints().first;
 }
 
-std::pair<const QPointF,const QPointF> Lineoo::getTwoPoints() const{
+void Lineoo::flush(){
+    position_.clear();
     legal_=true;
     for(auto iter:parents_){
         if(!iter->isLegal()){
             legal_=false;
-            return std::make_pair(QPointF(),QPointF(1,1));
+            position_.push_back(QPointF());
+            position_.push_back(QPointF(1,1));
+            return;
         }
     }
     switch(generation_){
     case -4:{
-        return std::make_pair(
-            2*parents_[1]->position()-parents_[0]->getTwoPoints().first,
-            2*parents_[1]->position()-parents_[0]->getTwoPoints().second
-            );
+        position_.push_back(2*parents_[1]->position()-parents_[0]->getTwoPoints().first);
+        position_.push_back(2*parents_[1]->position()-parents_[0]->getTwoPoints().second);
+        return;
     }
     case -3:{
-        return std::make_pair(
-            reflect(parents_[0]->getTwoPoints().first,parents_[1]->getTwoPoints()),
-            reflect(parents_[0]->getTwoPoints().second,parents_[1]->getTwoPoints())
-            );
+        position_.push_back(reflect(parents_[0]->getTwoPoints().first,parents_[1]->getTwoPoints()));
+        position_.push_back(reflect(parents_[0]->getTwoPoints().second,parents_[1]->getTwoPoints()));
+        return;
     }
-    case 0:return std::make_pair(parents_[0]->position(),parents_[1]->position());
+    case 0:
+        position_.push_back(parents_[0]->position());
+        position_.push_back(parents_[1]->position());
+        return;
     default:
         break;
     }
-    QMessageBox::warning(nullptr, "警告", "lineoo的getTwoPoint方法没有完成!");
-    return std::make_pair(QPointF(),QPointF());
+    QMessageBox::warning(nullptr, "警告", "lineoo的flush方法没有完成!");
+    position_.push_back(QPointF());
+    position_.push_back(QPointF());
+    return;
+}
+
+std::pair<const QPointF,const QPointF> Lineoo::getTwoPoints() const{
+    return std::make_pair(position_[0],position_[1]);
 }
 
 LineooCreator::LineooCreator(){

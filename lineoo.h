@@ -27,6 +27,7 @@ public:
     std::pair<const QPointF, const QPointF> getTwoPoints() const override;
 
     double length() const{return len(getTwoPoints().first-getTwoPoints().second);}
+    void flush() override;
 
 protected:
     // isNear 计算的辅助函数 (点到线段的距离)

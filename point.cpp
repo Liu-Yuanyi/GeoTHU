@@ -2,7 +2,7 @@
 #include "objecttype.h"
 #include "calculator.h"
 
-Point::Point(const QPointF& position) : GeometricObject(ObjectName::Point), position_(position) {
+Point::Point(const QPointF& position) : GeometricObject(ObjectName::Point), PointArg(position) {
     generation_=0;
     GetDefaultLable[ObjectType::Point]=nextPointLable(GetDefaultLable[ObjectType::Point]);
 }
@@ -21,19 +21,19 @@ void Point::setPosition(const QPointF& pos) {
     switch(generation_){
     case 0:{
         expectParentNum(0);
-        position_ = pos;
+        PointArg = pos;
         return;
     }
     case 1:
     case 2:
     case 3:{
         expectParentNum(1);
-        position_.rx()=footRatio(pos,parents_[0]->getTwoPoints(),parents_[0]->getObjectType());
+        PointArg.rx()=footRatio(pos,parents_[0]->getTwoPoints(),parents_[0]->getObjectType());
         return;
     }
     case 4:{
         expectParentNum(1);
-        position_=NearestPointOnCircle(pos,parents_[0]->getTwoPoints())-parents_[0]->getTwoPoints().first;
+        PointArg=NearestPointOnCircle(pos,parents_[0]->getTwoPoints())-parents_[0]->getTwoPoints().first;
         return;
     }
     default:
@@ -85,39 +85,46 @@ bool Point::isNear(const QPointF& clickPos) const {
     return (dx * dx + dy * dy) <= (size_ + 4) * (size_ + 4);
 }
 
-QPointF Point::position() const{
+void Point::flush(){
+    position_.clear();
     legal_=true;
     for(auto iter:parents_){
         if(!iter->isLegal()){
             legal_=false;
-            return QPointF();
+            position_.push_back(QPointF());
+            return;
         }
     }
     switch(generation_){
     case -4:{
-        return 2*parents_[1]->position() - parents_[0]->position();
+        position_.push_back(2*parents_[1]->position() - parents_[0]->position());
+        return;
     }
     case -3:{
-        return reflect(parents_[0]->position(),parents_[1]->getTwoPoints());
+        position_.push_back(reflect(parents_[0]->position(),parents_[1]->getTwoPoints()));
+        return;
     }
     case 0:{
-        return position_;
+        position_.push_back(PointArg);
+        return;
     }
     case 1:
     case 2:
     case 3:{
         expectParentNum(1);
         auto ppp=parents_[0]->getTwoPoints();
-        return ppp.first+position_.x()*(ppp.second-ppp.first);
+        position_.push_back(ppp.first+PointArg.x()*(ppp.second-ppp.first));
+        return;
     }
     case 4:{
         expectParentNum(1);
         auto ppp=parents_[0]->getTwoPoints();
-        return ppp.first+position_*len(ppp.second-ppp.first)/len(position_);
+        position_.push_back(ppp.first+PointArg*len(ppp.second-ppp.first)/len(PointArg));
+        return;
     }
     case 5:case 6:case 7:case 8:case 9:case 10:case 11:case 12:case 13:{
         expectParentNum(2);
-        int range1=(generation_-5)/3,range2=(generation_-5)%3;//两根line的限度
+        int range1=(generation_-5)/3,range2=(generation_-5)%3;
         auto res=linelineintersection(parents_[0]->getTwoPoints(),parents_[1]->getTwoPoints());
 
         if(
@@ -125,7 +132,8 @@ QPointF Point::position() const{
             ||  range2==1&&res.t[1]<0 || range2==2&&(res.t[1]<0||res.t[1]>1)){
             legal_=false;
         }
-        return res.p;
+        position_.push_back(res.p);
+        return;
     }
     case 14: case 15: case 16: case 17: case 18: case 19:{
         expectParentNum(2);
@@ -134,7 +142,8 @@ QPointF Point::position() const{
         if(res.exist==false || range==1&&res.t[generation_%2]<0 || range==2&&(res.t[generation_%2]<0||res.t[generation_%2]>1)){
             legal_=false;
         }
-        return res.p[generation_%2];
+        position_.push_back(res.p[generation_%2]);
+        return;
     }
     case 20: case 21:{
         expectParentNum(2);
@@ -142,7 +151,8 @@ QPointF Point::position() const{
         if(res.exist==false){
             legal_=false;
         }
-        return res.p[generation_%2];
+        position_.push_back(res.p[generation_%2]);
+        return;
     }
     case 30:{
         QPointF P1, P2;
@@ -156,43 +166,48 @@ QPointF Point::position() const{
             P1 = p.first;
             P2 = p.second;
         }
-        return QPointF((P1.x() + P2.x()) / 2, (P1.y() + P2.y()) / 2);
+        position_.push_back(QPointF((P1.x() + P2.x()) / 2, (P1.y() + P2.y()) / 2));
+        return;
     }
     case 31:case 32:{
-        const QPointF& center = parents_[1]->getTwoPoints().first;    // 圆心
-        const QPointF& pointOnCircle = parents_[1]->getTwoPoints().second;  // 圆上一点
+        const QPointF& center = parents_[1]->getTwoPoints().first;
+        const QPointF& pointOnCircle = parents_[1]->getTwoPoints().second;
         const QPointF& A =parents_[0]->position();
-        // 计算点A到圆心的向量
         qreal radius = len(center-pointOnCircle);
         QPointF AC = A - center;
         qreal dist_squared = AC.x() * AC.x() + AC.y() * AC.y();
         qreal dist = std::sqrt(dist_squared);
 
-        // 如果点A在圆内，则没有切线
         if (dist <= radius) {
             legal_=false;
-            return QPointF();
+            position_.push_back(QPointF());
+            return;
         }
 
-        // 计算辅助值
         qreal h = std::sqrt(dist_squared - radius * radius);
-
-        // 计算旋转矩阵（顺时针和逆时针）
         qreal cos_theta = radius / dist;
         qreal sin_theta = h / dist;
 
-        if(generation_==31) return QPointF(
+        if(generation_==31) {
+            position_.push_back(QPointF(
                 center.x() + (AC.x() * cos_theta - AC.y() * sin_theta) * radius / dist,
                 center.y() + (AC.x() * sin_theta + AC.y() * cos_theta) * radius / dist
-            );
-
-        else return QPointF(
+                ));
+        } else {
+            position_.push_back(QPointF(
                 center.x() + (AC.x() * cos_theta + AC.y() * sin_theta) * radius / dist,
                 center.y() + (-AC.x() * sin_theta + AC.y() * cos_theta) * radius / dist
-            );
+                ));
+        }
+        return;
     }
     default:
-        QMessageBox::warning(nullptr, "警告", "lineoo的getTwoPoint方法没有完成!");
-        return QPointF();
+        QMessageBox::warning(nullptr, "警告", "Point的flush方法没有完成!");
+        position_.push_back(QPointF());
+        return;
     };
+}
+
+QPointF Point::position() const{
+    return position_[0];
 }

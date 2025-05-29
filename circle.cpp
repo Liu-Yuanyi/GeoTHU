@@ -104,8 +104,38 @@ bool Circle::isNear(const QPointF& pos) const {
     return std::abs(distToCenter - currentRadius) <= tolerance;
 }
 
+void Circle::flush(){
+    position_.clear();
+    legal_ = true;
+    for (auto iter : parents_) {
+        if (!iter->isLegal()) {
+            legal_ = false;
+            position_.push_back(QPointF());position_.push_back(QPointF(1, 1));
+        }
+    }
+
+    switch(generation_){
+    case 0:{
+        position_.push_back(parents_[0]->position()),position_.push_back(parents_[1]->position());
+        return;
+    }
+    case 1:{
+        position_.push_back(parents_[0]->position()),position_.push_back(parents_[0]->position()+QPointF(dynamic_cast<Lineoo*>(parents_[1])->length(),0));
+        return;
+    }
+    case 2:{
+        position_.push_back(calculateCircleCenter(parents_[0]->position(),parents_[1]->position(),parents_[2]->position())),position_.push_back(parents_[0]->position());
+        return;
+    }
+    default:{
+        QMessageBox::warning(nullptr,"警告","Cirle的flush方法未实现!");
+        position_.push_back(QPointF());position_.push_back(QPointF(1, 1));
+        return;
+    }
+    }
+}
+
 QPointF Circle::position() const {
-    // 返回圆心位置
     return getTwoPoints().first;
 }
 
@@ -115,29 +145,7 @@ double Circle::getRadius() const {
 }
 
 std::pair<const QPointF, const QPointF> Circle::getTwoPoints() const {
-    // 检查父对象的合法性
-    legal_ = true;
-    for (auto iter : parents_) {
-        if (!iter->isLegal()) {
-            legal_ = false;
-            return std::make_pair(QPointF(), QPointF(1, 1));
-        }
-    }
-
-    switch(generation_){
-    case 0:{
-        return std::make_pair(parents_[0]->position(),parents_[1]->position());
-    }
-    case 1:{
-        return std::make_pair(parents_[0]->position(),parents_[0]->position()+QPointF(dynamic_cast<Lineoo*>(parents_[1])->length(),0));
-    }
-    case 2:{
-        return std::make_pair(calculateCircleCenter(parents_[0]->position(),parents_[1]->position(),parents_[2]->position()),parents_[0]->position());
-    }
-    default:{
-        return std::make_pair(QPointF(0,0),QPointF(1,1));
-    }
-    }
+    return std::make_pair(position_[0],position_[1]);
 }
 
 TwoPointCircleCreator::TwoPointCircleCreator(){

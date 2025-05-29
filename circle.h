@@ -19,6 +19,7 @@ public:
     QPointF position() const override; // 通常返回圆心
 
     double getRadius() const;
+    void flush() override;
 
     std::pair<const QPointF, const QPointF> getTwoPoints() const override;
 

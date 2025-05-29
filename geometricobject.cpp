@@ -41,6 +41,7 @@ std::map<ObjectType, int> GetDefaultShape = {
 
 
 GeometricObject::GeometricObject(ObjectName name):
+    position_(),
     selected_(true),      // 默认选中状态 (注意：这里设置为 true，通常可能希望是 false)
     hovered_(false),      // 默认悬停状态
     legal_(true),         // 默认合法状态
