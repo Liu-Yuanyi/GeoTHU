@@ -104,33 +104,34 @@ bool Circle::isNear(const QPointF& pos) const {
     return std::abs(distToCenter - currentRadius) <= tolerance;
 }
 
-void Circle::flush(){
+GeometricObject* Circle::flush(){
     position_.clear();
     legal_ = true;
     for (auto iter : parents_) {
         if (!iter->isLegal()) {
             legal_ = false;
             position_.push_back(QPointF());position_.push_back(QPointF(1, 1));
+            return this;
         }
     }
 
     switch(generation_){
     case 0:{
         position_.push_back(parents_[0]->position()),position_.push_back(parents_[1]->position());
-        return;
+        return this;
     }
     case 1:{
         position_.push_back(parents_[0]->position()),position_.push_back(parents_[0]->position()+QPointF(dynamic_cast<Lineoo*>(parents_[1])->length(),0));
-        return;
+        return this;
     }
     case 2:{
         position_.push_back(calculateCircleCenter(parents_[0]->position(),parents_[1]->position(),parents_[2]->position())),position_.push_back(parents_[0]->position());
-        return;
+        return this;
     }
     default:{
         QMessageBox::warning(nullptr,"警告","Cirle的flush方法未实现!");
         position_.push_back(QPointF());position_.push_back(QPointF(1, 1));
-        return;
+        return this;
     }
     }
 }
@@ -155,7 +156,7 @@ TwoPointCircleCreator::TwoPointCircleCreator(){
 
 std::set<GeometricObject*> TwoPointCircleCreator::apply(std::vector<GeometricObject*> objs,
                                                          QPointF position) const {
-    return std::set<GeometricObject*>{new Circle(objs,0)};
+    return std::set<GeometricObject*>{(new Circle(objs,0))->flush()};
 }
 
 CenterRadiusCircleCreator::CenterRadiusCircleCreator() {
@@ -166,7 +167,7 @@ CenterRadiusCircleCreator::CenterRadiusCircleCreator() {
 
 std::set<GeometricObject*> CenterRadiusCircleCreator::apply(std::vector<GeometricObject*> objs,
                                                              QPointF position) const {
-    return std::set<GeometricObject*>{new Circle(objs,1)};
+    return std::set<GeometricObject*>{(new Circle(objs,1))->flush()};
 }
 
 ThreePointCircleCreator::ThreePointCircleCreator() {
@@ -176,5 +177,5 @@ ThreePointCircleCreator::ThreePointCircleCreator() {
 
 std::set<GeometricObject*> ThreePointCircleCreator::apply(std::vector<GeometricObject*> objs,
                                                            QPointF position) const {
-    return std::set<GeometricObject*>{new Circle(objs,2)};
+    return std::set<GeometricObject*>{(new Circle(objs,2))->flush()};
 }

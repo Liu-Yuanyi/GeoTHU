@@ -21,7 +21,7 @@ public:
     QPointF position() const override; // 返回 startPoint_
     std::pair<const QPointF, const QPointF> getTwoPoints() const override;
 
-    void flush() override;
+    GeometricObject* flush() override;
 
 protected:
     // isNear 计算的辅助函数 (点到线段的距离)

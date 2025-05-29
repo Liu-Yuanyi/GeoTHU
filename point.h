@@ -21,7 +21,7 @@ public:
     QPointF position() const override;
 
     void setPosition(const QPointF& pos = QPointF());
-    void flush() override;
+    GeometricObject* flush() override;
 
 private:
     QPointF PointArg;//如果是1,2,3 返回一个比例常数放在x(), 如果是4, 则为所在半径的方向向量

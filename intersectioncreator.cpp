@@ -28,6 +28,7 @@ std::set<GeometricObject*> IntersectionCreator::apply(std::vector<GeometricObjec
     std::set<GeometricObject*> ret;
     if(index<=8){
         GeometricObject *p=new Point(objs, index+5);
+        p->flush();
         ret.insert(p);
     }
     else{
@@ -37,6 +38,8 @@ std::set<GeometricObject*> IntersectionCreator::apply(std::vector<GeometricObjec
         }
         GeometricObject *p1=new Point(objs, index*2-4);
         GeometricObject *p2=new Point(objs, index*2-3);
+        p1->flush();
+        p2->flush();
         ret.insert(p1);ret.insert(p2);
     }
     return ret;

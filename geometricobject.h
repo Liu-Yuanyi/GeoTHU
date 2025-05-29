@@ -65,7 +65,7 @@ public:
     const std::vector<GeometricObject*>& getChildren() const;
     bool hasChild(GeometricObject* child) const;
 
-    virtual void flush()=0;
+    virtual GeometricObject* flush()=0;//返回自己
 #warning needing "=0"
     virtual bool isInRect(QRect rect){return 0;};
 

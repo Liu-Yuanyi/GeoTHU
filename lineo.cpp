@@ -142,7 +142,7 @@ inline std::pair<const QPointF,const QPointF> zhongchui(std::pair<const QPointF&
                           QPointF((x1+x2)/2.0+y2-y1,(y1+y2)/2.0+x1-x2));
 }
 
-void Lineo::flush(){
+GeometricObject* Lineo::flush(){
     position_.clear();
     legal_=true;
     for(auto iter:parents_){
@@ -150,24 +150,24 @@ void Lineo::flush(){
             legal_=false;
             position_.push_back(QPointF());
             position_.push_back(QPointF(1,1));
-            return;
+            return this;
         }
     }
     switch(generation_){
     case -4:{
         position_.push_back(2*parents_[1]->position()-parents_[0]->getTwoPoints().first);
         position_.push_back(2*parents_[1]->position()-parents_[0]->getTwoPoints().second);
-        return;
+        return this;
     }
     case -3:{
         position_.push_back(reflect(parents_[0]->getTwoPoints().first,parents_[1]->getTwoPoints()));
         position_.push_back(reflect(parents_[0]->getTwoPoints().second,parents_[1]->getTwoPoints()));
-        return;
+        return this;
     }
     case 0:
         position_.push_back(parents_[0]->position());
         position_.push_back(parents_[1]->position());
-        return;
+        return this;
     case 1:{
         expectParentNum(3);
         QPointF p1 = parents_[1]->position();
@@ -178,7 +178,7 @@ void Lineo::flush(){
         b = p1 + (b - p1) * 300 / l2;
         position_.push_back(p1);
         position_.push_back((a + b) / 2);
-        return;
+        return this;
     }
     case 2:
         // 保持原有case 2的逻辑不变（为空）
@@ -189,7 +189,7 @@ void Lineo::flush(){
     QMessageBox::warning(nullptr, "警告", "lineo的flush方法没有完成!");
     position_.push_back(QPointF());
     position_.push_back(QPointF());
-    return;
+    return this;
 }
 
 std::pair<const QPointF,const QPointF> Lineo::getTwoPoints() const{
@@ -204,6 +204,7 @@ LineoCreator::LineoCreator(){
 std::set<GeometricObject*> LineoCreator::apply(std::vector<GeometricObject*> objs,
                                                QPointF position) const{
     Lineo *pLineo=new Lineo(objs,0);
+    pLineo->flush();
     std::set<GeometricObject*> ret{pLineo};
     return ret;
 }

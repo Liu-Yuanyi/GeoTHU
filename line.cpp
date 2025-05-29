@@ -155,7 +155,7 @@ inline std::pair<const QPointF,const QPointF> zhongchui(std::pair<const QPointF&
                           QPointF((x1+x2)/2.0+y2-y1,(y1+y2)/2.0+x1-x2));
 }
 
-void Line::flush(){
+GeometricObject* Line::flush(){
     position_.clear();
     legal_=true;
     for(auto iter:parents_){
@@ -163,35 +163,35 @@ void Line::flush(){
             legal_=false;
             position_.push_back(QPointF());
             position_.push_back(QPointF(1,1));
-            return;
+            return this;
         }
     }
     switch(generation_){
     case -4:{
         position_.push_back(2*parents_[1]->position()-parents_[0]->getTwoPoints().first);
         position_.push_back(2*parents_[1]->position()-parents_[0]->getTwoPoints().second);
-        return;
+        return this;
     }
     case -3:{
         position_.push_back(reflect(parents_[0]->getTwoPoints().first,parents_[1]->getTwoPoints()));
         position_.push_back(reflect(parents_[0]->getTwoPoints().second,parents_[1]->getTwoPoints()));
-        return;
+        return this;
     }
     case 0:
         position_.push_back(parents_[0]->position());
         position_.push_back(parents_[1]->position());
-        return;
+        return this;
     case 1:{
         auto pair = zhongchui(std::make_pair(parents_[0]->position(),parents_[1]->position()));
         position_.push_back(pair.first);
         position_.push_back(pair.second);
-        return;
+        return this;
     }
     case 2:{
         auto pair = zhongchui(parents_[0]->getTwoPoints());
         position_.push_back(pair.first);
         position_.push_back(pair.second);
-        return;
+        return this;
     }
     case 3:{//缺少三点
         QPointF P1,P2,P3;
@@ -209,7 +209,7 @@ void Line::flush(){
         }
         position_.push_back(P3);
         position_.push_back(QPointF(P3.x()+P1.x()-P2.x(),P3.y()+P1.y()-P2.y()));
-        return;
+        return this;
     }
     case 6:{
         expectParentNum(2);
@@ -219,11 +219,11 @@ void Line::flush(){
         if (P2.y() == P3.y()){
             position_.push_back(P1);
             position_.push_back(QPointF(P1.x(), P2.y() + 200));
-            return;
+            return this;
         } else {
             position_.push_back(P1);
             position_.push_back(QPointF(P3.y() - P2.y() + P1.x(), P1.y() + P2.x() - P3.x()));
-            return;
+            return this;
         }
     }
     case 7:{
@@ -233,11 +233,11 @@ void Line::flush(){
         if (P2.y() == P3.y()){
             position_.push_back(P1);
             position_.push_back(QPointF(P1.x(), P2.y() + 200));
-            return;
+            return this;
         } else {
             position_.push_back(P1);
             position_.push_back(QPointF(P3.y() - P2.y() + P1.x(), P1.y() + P2.x() - P3.x()));
-            return;
+            return this;
         }
     }
     case 8:{
@@ -250,7 +250,7 @@ void Line::flush(){
             legal_ = false;
             position_.push_back(QPointF(1, 1));
             position_.push_back(QPointF(2, 2));
-            return;
+            return this;
         }
         legal_ = true;
         double dist2 = std::sqrt(dist1 * dist1 - radius * radius);
@@ -258,7 +258,7 @@ void Line::flush(){
         QPointF P3 = P1 + direction1 * dist2 / dist1 + direction2 * radius / dist1;
         position_.push_back(P1);
         position_.push_back(P3);
-        return;
+        return this;
     }
     case 9:{
         expectParentNum(2);
@@ -270,7 +270,7 @@ void Line::flush(){
             legal_ = false;
             position_.push_back(QPointF(1, 1));
             position_.push_back(QPointF(2, 2));
-            return;
+            return this;
         }
         legal_ = true;
         double dist2 = std::sqrt(dist1 * dist1 - radius * radius);
@@ -278,7 +278,7 @@ void Line::flush(){
         QPointF P3 = P1 + direction1 * dist2 / dist1 - direction2 * radius / dist1;
         position_.push_back(P1);
         position_.push_back(P3);
-        return;
+        return this;
     }
     default:
         break;
@@ -286,7 +286,7 @@ void Line::flush(){
     QMessageBox::warning(nullptr, "警告", "line的flush方法没有完成!");
     position_.push_back(QPointF());
     position_.push_back(QPointF(1,1));
-    return;
+    return this;
 }
 std::pair<const QPointF,const QPointF> Line::getTwoPoints() const{
     return std::make_pair(position_[0],position_[1]);
@@ -300,6 +300,7 @@ LineCreator::LineCreator(){
 std::set<GeometricObject*> LineCreator::apply(std::vector<GeometricObject*> objs,
                                   QPointF position) const{
     Line *pLine=new Line(objs,0);
+    pLine->flush();
     std::set<GeometricObject*> ret{pLine};
     return ret;
 }

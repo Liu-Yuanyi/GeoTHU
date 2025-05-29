@@ -14,7 +14,6 @@ Point::Point(const std::vector<GeometricObject*>& parents,const int& generation)
     }
     generation_=generation;
     GetDefaultLable[ObjectType::Point]=nextPointLable(GetDefaultLable[ObjectType::Point]);
-    setPosition();
 }
 
 void Point::setPosition(const QPointF& pos) {
@@ -85,28 +84,28 @@ bool Point::isNear(const QPointF& clickPos) const {
     return (dx * dx + dy * dy) <= (size_ + 4) * (size_ + 4);
 }
 
-void Point::flush(){
+GeometricObject* Point::flush(){
     position_.clear();
     legal_=true;
     for(auto iter:parents_){
         if(!iter->isLegal()){
             legal_=false;
             position_.push_back(QPointF());
-            return;
+            return this;
         }
     }
     switch(generation_){
     case -4:{
         position_.push_back(2*parents_[1]->position() - parents_[0]->position());
-        return;
+        return this;
     }
     case -3:{
         position_.push_back(reflect(parents_[0]->position(),parents_[1]->getTwoPoints()));
-        return;
+        return this;
     }
     case 0:{
         position_.push_back(PointArg);
-        return;
+        return this;
     }
     case 1:
     case 2:
@@ -114,13 +113,13 @@ void Point::flush(){
         expectParentNum(1);
         auto ppp=parents_[0]->getTwoPoints();
         position_.push_back(ppp.first+PointArg.x()*(ppp.second-ppp.first));
-        return;
+        return this;
     }
     case 4:{
         expectParentNum(1);
         auto ppp=parents_[0]->getTwoPoints();
         position_.push_back(ppp.first+PointArg*len(ppp.second-ppp.first)/len(PointArg));
-        return;
+        return this;
     }
     case 5:case 6:case 7:case 8:case 9:case 10:case 11:case 12:case 13:{
         expectParentNum(2);
@@ -133,7 +132,7 @@ void Point::flush(){
             legal_=false;
         }
         position_.push_back(res.p);
-        return;
+        return this;
     }
     case 14: case 15: case 16: case 17: case 18: case 19:{
         expectParentNum(2);
@@ -143,7 +142,7 @@ void Point::flush(){
             legal_=false;
         }
         position_.push_back(res.p[generation_%2]);
-        return;
+        return this;
     }
     case 20: case 21:{
         expectParentNum(2);
@@ -152,7 +151,7 @@ void Point::flush(){
             legal_=false;
         }
         position_.push_back(res.p[generation_%2]);
-        return;
+        return this;
     }
     case 30:{
         QPointF P1, P2;
@@ -167,7 +166,7 @@ void Point::flush(){
             P2 = p.second;
         }
         position_.push_back(QPointF((P1.x() + P2.x()) / 2, (P1.y() + P2.y()) / 2));
-        return;
+        return this;
     }
     case 31:case 32:{
         const QPointF& center = parents_[1]->getTwoPoints().first;
@@ -181,7 +180,7 @@ void Point::flush(){
         if (dist <= radius) {
             legal_=false;
             position_.push_back(QPointF());
-            return;
+            return this;
         }
 
         qreal h = std::sqrt(dist_squared - radius * radius);
@@ -199,12 +198,12 @@ void Point::flush(){
                 center.y() + (-AC.x() * sin_theta + AC.y() * cos_theta) * radius / dist
                 ));
         }
-        return;
+        return this;
     }
     default:
         QMessageBox::warning(nullptr, "警告", "Point的flush方法没有完成!");
         position_.push_back(QPointF());
-        return;
+        return this;
     };
 }
 

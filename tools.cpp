@@ -12,9 +12,10 @@ PerpendicularBisectorCreator::PerpendicularBisectorCreator(){
 }
 
 std::set<GeometricObject*> PerpendicularBisectorCreator::apply(std::vector<GeometricObject*> objs,
-                                         QPointF position)const{
+                                                                QPointF position)const{
     int generation=PerpendicularBisectorCreator::getInputIndex(objs);
     Line *pLine=new Line(objs,1+generation);
+    pLine->flush();
     std::set<GeometricObject*> ret{pLine};
     return ret;
 }
@@ -31,11 +32,12 @@ ParallelLineCreator::ParallelLineCreator(){
 }
 
 std::set<GeometricObject*> ParallelLineCreator::apply(std::vector<GeometricObject*> objs,
-                                                                QPointF position)const{
+                                                       QPointF position)const{
     if(objs[0]->getObjectType()==ObjectType::Point && objs.size()==2){
         std::swap(objs[1],objs[0]);
     }
     Line *pLine=new Line(objs,3);
+    pLine->flush();
     std::set<GeometricObject*> ret{pLine};
     return ret;
 }
@@ -47,8 +49,9 @@ MidpointCreator::MidpointCreator() {
 }
 
 std::set<GeometricObject*> MidpointCreator::apply(std::vector<GeometricObject*> objs,
-                                                       QPointF position) const {
+                                                   QPointF position) const {
     Point* newPoint = new Point(objs, 30);
+    newPoint->flush();
     std::set<GeometricObject*> ret{newPoint};
     return ret;
 }
@@ -64,11 +67,12 @@ PerpendicularLineCreator::PerpendicularLineCreator() {
 }
 
 std::set<GeometricObject*> PerpendicularLineCreator::apply(std::vector<GeometricObject*> objs,
-                                                   QPointF position) const {
+                                                            QPointF position) const {
     if(objs[1]->getObjectType()==ObjectType::Point){
         std::swap(objs[0],objs[1]);
     }
     Line* newLine = new Line(objs, 6);
+    newLine->flush();
     std::set<GeometricObject*> ret{newLine};
     return ret;
 }
@@ -79,8 +83,9 @@ AngleBisectorCreator::AngleBisectorCreator(){
 }
 
 std::set<GeometricObject*> AngleBisectorCreator::apply(std::vector<GeometricObject*> objs,
-                            QPointF position) const {
+                                                        QPointF position) const {
     Lineo* newLineo = new Lineo(objs, 1);
+    newLineo->flush();
     std::set<GeometricObject*> ret{newLineo};
     return ret;
 }
@@ -93,7 +98,7 @@ TangentLineCreator::TangentLineCreator(){
 }
 
 std::set<GeometricObject*> TangentLineCreator::apply(std::vector<GeometricObject*> objs,
-                                                        QPointF position) const {
+                                                      QPointF position) const {
     if(objs[0]->getObjectType()==ObjectType::Circle){
         std::swap(objs[0],objs[1]);
     }
@@ -104,9 +109,9 @@ std::set<GeometricObject*> TangentLineCreator::apply(std::vector<GeometricObject
     if (radius > dist + 1e-4) {
         return std::set<GeometricObject*>();
     } else if (abs(radius - dist) <= 1e-4) {
-        return std::set<GeometricObject*>{new Line(objs, 7)};
+        return std::set<GeometricObject*>{(new Line(objs, 7))->flush()};
     } else {
-        return std::set<GeometricObject*>{new Line(objs, 8), new Line(objs, 9), new Point(objs,31), new Point(objs,32)};
+        return std::set<GeometricObject*>{(new Line(objs, 8))->flush(), (new Line(objs, 9))->flush(), (new Point(objs,31))->flush(), (new Point(objs,32))->flush()};
     }
 }
 
@@ -131,7 +136,7 @@ AxialSymmetry::AxialSymmetry(){
 }
 
 std::set<GeometricObject*> AxialSymmetry::apply(std::vector<GeometricObject*> objs,
-                                                      QPointF position) const {
+                                                 QPointF position) const {
     GeometricObject *ret;
     switch(objs[0]->getObjectType()){
     case ObjectType::Circle:{
@@ -141,19 +146,19 @@ std::set<GeometricObject*> AxialSymmetry::apply(std::vector<GeometricObject*> ob
         break;
     }
     case ObjectType::Line:{
-        return std::set<GeometricObject*>{new Line(objs, -3)};
+        return std::set<GeometricObject*>{(new Line(objs, -3))->flush()};
         break;
     }
     case ObjectType::Lineo:{
-        return std::set<GeometricObject*>{new Lineo(objs, -3)};
+        return std::set<GeometricObject*>{(new Lineo(objs, -3))->flush()};
         break;
     }
     case ObjectType::Lineoo:{
-        return std::set<GeometricObject*>{new Lineoo(objs, -3)};
+        return std::set<GeometricObject*>{(new Lineoo(objs, -3))->flush()};
         break;
     }
     case ObjectType::Point:{
-        return std::set<GeometricObject*>{new Point(objs, -3)};
+        return std::set<GeometricObject*>{(new Point(objs, -3))->flush()};
         break;
     }
     default:{
@@ -174,7 +179,7 @@ CentralSymmetry::CentralSymmetry(){
 }
 
 std::set<GeometricObject*> CentralSymmetry::apply(std::vector<GeometricObject*> objs,
-                                                 QPointF position) const {
+                                                   QPointF position) const {
     GeometricObject *ret;
     switch(objs[0]->getObjectType()){
     case ObjectType::Circle:{
@@ -184,19 +189,19 @@ std::set<GeometricObject*> CentralSymmetry::apply(std::vector<GeometricObject*> 
         break;
     }
     case ObjectType::Line:{
-        return std::set<GeometricObject*>{new Line(objs, -4)};
+        return std::set<GeometricObject*>{(new Line(objs, -4))->flush()};
         break;
     }
     case ObjectType::Lineo:{
-        return std::set<GeometricObject*>{new Lineo(objs, -4)};
+        return std::set<GeometricObject*>{(new Lineo(objs, -4))->flush()};
         break;
     }
     case ObjectType::Lineoo:{
-        return std::set<GeometricObject*>{new Lineoo(objs, -4)};
+        return std::set<GeometricObject*>{(new Lineoo(objs, -4))->flush()};
         break;
     }
     case ObjectType::Point:{
-        return std::set<GeometricObject*>{new Point(objs, -4)};
+        return std::set<GeometricObject*>{(new Point(objs, -4))->flush()};
         break;
     }
     default:{

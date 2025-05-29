@@ -145,18 +145,18 @@ void Canvas::mousePressEvent(QMouseEvent* event) {
                     return;
                 }
                 std::vector<GeometricObject*> objsNear = findObjectsNear(mousePos_);
-                Point* newPoint;
+                GeometricObject* newPoint;
                 if (objsNear.size() == 1){
                     GeometricObject* constraintObj = objsNear[0];
                     if (constraintObj->getObjectType() == ObjectType::Circle) {
-                        newPoint = new Point(objsNear, 4);
-                        newPoint->setPosition(mousePos_);
+                        newPoint = (new Point(objsNear, 4))->flush();
+                        dynamic_cast<Point*>(newPoint)->setPosition(mousePos_);
                     } else {
-                        newPoint = new Point(objsNear, 3);
-                        newPoint->setPosition(mousePos_);
+                        newPoint = (new Point(objsNear, 3))->flush();
+                        dynamic_cast<Point*>(newPoint)->setPosition(mousePos_);
                     }
                 } else {
-                    newPoint = new Point(mousePos_);
+                    newPoint = (new Point(mousePos_))->flush();
                 }
                 objects_.push_back(newPoint);
                 newPoint->setSelected(true); // 新创建的点默认为选中状态
@@ -180,24 +180,24 @@ void Canvas::mousePressEvent(QMouseEvent* event) {
                 clearSelections();
             } else if (currentOperation_->isValidInput(operationSelections_) == 2){ //下一个一定是点
                 GeometricObject* possiblePoint = automaticIntersection();
-                Point* targetPoint;
+                GeometricObject* targetPoint;
                 std::vector<GeometricObject*> objsNear = findObjectsNear(mousePos_);
                 if (possiblePoint) {
                     targetPoint = dynamic_cast<Point*>(possiblePoint);
                 } else if (objsNear.size() == 1) {
                     GeometricObject* constraintObj = objsNear[0];
                     if (constraintObj->getObjectType() == ObjectType::Circle) {
-                        targetPoint = new Point(objsNear, 4);
-                        targetPoint->setPosition(mousePos_);
+                        targetPoint = (new Point(objsNear, 4))->flush();
+                        dynamic_cast<Point*>(targetPoint)->setPosition(mousePos_);
                     } else {
-                        targetPoint = new Point(objsNear, 3);
-                        targetPoint->setPosition(mousePos_);
+                        targetPoint = (new Point(objsNear, 3))->flush();
+                        dynamic_cast<Point*>(targetPoint)->setPosition(mousePos_);
                     }
                     objects_.push_back(targetPoint);
                 } else {
                     targetPoint = findPointNear(mousePos_);
                     if (!targetPoint) { // 如果附近没有点，则创建新点
-                        Point* newPoint = new Point(mousePos_);
+                        GeometricObject* newPoint = (new Point(mousePos_))->flush();
                         objects_.push_back(newPoint);
                         targetPoint = newPoint;
                     }
@@ -249,7 +249,7 @@ void Canvas::mousePressEvent(QMouseEvent* event) {
                         }
                     }
                     else{
-                        Point* newPoint = new Point(mousePos_);
+                        GeometricObject* newPoint = (new Point(mousePos_))->flush();
                         objects_.push_back(newPoint);
                         selectedObjs_.insert(newPoint);
                         if (std::find(operationSelections_.begin(), operationSelections_.end(), newPoint) != operationSelections_.end()){
