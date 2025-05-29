@@ -20,6 +20,7 @@ public:
 
     double getRadius() const;
     GeometricObject* flush() override;
+    virtual bool isTouchedByRectangle(const QPointF& start, const QPointF& end) const override;
 
     std::pair<const QPointF, const QPointF> getTwoPoints() const override;
 

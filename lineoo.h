@@ -28,6 +28,7 @@ public:
 
     double length() const{return len(getTwoPoints().first-getTwoPoints().second);}
     GeometricObject* flush() override;
+    virtual bool isTouchedByRectangle(const QPointF& start, const QPointF& end) const override;
 
 protected:
     // isNear 计算的辅助函数 (点到线段的距离)

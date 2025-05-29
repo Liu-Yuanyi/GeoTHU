@@ -3,6 +3,8 @@
 
 #include"point.h"
 
+const double Epsilon=0.0001;
+
 inline const QPointF calculateCircleCenter(const QPointF& p1, const QPointF& p2, const QPointF& p3) {
     // 计算向量 v1 = (p2 - p1) 和 v2 = (p3 - p1)
     double x1 = p2.x() - p1.x();
@@ -154,7 +156,7 @@ inline linecircleIntersectionResult linecircleintersection(
     if (discriminant < 0) {
         double t=footRatio(O,AB);
         QPointF foot=A+t*(B-A);
-        if(len(foot-O)-len(R-O)<0.00001){
+        if(len(foot-O)-len(R-O)<Epsilon){
             result.p[0]=result.p[1]=foot;
             result.t[0]=result.t[1]=t;
             result.exist=true;
@@ -203,7 +205,10 @@ inline circlecircleIntersectionResult circlecircleintersection(
 
     // 处理两圆位置关系
     if (d > r1 + r2 || d < qAbs(r1 - r2)) {
-        // 两圆相离或内含，无交点
+        if(0<=(d-r1-r2) && (d-r1-r2)<=Epsilon || qAbs(r1-r2)-d>=0 && qAbs(r1-r2)-d<=Epsilon){
+            result.p[0]=result.p[1]= A + (len(B-A)/len(O-A))*(O-A);
+            result.exist=true;
+        }
         return result;
     }
 

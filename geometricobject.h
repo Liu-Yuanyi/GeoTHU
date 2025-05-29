@@ -66,8 +66,7 @@ public:
     bool hasChild(GeometricObject* child) const;
 
     virtual GeometricObject* flush()=0;//返回自己
-#warning needing "=0"
-    virtual bool isInRect(QRect rect){return 0;};
+    virtual bool isTouchedByRectangle(const QPointF& start, const QPointF& end) const=0;
 
 protected:
 

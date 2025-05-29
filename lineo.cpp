@@ -208,3 +208,31 @@ std::set<GeometricObject*> LineoCreator::apply(std::vector<GeometricObject*> obj
     std::set<GeometricObject*> ret{pLineo};
     return ret;
 }
+
+bool Lineo::isTouchedByRectangle(const QPointF& start, const QPointF& end) const {
+    auto p = getTwoPoints();
+    double x1 = p.first.x(), x2 = p.second.x() + 1000 * (p.second.x() - x1);
+    double y1 = p.first.y(), y2 = p.second.y() + 1000 * (p.second.y() - y1);
+    double a = y1 - y2, b = x2 - x1, c = y2*x1 - y1*x2;
+    std::vector<QPointF> v = {start, end, QPointF(start.x(), end.y()), QPointF(end.x(), start.y())};
+    std::set<int> sgn;
+    for (auto point : v){
+        if (a * point.x() + b * point.y() + c > 0){
+            sgn.insert(1);
+        } else if (a * point.x() + b * point.y() + c == 0){
+            sgn.insert(0);
+        } else {
+            sgn.insert(-1);
+        }
+    }
+    if (sgn.size() < 2){
+        return false;
+    }
+    double largerX = std::max(start.x(), end.x()), smallerX = std::min(start.x(), end.x());
+    double largerY = std::max(start.y(), end.y()), smallerY = std::min(start.y(), end.y());
+    if ((x1 > largerX and x2 > largerX) or (x1 < smallerX and x2 < smallerX) or
+        (y1 > largerY and y2 > largerY) or (y1 < smallerY and y2 < smallerY)){
+        return false;
+    }
+    return true;
+}

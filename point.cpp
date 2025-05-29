@@ -210,3 +210,10 @@ GeometricObject* Point::flush(){
 QPointF Point::position() const{
     return position_[0];
 }
+
+bool Point::isTouchedByRectangle(const QPointF& start, const QPointF& end) const{
+    double x = position().x(), y = position().y();
+    double xStart = start.x(), yStart = start.y();
+    double xEnd = end.x(), yEnd = end.y();
+    return (x-xStart) * (x-xEnd) <= 0 and (y-yStart) * (y-yEnd) <= 0;
+}

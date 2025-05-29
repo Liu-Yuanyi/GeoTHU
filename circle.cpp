@@ -179,3 +179,21 @@ std::set<GeometricObject*> ThreePointCircleCreator::apply(std::vector<GeometricO
                                                            QPointF position) const {
     return std::set<GeometricObject*>{(new Circle(objs,2))->flush()};
 }
+
+bool Circle::isTouchedByRectangle(const QPointF& start, const QPointF& end) const {
+    auto p = getTwoPoints();
+    double dist = QLineF(p.first, p.second).length();
+    double x = p.first.x(), y = p.first.y();
+    std::vector<QPointF> v = {start, end, QPointF(start.x(), end.y()), QPointF(end.x(), start.y())};
+    std::set<int> sgn;
+    for (auto point : v){
+        if (std::pow(point.x() - x, 2) + std::pow(point.y() - y, 2) > dist * dist){
+            sgn.insert(1);
+        } else if (std::pow(point.x() - x, 2) + std::pow(point.y() - y, 2) == dist * dist){
+            sgn.insert(0);
+        } else {
+            sgn.insert(-1);
+        }
+    }
+    return sgn.size() >= 2;
+}

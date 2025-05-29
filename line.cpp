@@ -304,3 +304,21 @@ std::set<GeometricObject*> LineCreator::apply(std::vector<GeometricObject*> objs
     std::set<GeometricObject*> ret{pLine};
     return ret;
 }
+
+bool Line::isTouchedByRectangle(const QPointF& start, const QPointF& end) const {
+    auto p = getTwoPoints();
+    double x1 = p.first.x(), x2 = p.second.x(), y1 = p.first.y(), y2 = p.second.y();
+    double a = y1 - y2, b = x2 - x1, c = y2*x1 - y1*x2;
+    std::vector<QPointF> v = {start, end, QPointF(start.x(), end.y()), QPointF(end.x(), start.y())};
+    std::set<int> sgn;
+    for (auto point : v){
+        if (a * point.x() + b * point.y() + c > 0){
+            sgn.insert(1);
+        } else if (a * point.x() + b * point.y() + c == 0){
+            sgn.insert(0);
+        } else {
+            sgn.insert(-1);
+        }
+    }
+    return sgn.size() >= 2;
+}

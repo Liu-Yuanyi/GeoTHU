@@ -108,6 +108,7 @@ void Canvas::mousePressEvent(QMouseEvent* event) {
         initialPositions_.clear(); // 清空，为新的拖拽或点选操作做准备
 
         if (currentMode == SelectionMode) {
+            isDuringMultipleSelection_ = false;
             if (automaticIntersection()){
                 return;
             }
@@ -130,6 +131,7 @@ void Canvas::mousePressEvent(QMouseEvent* event) {
             } else { // 点击到空白区域
                 if (!(event->modifiers() & Qt::ControlModifier)) { // 如果没有按下Ctrl键
                     clearSelections();
+                    multipleSelectionStartPos_ = mousePos_;
                 }
                 deselectPermitted_ = true; // 允许在释放时取消选择（如果这是一个简单的点击）
             }
@@ -301,7 +303,7 @@ void Canvas::mouseMoveEvent(QMouseEvent* event) {
     updateHoverState(currentPos); // 实时更新悬停对象
 
     if (currentMode == SelectionMode) {
-        if (!selectedObjs_.empty() && (event->buttons() & Qt::LeftButton)) { // 如果有选中的对象并且按住左键拖动
+        if (!selectedObjs_.empty() && (event->buttons() & Qt::LeftButton) && !isDuringMultipleSelection_) { // 如果有选中的对象并且按住左键拖动
             QPointF delta = currentPos - mousePos_; // 计算拖动向量
             for (auto obj : selectedObjs_) {
                 QPointF newPos = initialPositions_[obj] + delta; // 计算新位置
@@ -313,6 +315,25 @@ void Canvas::mouseMoveEvent(QMouseEvent* event) {
             }
             deselectPermitted_ = false; // 拖动过程中不允许取消选择
             update();
+        }else if ((event->buttons() & Qt::LeftButton) && isDuringMultipleSelection_) {
+            multipleSelectionEndPos_ = currentPos;
+            for (auto obj : objects_){
+                if (obj->isShown()){
+                    if (obj->isTouchedByRectangle(multipleSelectionStartPos_, multipleSelectionEndPos_)){
+                        obj->setSelected(true);
+                        selectedObjs_.insert(obj);
+                    } else {
+                        obj->setSelected(false);
+                        auto iter = selectedObjs_.find(obj);
+                        if (iter != selectedObjs_.end()) {
+                            selectedObjs_.erase(iter);
+                        }
+                    }
+                }
+            }
+        } else if (event->buttons() & Qt::LeftButton) {
+            multipleSelectionEndPos_ = currentPos;
+            isDuringMultipleSelection_ = true;
         }
     }
 }
@@ -320,6 +341,7 @@ void Canvas::mouseMoveEvent(QMouseEvent* event) {
 void Canvas::mouseReleaseEvent(QMouseEvent* event) {
     if (event->button() == Qt::LeftButton) {
         if (currentMode == SelectionMode) {
+            isDuringMultipleSelection_ = false;
             // 处理拖拽结束后的 deselectPermitted 状态
             if (!deselectPermitted_) { // 如果之前是拖拽或按下时选中
                 deselectPermitted_ = true;
@@ -348,6 +370,20 @@ void Canvas::paintEvent(QPaintEvent* event) {
     QPainter painter(this);
     painter.setRenderHint(QPainter::Antialiasing); // 抗锯齿，使图形更平滑
 
+    if (isDuringMultipleSelection_) {
+        QPen pen(Qt::black);             // solid black edge
+        pen.setWidth(2);                 // thickness of the edge
+        painter.setPen(pen);
+        // Set light fill color (brush)
+        QBrush brush(Qt::lightGray);     // light gray fill
+        painter.setBrush(brush);
+        double x = multipleSelectionStartPos_.x(), y = multipleSelectionStartPos_.y();
+        double dx = multipleSelectionEndPos_.x() - x;
+        double dy = multipleSelectionEndPos_.y() - y;
+        QRect rect(x, y, dx, dy);    // x, y, width, height
+        painter.drawRect(rect);
+        painter.setBrush(Qt::NoBrush);
+    }
     if (!showObjectsCache.empty()){
         for (auto obj : showObjectsCache){
             obj->setSelected(true);

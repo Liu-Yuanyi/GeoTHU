@@ -49,6 +49,10 @@ private:
     Operation* currentOperation_ = nullptr;  // 当前进行的操作 (例如平移、旋转等)
     std::vector<GeometricObject*> operationSelections_; // 记录目前选择了哪些对象
 
+    QPointF multipleSelectionStartPos_;
+    QPointF multipleSelectionEndPos_;
+    bool isDuringMultipleSelection_;
+
     // --- 私有辅助函数 ---
     void updateHoverState(const QPointF& pos);                  // 更新鼠标悬停状态
     GeometricObject* findObjNear(const QPointF& pos) const;     // 查找指定位置附近的对象
