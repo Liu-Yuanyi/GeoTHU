@@ -184,16 +184,26 @@ bool Circle::isTouchedByRectangle(const QPointF& start, const QPointF& end) cons
     auto p = getTwoPoints();
     double dist = QLineF(p.first, p.second).length();
     double x = p.first.x(), y = p.first.y();
-    std::vector<QPointF> v = {start, end, QPointF(start.x(), end.y()), QPointF(end.x(), start.y())};
-    std::set<int> sgn;
-    for (auto point : v){
-        if (std::pow(point.x() - x, 2) + std::pow(point.y() - y, 2) > dist * dist){
-            sgn.insert(1);
-        } else if (std::pow(point.x() - x, 2) + std::pow(point.y() - y, 2) == dist * dist){
-            sgn.insert(0);
-        } else {
-            sgn.insert(-1);
-        }
+    std::vector<double> v = {start.x(), end.y(), end.x(), start.y()};
+        std::vector<double> w = {x, y};
+        double minDist = 1e9, maxDist = 0;
+        for (int i = 0; i < 4; ++i){
+                maxDist = std::max(QLineF(QPointF(v[2 * (i/2)], v[2 * (i%2) + 1]), p.first).length(), maxDist);
+            }
+        double minX = std::min(std::abs(start.x() - x), std::abs(end.x() - x));
+        double minY = std::min(std::abs(start.y() - y), std::abs(end.y() - y));
+        if ((start.y() - y) * (end.y() - y) <= 0){
+                minDist = std::min(minDist, minX);
+            } else{
+                minDist = std::min(minDist, std::sqrt(minX * minX + minY * minY));
+            }
+        if ((start.x() - x) * (end.x() - x) <= 0){
+                minDist = std::min(minDist, minY);
+            } else{
+                minDist = std::min(minDist, std::sqrt(minX * minX + minY * minY));
+            }
+        if ((start.y() - y) * (end.y() - y) <= 0 and (start.x() - x) * (end.x() - x) <= 0){
+                minDist = 0;
     }
-    return sgn.size() >= 2;
+    return maxDist >= dist and minDist <= dist;
 }

@@ -85,18 +85,41 @@ void Canvas::updateHoverState(const QPointF& pos) {
 }
 
 GeometricObject* Canvas::automaticIntersection(){
+    QString neededlabel=GetDefaultLable[ObjectType::Point];
     std::vector<GeometricObject*> objsNear = findObjectsNear(mousePos_);
     if (objsNear.size() >= 2){
         std::vector<GeometricObject*> v = {objsNear[0], objsNear[1]};
         auto newObjects = operations[10]->apply(v);
-        for (auto obj : newObjects){
-            if (obj->isNear(mousePos_)) {
-                objects_.push_back(obj);
-                obj->setSelected(true);
-                selectedObjs_.insert(obj);
-                return obj;
+        qDebug()<<"newObject.size() = "<<newObjects.size();
+                GeometricObject* targetObj = nullptr;
+                double mindist=1e100;
+                for(auto iter:newObjects){
+                        if(!iter->isLegal()){
+                                delete iter;
+                                continue;
+                            }
+                        if(targetObj==nullptr){
+                                targetObj=iter;
+                                mindist=len(mousePos_-iter->position());
+                                continue;
+                            }
+                        if(len(mousePos_-iter->position())<mindist){
+                                delete targetObj;
+                                targetObj=iter;
+                                mindist=len(mousePos_-iter->position());
+                            }
+                        else{
+                                delete iter;
             }
         }
+        if(targetObj){
+                targetObj->setLabel(neededlabel);
+                GetDefaultLable[ObjectType::Point]=nextPointLable(neededlabel);
+                objects_.push_back(targetObj);
+                targetObj->setSelected(1);
+                selectedObjs_.insert(targetObj);
+            }
+        return targetObj;
     }
     return nullptr;
 }
@@ -685,6 +708,23 @@ void Canvas::showObjects(){
     }
 }
 
+void Canvas::clearObjects(){
+    for (auto obj : objects_){
+        delete obj;
+    }
+    objects_.clear();
+    hoveredObjs_.clear();
+    selectedObjs_.clear();
+    initialPositions_.clear();
+    operationSelections_.clear();
+    GetDefaultLable={
+        {ObjectType::Point, "A"},       // 点的默认标签
+        {ObjectType::Line, "line_1"},
+        {ObjectType::Lineo, "ray_1"},
+        {ObjectType::Lineoo, "segment_1"},
+        {ObjectType::Circle, "Circle1"}
+        };
+}
 
 GeometricObject* Canvas::findObjNear(const QPointF& pos) const {
     // 为了让用户更容易选中，可以考虑优先返回选中的对象（如果多个对象重叠）

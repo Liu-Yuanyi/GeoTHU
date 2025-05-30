@@ -16,6 +16,12 @@ Point::Point(const std::vector<GeometricObject*>& parents,const int& generation)
     GetDefaultLable[ObjectType::Point]=nextPointLable(GetDefaultLable[ObjectType::Point]);
 }
 
+
+Point::~Point(){
+    //GetDefaultLable[ObjectType::Point] = previousPointLable(GetDefaultLable[ObjectType::Point]);
+}
+
+
 void Point::setPosition(const QPointF& pos) {
     switch(generation_){
     case 0:{

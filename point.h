@@ -23,6 +23,7 @@ public:
     void setPosition(const QPointF& pos = QPointF());
     GeometricObject* flush() override;
     virtual bool isTouchedByRectangle(const QPointF& start, const QPointF& end) const override;
+    ~Point();
 
 private:
     QPointF PointArg;//如果是1,2,3 返回一个比例常数放在x(), 如果是4, 则为所在半径的方向向量

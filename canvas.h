@@ -26,6 +26,7 @@ public:
     void deleteObjects();
     void hideObjects();
     void showObjects();
+    void clearObjects();
 
 protected:
     void mousePressEvent(QMouseEvent* event) override;

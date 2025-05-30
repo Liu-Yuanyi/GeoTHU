@@ -121,26 +121,32 @@ inline QString nextLineLable(const QString& input) {
     return word + QString::number(num + 1);
 }
 
-inline QString nextPointLable(const QString& input) {
-    QString result = input;
-
-    // 从字符串的最后一个字符开始向前处理
-    for (int i = result.size() - 1; i >= 0; --i) {
-        QChar& c = result[i];
-
-        // 如果当前字符不是'Z'，直接加1并返回
-        if (c != 'Z') {
-            c = QChar(c.unicode() + 1);
-            return result;
-        }
-
-        // 如果当前字符是'Z'，将其置为'A'，并继续处理前一位
-        c = 'A';
+inline int string2int(QString input) {
+    if (input == ""){
+        return 0;
+    } else {
+        QChar c = input[input.length() - 1];
+        input.erase(input.end() - 1);
+        return string2int(input) * 26 + (c.unicode() - QChar('A').unicode() + 1);
     }
+}
 
-    // 如果所有字符都是'Z'，则需要在前面添加一个'A'
-    result.prepend('A');
-    return result;
+inline QString int2string(int n) {
+    if (n <= 26){
+        char c = 'A' + n - 1;
+        return QString(c);
+    } else {
+        char c = 'A' + (n-1) % 26;
+        return int2string((n-1)/26) + QString(c);
+    }
+}
+
+inline QString nextPointLable(const QString& input) {
+    return int2string(string2int(input) + 1);
+}
+
+inline QString previousPointLable(const QString& input){
+        return int2string(string2int(input) - 1);
 }
 
 #endif // GEOMETRICOBJECT_H

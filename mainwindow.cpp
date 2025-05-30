@@ -225,6 +225,7 @@ void MainWindow::setupToolPanel()
     transformUtilLayout->addWidget(createToolButton(tr("Hide"), ":/raw_icons/show_hide.png", tr("Hide selected objects")));
     transformUtilLayout->addWidget(createToolButton(tr("Show"), ":/raw_icons/show_hide.png", tr("Show all hidden objects")));
     transformUtilLayout->addWidget(createToolButton(tr("Delete"), ":/raw_icons/delete.png", tr("Delete objects")));
+    transformUtilLayout->addWidget(createToolButton(tr("Clear"), ":/raw_icons/clear.png", tr("Clear everything; Start anew.")));
     transformUtilLayout->addStretch();
     transformUtilGroup->setLayout(transformUtilLayout);
 
@@ -292,6 +293,16 @@ void MainWindow::onToolSelected(QAbstractButton *abstractButton)
             }
         }
         m_canvas->setMode(Canvas::SelectionMode);
+    } else if (toolId == tr("Clear")){
+        m_canvas->clearObjects();
+        if (!m_toolButtonGroup->buttons().isEmpty()) {
+            QAbstractButton* firstButton = m_toolButtonGroup->buttons().first();
+            if (firstButton) {
+                    firstButton->setChecked(true); // 选中按钮
+                    onToolSelected(firstButton);   // 调用槽函数以应用初始模式
+                }
+            }
+       m_canvas->setMode(Canvas::SelectionMode);
     } else {
         // 对于尚未明确处理的工具，可以设置为 OperationMode 或 SelectionMode
         // 或者在 Canvas 中为每个工具实现一个特定的模式
@@ -329,9 +340,9 @@ void MainWindow::onToolSelected(QAbstractButton *abstractButton)
         m_canvas->setOperation(13);
     } else if (toolId == tr("Semicircle")){
         m_canvas->setOperation(14);
-    }else if (toolId == tr("Axial Symmetry")){
+    } else if (toolId == tr("Axial Symmetry")){
         m_canvas->setOperation(15);
-    }else if (toolId == tr("Central Symmetry")){
+    } else if (toolId == tr("Central Symmetry")){
         m_canvas->setOperation(16);
     }
 }
