@@ -1,4 +1,5 @@
 #ifndef CALCULATOR_H
+
 #define CALCULATOR_H
 
 #include"point.h"
