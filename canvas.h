@@ -27,6 +27,8 @@ public:
     void hideObjects();
     void showObjects();
     void clearObjects();
+    bool isSaved() { return saved_; }
+    bool saveFile();
 
 protected:
     void mousePressEvent(QMouseEvent* event) override;
@@ -55,6 +57,7 @@ private:
     QPointF multipleSelectionEndPos_;
     bool isDuringMultipleSelection_;
     QString filePath_;
+    bool saved_;
 
     std::vector<std::vector<GeometricObject*>> cacheObj_;
     std::vector<std::vector<GeometricObject*>> cacheDel_;
@@ -71,7 +74,6 @@ private:
     Point* findPointNear(const QPointF& pos) const;           // 查找指定位置附近的点对象
     void clearSelections();                                     // 清除所有对象的选中状态
     GeometricObject* automaticIntersection();
-    void saveFile();
     void loadFile();
     void loadInCache();
     void undo();

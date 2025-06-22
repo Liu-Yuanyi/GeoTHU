@@ -347,3 +347,23 @@ void MainWindow::onToolSelected(QAbstractButton *abstractButton)
     }
 }
 
+void MainWindow::closeEvent(QCloseEvent *event){
+    if (!m_canvas->isSaved()) {
+        QMessageBox::StandardButton reply = QMessageBox::warning(
+            this, "Unsaved Changes", "Do you want to save your changes?",
+            QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel
+            );
+        if (reply == QMessageBox::Save) {
+            if (m_canvas->saveFile()) {
+                event->accept();
+            } else {
+                event->ignore();
+            }
+        } else if (reply == QMessageBox::Discard) {
+            event->accept();
+        } else {
+            event->ignore();
+        }
+    }
+}
+

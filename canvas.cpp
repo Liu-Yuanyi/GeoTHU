@@ -30,6 +30,7 @@ Canvas::Canvas(QWidget* parent) : QWidget(parent) {
     currentMode = SelectionMode;
     setFocusPolicy(Qt::StrongFocus);
     filePath_ = "";
+    saved_ = false;
     operations.push_back(new TwoPointCircleCreator());
     operations.push_back(new LineCreator());
     operations.push_back(new LineooCreator());
@@ -709,11 +710,11 @@ void Canvas::wheelEvent(QWheelEvent *event) {
     event->accept();
 }
 
-void Canvas::saveFile() {
+bool Canvas::saveFile() {
     if (filePath_.isEmpty()) {
         QString path = QFileDialog::getSaveFileName(this, "save", "", "My Files (*.thu)");
         if (path.isEmpty()){
-            return;
+            return false;
         }
         filePath_ = path;
     }
@@ -721,7 +722,7 @@ void Canvas::saveFile() {
     QFile file(filePath_);
     if (!file.open(QIODevice::WriteOnly)) {
         QMessageBox::critical(this, "Error", "Could not open file:\n" + file.errorString());
-        return;
+        return false;
     }
     QDataStream out(&file);
     out.setVersion(QDataStream::Qt_6_0);
@@ -732,6 +733,8 @@ void Canvas::saveFile() {
         helper.save(obj, out);
     }
     file.close();
+    saved_ = true;
+    return true;
 }
 
 void Canvas::loadFile() {
@@ -759,6 +762,7 @@ void Canvas::loadFile() {
     }
     file.close();
     filePath_ = path;
+    saved_ = true;
 }
 
 void Canvas::loadInCache() {
@@ -775,6 +779,7 @@ void Canvas::loadInCache() {
     }
     cacheHidden_[currentCacheIndex_] = hiddenStates;
     cachePos_[currentCacheIndex_] = pos;
+    saved_ = false;
 }
 
 void Canvas::undo() {

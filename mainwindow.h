@@ -32,9 +32,9 @@ private:
     QWidget *toolPanelContent;
     QScrollArea *scrollArea;
 
-    QButtonGroup *m_toolButtonGroup; // <--- 用于管理工具按钮
-    Canvas *m_canvas;                // <--- 指向您的Canvas对象
-    // 注意: 您需要在 mainwindow.cpp 中 #include "canvas.h" (您的Canvas头文件)
+    QButtonGroup *m_toolButtonGroup;
+    Canvas *m_canvas;
+    void closeEvent(QCloseEvent *event) override;
 };
 
 #endif // MAINWINDOW_H
