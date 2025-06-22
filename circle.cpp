@@ -167,7 +167,7 @@ bool Arc::isNear(const QPointF& pos) const {
     long double theta=Theta(pos-position());
 
     return (abs(len(pos-position())-len(getTwoPoints()))<getSize()+1e-2) &&
-                   ((s <= t) ? (theta >= s && theta <= t) : (theta >= s || theta <= t));
+           thetainst(theta,s,t);
 }
 
 GeometricObject* Circle::flush(){
@@ -323,8 +323,46 @@ bool Circle::isTouchedByRectangle(const QPointF& start, const QPointF& end) cons
     return maxDist >= dist and minDist <= dist;
 }
 bool Arc::isTouchedByRectangle(const QPointF& start, const QPointF& end) const {
-#warning 1
-    return 0;
+    long double left = std::min(start.x(), end.x());
+    long double right = std::max(start.x(), end.x());
+    long double top = std::min(start.y(), end.y());
+    long double bottom = std::max(start.y(), end.y());
+
+    // 3. 检查圆弧端点是否在矩形内
+    long double radius=len(getTwoPoints());
+    long double x = position().x() + radius * cos(Angles_.first);
+    long double y = position().y() - radius * sin(Angles_.first); // 注意y向下为正
+    if (x >= left && x <= right && y >= top && y <= bottom)
+        return true;
+    x = position().x() + radius * cos(Angles_.second);
+    y = position().y() - radius * sin(Angles_.second); // 注意y向下为正
+    if (x >= left && x <= right && y >= top && y <= bottom)
+        return true;
+
+
+    // 4. 检查矩形四边与圆弧是否有交点
+    // 矩形四边：上下左右
+    struct Line { std::pair<QPointF, QPointF> p; };
+    Line edges[4] = {
+        { {QPointF(left, top), QPointF(right, top)} },    // 上
+        { {QPointF(right, top), QPointF(right, bottom)} },// 右
+        { {QPointF(right, bottom), QPointF(left, bottom)} },// 下
+        { {QPointF(left, bottom), QPointF(left, top)} }   // 左
+    };
+
+    for (int i = 0; i < 4; ++i) {
+        auto inter = linecircleintersection(edges[i].p,getTwoPoints());
+        if(!inter.exist){
+            continue;
+        }
+        if(0<=inter.t[0] && inter.t[0]<=1 && thetainst(Theta(inter.p[0]-position()),Angles_.first,Angles_.second)){
+            return true;
+        }
+        if(0<=inter.t[1] && inter.t[1]<=1 && thetainst(Theta(inter.p[1]-position()),Angles_.first,Angles_.second)){
+            return true;
+        }
+    }
+    return false;
 }
 
 
