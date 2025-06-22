@@ -28,7 +28,7 @@ public:
 protected:
     // isNear 计算的辅助函数 (点到线段的距离)
     Qt::PenStyle getPenStyle()const;
-    double distanceToLineo(const QPointF& p,const std::pair<QPointF,QPointF>& Points) const;
+    long double distanceToLineo(const QPointF& p,const std::pair<QPointF,QPointF>& Points) const;
 };
 
 //Lineo的shape:

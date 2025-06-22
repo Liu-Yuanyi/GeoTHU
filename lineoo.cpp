@@ -38,7 +38,7 @@ void Lineoo::draw(QPainter* painter) const {
 
     QPen pen; // 创建一个QPen对象用于绘制
 
-    double add=((int)hovered_)*HOVER_ADD_WIDTH;
+    long double add=((int)hovered_)*HOVER_ADD_WIDTH;
 
     if(selected_){
         QColor selectcolor=getColor().lighter(250);
@@ -59,18 +59,18 @@ void Lineoo::draw(QPainter* painter) const {
 }
 
 // 辅助函数：计算点 p 到直线 p1p2 的距离
-double Lineoo::distanceToLineoo(const QPointF& p, const std::pair<QPointF,QPointF>& Points) const {
-    double x1=Points.first.x(),x2=Points.second.x(),y1=Points.first.y(),y2=Points.second.y();
-    double X=p.x(),Y=p.y();
-    double A = X - x1;
-    double B = Y - y1;
-    double C = x2 - x1;
-    double D = y2 - y1;
+long double Lineoo::distanceToLineoo(const QPointF& p, const std::pair<QPointF,QPointF>& Points) const {
+    long double x1=Points.first.x(),x2=Points.second.x(),y1=Points.first.y(),y2=Points.second.y();
+    long double X=p.x(),Y=p.y();
+    long double A = X - x1;
+    long double B = Y - y1;
+    long double C = x2 - x1;
+    long double D = y2 - y1;
 
     // 线段长度的平方
-    double dot = C * C + D * D;
+    long double dot = C * C + D * D;
     // 计算投影比例 t
-    double t = (A * C + B * D) / dot;
+    long double t = (A * C + B * D) / dot;
 
     if (t < 0) {
         // 点在端点1的一侧
@@ -82,8 +82,8 @@ double Lineoo::distanceToLineoo(const QPointF& p, const std::pair<QPointF,QPoint
     }
 
     // 点在线段之间，计算点到直线距离
-    double E = x1 + t * C;
-    double F = y1 + t * D;
+    long double E = x1 + t * C;
+    long double F = y1 + t * D;
     return sqrt((X - E) * (X - E) + (Y - F) * (Y - F));
 }
 
@@ -154,9 +154,9 @@ std::set<GeometricObject*> LineooCreator::apply(std::vector<GeometricObject*> ob
 
 bool Lineoo::isTouchedByRectangle(const QPointF& start, const QPointF& end) const {
     auto p = getTwoPoints();
-    double x1 = p.first.x(), x2 = p.second.x();
-    double y1 = p.first.y(), y2 = p.second.y();
-    double a = y1 - y2, b = x2 - x1, c = y2*x1 - y1*x2;
+    long double x1 = p.first.x(), x2 = p.second.x();
+    long double y1 = p.first.y(), y2 = p.second.y();
+    long double a = y1 - y2, b = x2 - x1, c = y2*x1 - y1*x2;
     std::vector<QPointF> v = {start, end, QPointF(start.x(), end.y()), QPointF(end.x(), start.y())};
     std::set<int> sgn;
     for (auto point : v){
@@ -171,8 +171,8 @@ bool Lineoo::isTouchedByRectangle(const QPointF& start, const QPointF& end) cons
     if (sgn.size() < 2){
         return false;
     }
-    double largerX = std::max(start.x(), end.x()), smallerX = std::min(start.x(), end.x());
-    double largerY = std::max(start.y(), end.y()), smallerY = std::min(start.y(), end.y());
+    long double largerX = std::max(start.x(), end.x()), smallerX = std::min(start.x(), end.x());
+    long double largerY = std::max(start.y(), end.y()), smallerY = std::min(start.y(), end.y());
     if ((x1 > largerX and x2 > largerX) or (x1 < smallerX and x2 < smallerX) or
         (y1 > largerY and y2 > largerY) or (y1 < smallerY and y2 < smallerY)){
         return false;

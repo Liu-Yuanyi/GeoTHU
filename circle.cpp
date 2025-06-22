@@ -65,10 +65,10 @@ void Circle::draw(QPainter* painter) const {
     // 获取圆心和半径
     auto points = getTwoPoints();
     QPointF center = points.first;
-    double radius = QLineF(points.first, points.second).length();
+    long double radius = QLineF(points.first, points.second).length();
 
     QPen pen;
-    double add = ((int)hovered_) * HOVER_ADD_WIDTH;
+    long double add = ((int)hovered_) * HOVER_ADD_WIDTH;
 
     // 如果被选中，先绘制一个较宽的选中效果
     if (selected_) {
@@ -108,14 +108,14 @@ void Arc::draw(QPainter* painter) const {
     // 获取圆心和半径
     auto points = getTwoPoints();
     QPointF center = points.first;
-    double radius = QLineF(points.first, points.second).length();
-    std::pair<double,double> Angles = getAngles();
+    long double radius = QLineF(points.first, points.second).length();
+    std::pair<long double,long double> Angles = getAngles();
     int startAngleQt = Angles.first * 180 / M_PI * 16;
     int spanAngleQt = (Angles.second - Angles.first) * 180 / M_PI * 16;
     if(spanAngleQt<0){ spanAngleQt+= 360*16;    }
     QRectF rect(center.x() - radius, center.y() - radius, radius * 2, radius * 2);
     QPen pen;
-    double add = ((int)hovered_) * HOVER_ADD_WIDTH;
+    long double add = ((int)hovered_) * HOVER_ADD_WIDTH;
 
     // 如果被选中，先绘制一个较宽的选中效果
     if (selected_) {
@@ -155,18 +155,18 @@ bool Circle::isNear(const QPointF& pos) const {
     // 使用 getTwoPoints 获取圆心和半径点
     auto points = getTwoPoints();
     QPointF currentCenter = points.first;
-    double currentRadius = QLineF(points.first, points.second).length();
+    long double currentRadius = QLineF(points.first, points.second).length();
 
-    double distToCenter = std::sqrt(std::pow(pos.x() - currentCenter.x(), 2) +
+    long double distToCenter = std::sqrt(std::pow(pos.x() - currentCenter.x(), 2) +
                                     std::pow(pos.y() - currentCenter.y(), 2));
 
     return std::abs(distToCenter - currentRadius) <= getSize() + 1e-2;
 }
 
 bool Arc::isNear(const QPointF& pos) const {
-    double theta=std::atan2((pos-position()).x(),(pos-position()).y());
+    long double theta=std::atan2((pos-position()).x(),(pos-position()).y());
     auto [s,t]=getAngles();
-    double closestAngle = (s <= t ? (theta >= s && theta <= t) : (theta >= s || theta <= t))
+    long double closestAngle = (s <= t ? (theta >= s && theta <= t) : (theta >= s || theta <= t))
                                   ? theta
                                   : ((std::min(std::min(std::abs(theta - s), std::abs(s + 2*M_PI - theta)),
                                                std::min(std::abs(theta - t), std::abs(t + 2*M_PI - theta)))
@@ -250,7 +250,7 @@ GeometricObject* Arc::flush(){
     }
     }
 }
-std::pair<double, double> Arc::getAngles() const{
+std::pair<long double, long double> Arc::getAngles() const{
     return Angles_;
 }
 QPointF Circle::position() const {
@@ -260,11 +260,11 @@ QPointF Arc::position() const {
     return getTwoPoints().first;
 }
 
-double Circle::getRadius() const {
+long double Circle::getRadius() const {
     const auto& points = getTwoPoints();
     return len(points.first - points.second);
 }
-double Arc::getRadius() const {
+long double Arc::getRadius() const {
     const auto& points = getTwoPoints();
     return len(points.first - points.second);
 }
@@ -278,16 +278,16 @@ std::pair<const QPointF, const QPointF> Arc::getTwoPoints() const {
 
 bool Circle::isTouchedByRectangle(const QPointF& start, const QPointF& end) const {
     auto p = getTwoPoints();
-    double dist = QLineF(p.first, p.second).length();
-    double x = p.first.x(), y = p.first.y();
-    std::vector<double> v = {start.x(), end.y(), end.x(), start.y()};
-        std::vector<double> w = {x, y};
-        double minDist = 1e9, maxDist = 0;
+    long double dist = QLineF(p.first, p.second).length();
+    long double x = p.first.x(), y = p.first.y();
+    std::vector<long double> v = {start.x(), end.y(), end.x(), start.y()};
+        std::vector<long double> w = {x, y};
+        long double minDist = 1e9L, maxDist = 0L;
         for (int i = 0; i < 4; ++i){
-                maxDist = std::max(QLineF(QPointF(v[2 * (i/2)], v[2 * (i%2) + 1]), p.first).length(), maxDist);
+                maxDist = std::max(len(QPointF(v[2 * (i/2)], v[2 * (i%2) + 1])-p.first), maxDist);
             }
-        double minX = std::min(std::abs(start.x() - x), std::abs(end.x() - x));
-        double minY = std::min(std::abs(start.y() - y), std::abs(end.y() - y));
+        long double minX = std::min(std::abs(start.x() - x), std::abs(end.x() - x));
+        long double minY = std::min(std::abs(start.y() - y), std::abs(end.y() - y));
         if ((start.y() - y) * (end.y() - y) <= 0){
                 minDist = std::min(minDist, minX);
             } else{

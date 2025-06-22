@@ -111,7 +111,7 @@ void Line::draw(QPainter* painter) const {
 
     QPen pen; // 创建一个QPen对象用于绘制
 
-    double add=((int)hovered_)*HOVER_ADD_WIDTH;
+    long double add=((int)hovered_)*HOVER_ADD_WIDTH;
 
     if(selected_){
         QColor selectcolor=getColor().lighter(250);
@@ -132,9 +132,9 @@ void Line::draw(QPainter* painter) const {
 }
 
 // 辅助函数：计算点 p 到直线 p1p2 的距离
-double Line::distanceToLine(const QPointF& p, const std::pair<QPointF,QPointF>& Points) const {
-    double x1=Points.first.x(),x2=Points.second.x(),y1=Points.first.y(),y2=Points.second.y();
-    double X=p.x(),Y=p.y();
+long double Line::distanceToLine(const QPointF& p, const std::pair<QPointF,QPointF>& Points) const {
+    long double x1=Points.first.x(),x2=Points.second.x(),y1=Points.first.y(),y2=Points.second.y();
+    long double X=p.x(),Y=p.y();
     return std::abs((y2-y1)*X+(x1-x2)*Y+y1*x2-y2*x1)/std::sqrt((y2-y1)*(y2-y1)+(x1-x2)*(x1-x2));
 }
 
@@ -150,7 +150,7 @@ QPointF Line::position() const {
 }
 
 inline std::pair<const QPointF,const QPointF> zhongchui(std::pair<const QPointF&,const QPointF&> ppp){
-    double x1=ppp.first.x(),x2=ppp.second.x(),y1=ppp.first.y(),y2=ppp.second.y();
+    long double x1=ppp.first.x(),x2=ppp.second.x(),y1=ppp.first.y(),y2=ppp.second.y();
     return std::make_pair(QPointF((x1+x2)/2.0,(y1+y2)/2.0),
                           QPointF((x1+x2)/2.0+y2-y1,(y1+y2)/2.0+x1-x2));
 }
@@ -244,8 +244,8 @@ GeometricObject* Line::flush(){
         expectParentNum(2);
         Circle* circle = dynamic_cast<Circle*>(parents_[1]);
         QPointF P1 = parents_[0]->position(), P2 = circle->position();
-        double radius = circle->getRadius();
-        double dist1 = std::sqrt(std::pow(P1.x() - P2.x(), 2) + std::pow(P1.y() - P2.y(), 2));
+        long double radius = circle->getRadius();
+        long double dist1 = std::sqrt(std::pow(P1.x() - P2.x(), 2) + std::pow(P1.y() - P2.y(), 2));
         if (dist1 * dist1 - radius * radius < 0){
             legal_ = false;
             position_.push_back(QPointF(1, 1));
@@ -253,7 +253,7 @@ GeometricObject* Line::flush(){
             return this;
         }
         legal_ = true;
-        double dist2 = std::sqrt(dist1 * dist1 - radius * radius);
+        long double dist2 = std::sqrt(dist1 * dist1 - radius * radius);
         QPointF direction1 = P2 - P1, direction2 = QPointF(-direction1.y(), direction1.x());
         QPointF P3 = P1 + direction1 * dist2 / dist1 + direction2 * radius / dist1;
         position_.push_back(P1);
@@ -264,8 +264,8 @@ GeometricObject* Line::flush(){
         expectParentNum(2);
         Circle* circle = dynamic_cast<Circle*>(parents_[1]);
         QPointF P1 = parents_[0]->position(), P2 = circle->position();
-        double radius = circle->getRadius();
-        double dist1 = std::sqrt(std::pow(P1.x() - P2.x(), 2) + std::pow(P1.y() - P2.y(), 2));
+        long double radius = circle->getRadius();
+        long double dist1 = std::sqrt(std::pow(P1.x() - P2.x(), 2) + std::pow(P1.y() - P2.y(), 2));
         if (dist1 * dist1 - radius * radius < 0){
             legal_ = false;
             position_.push_back(QPointF(1, 1));
@@ -273,7 +273,7 @@ GeometricObject* Line::flush(){
             return this;
         }
         legal_ = true;
-        double dist2 = std::sqrt(dist1 * dist1 - radius * radius);
+        long double dist2 = std::sqrt(dist1 * dist1 - radius * radius);
         QPointF direction1 = P2 - P1, direction2 = QPointF(-direction1.y(), direction1.x());
         QPointF P3 = P1 + direction1 * dist2 / dist1 - direction2 * radius / dist1;
         position_.push_back(P1);
@@ -307,8 +307,8 @@ std::set<GeometricObject*> LineCreator::apply(std::vector<GeometricObject*> objs
 
 bool Line::isTouchedByRectangle(const QPointF& start, const QPointF& end) const {
     auto p = getTwoPoints();
-    double x1 = p.first.x(), x2 = p.second.x(), y1 = p.first.y(), y2 = p.second.y();
-    double a = y1 - y2, b = x2 - x1, c = y2*x1 - y1*x2;
+    long double x1 = p.first.x(), x2 = p.second.x(), y1 = p.first.y(), y2 = p.second.y();
+    long double a = y1 - y2, b = x2 - x1, c = y2*x1 - y1*x2;
     std::vector<QPointF> v = {start, end, QPointF(start.x(), end.y()), QPointF(end.x(), start.y())};
     std::set<int> sgn;
     for (auto point : v){

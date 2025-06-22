@@ -18,7 +18,7 @@ public:
     bool isNear(const QPointF& pos) const override;
     QPointF position() const override; // 通常返回圆心
 
-    double getRadius() const;
+    long double getRadius() const;
     GeometricObject* flush() override;
     virtual bool isTouchedByRectangle(const QPointF& start, const QPointF& end) const override;
 
@@ -67,15 +67,15 @@ public:
     bool isNear(const QPointF& pos) const override;
     QPointF position() const override; // 返回圆心
 
-    double getRadius() const;
+    long double getRadius() const;
     GeometricObject* flush() override;
     virtual bool isTouchedByRectangle(const QPointF& start, const QPointF& end) const override;
 
     std::pair<const QPointF, const QPointF> getTwoPoints() const override;//Arc的getTwoPoints保证second是弧的起点
 
-    std::pair<double, double> getAngles() const;
+    std::pair<long double, long double> getAngles() const;
 protected:
-    std::pair<double,double> Angles_;
+    std::pair<long double,long double> Angles_;
     Qt::PenStyle getPenStyle() const;
 
 };

@@ -11,8 +11,8 @@
 #include <QMessageBox>
 
 // isNear 检查用的小容差值 (例如，以像素为单位)
-const double HOVER_ADD_WIDTH =1.5;
-const double SELECTED_WIDTH =2.5;
+const long double HOVER_ADD_WIDTH =1.5;
+const long double SELECTED_WIDTH =2.5;
 
 class Lineoo : public GeometricObject {
 public:
@@ -26,14 +26,14 @@ public:
     QPointF position() const override; // 返回 startPoint_
     std::pair<const QPointF, const QPointF> getTwoPoints() const override;
 
-    double length() const{return len(getTwoPoints().first-getTwoPoints().second);}
+    long double length() const{return len(getTwoPoints().first-getTwoPoints().second);}
     GeometricObject* flush() override;
     virtual bool isTouchedByRectangle(const QPointF& start, const QPointF& end) const override;
 
 protected:
     // isNear 计算的辅助函数 (点到线段的距离)
     Qt::PenStyle getPenStyle()const;
-    double distanceToLineoo(const QPointF& p,const std::pair<QPointF,QPointF>& Points) const;
+    long double distanceToLineoo(const QPointF& p,const std::pair<QPointF,QPointF>& Points) const;
 };
 
 //lineoo的shape:

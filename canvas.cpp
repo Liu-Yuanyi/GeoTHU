@@ -103,7 +103,7 @@ GeometricObject* Canvas::automaticIntersection(){
         auto newObjects = operations[10]->apply(v);
         qDebug()<<"newObject.size() = "<<newObjects.size();
         GeometricObject* targetObj = nullptr;
-        double mindist=1e100;
+        long double mindist=1e100;
         for(auto iter:newObjects){
             if(!iter->isLegal()){
                 delete iter;
@@ -419,9 +419,9 @@ void Canvas::paintEvent(QPaintEvent* event) {
         QBrush brush(Qt::lightGray);     // light gray fill
         painter.setBrush(brush);
 
-        double x = multipleSelectionStartPos_.x(), y = multipleSelectionStartPos_.y();
-        double dx = multipleSelectionEndPos_.x() - x;
-        double dy = multipleSelectionEndPos_.y() - y;
+        long double x = multipleSelectionStartPos_.x(), y = multipleSelectionStartPos_.y();
+        long double dx = multipleSelectionEndPos_.x() - x;
+        long double dy = multipleSelectionEndPos_.y() - y;
         QRect rect(x, y, dx, dy);    // x, y, width, height
         painter.drawRect(rect);
 
@@ -674,8 +674,8 @@ void Canvas::keyPressEvent(QKeyEvent *event) {
 void Canvas::wheelEvent(QWheelEvent *event) {
     mousePos_ = event->position();
     if (!(event->modifiers() & Qt::ControlModifier)){
-        double deltay = event->angleDelta().y();
-        double deltax = event->angleDelta().x();
+        long double deltay = event->angleDelta().y();
+        long double deltax = event->angleDelta().x();
         for (auto obj : objects_) {
             if (obj->getObjectType() == ObjectType::Point and obj->getParents().empty()) {
                 auto curPosition = obj->position();
@@ -690,7 +690,7 @@ void Canvas::wheelEvent(QWheelEvent *event) {
             }
         }
     } else {
-        double deltay = event->angleDelta().y();
+        long double deltay = event->angleDelta().y();
         for (auto obj : objects_) {
             if (obj->getObjectType() == ObjectType::Point and obj->getParents().empty()) {
                 auto curPosition = obj->position();
