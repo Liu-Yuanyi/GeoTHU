@@ -49,11 +49,20 @@ private:
     bool deselectPermitted_ = true;          // 是否允许在鼠标释放时取消选择（用于区分拖拽和单击）
     Operation* currentOperation_ = nullptr;  // 当前进行的操作 (例如平移、旋转等)
     std::vector<GeometricObject*> operationSelections_; // 记录目前选择了哪些对象
+    std::vector<GeometricObject*> deletedObjs_ = {};
 
     QPointF multipleSelectionStartPos_;
     QPointF multipleSelectionEndPos_;
     bool isDuringMultipleSelection_;
     QString filePath_;
+
+    std::vector<std::vector<GeometricObject*>> cacheObj_;
+    std::vector<std::vector<GeometricObject*>> cacheDel_;
+    std::vector<std::vector<bool>> cacheHidden_;
+    std::vector<std::vector<QPointF>> cachePos_;
+    int currentCacheIndex_ = 0;
+    int maxUndoCount_ = 0;
+    int maxRedoCount_ = 0;
 
     // --- 私有辅助函数 ---
     void updateHoverState(const QPointF& pos);                  // 更新鼠标悬停状态
@@ -64,6 +73,9 @@ private:
     GeometricObject* automaticIntersection();
     void saveFile();
     void loadFile();
+    void loadInCache();
+    void undo();
+    void redo();
 };
 
 #endif // CANVAS_H

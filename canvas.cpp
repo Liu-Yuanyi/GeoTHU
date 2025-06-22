@@ -20,6 +20,8 @@
 // extern std::map<ObjectType, double> GetDefaultSize;
 // extern std::map<ObjectType, QString> GetDefaultLable;
 
+const int maxCacheSize = 200;
+
 std::set<GeometricObject*> showObjectsCache;
 
 Canvas::Canvas(QWidget* parent) : QWidget(parent) {
@@ -46,6 +48,11 @@ Canvas::Canvas(QWidget* parent) : QWidget(parent) {
     operations.push_back(new AxialSymmetry());             //索引15
     operations.push_back(new CentralSymmetry());
     // TODO: add other operations here.
+
+    cacheObj_ = std::vector<std::vector<GeometricObject*>>(maxCacheSize, std::vector<GeometricObject*>());
+    cacheDel_ = std::vector<std::vector<GeometricObject*>>(maxCacheSize, std::vector<GeometricObject*>());
+    cacheHidden_ = std::vector<std::vector<bool>>(maxCacheSize, std::vector<bool>());
+    cachePos_ = std::vector<std::vector<QPointF>>(maxCacheSize, std::vector<QPointF>());
 }
 
 Canvas::~Canvas(){
@@ -95,32 +102,33 @@ GeometricObject* Canvas::automaticIntersection(){
         std::vector<GeometricObject*> v = {objsNear[0], objsNear[1]};
         auto newObjects = operations[10]->apply(v);
         qDebug()<<"newObject.size() = "<<newObjects.size();
-                GeometricObject* targetObj = nullptr;
-                double mindist=1e100;
-                for(auto iter:newObjects){
-                        if(!iter->isLegal()){
-                                delete iter;
-                                continue;
-                            }
-                        if(targetObj==nullptr){
-                                targetObj=iter;
-                                mindist=len(mousePos_-iter->position());
-                                continue;
-                            }
-                        if(len(mousePos_-iter->position())<mindist){
-                                delete targetObj;
-                                targetObj=iter;
-                                mindist=len(mousePos_-iter->position());
-                            }
-                        else{
-                                delete iter;
+        GeometricObject* targetObj = nullptr;
+        double mindist=1e100;
+        for(auto iter:newObjects){
+            if(!iter->isLegal()){
+                delete iter;
+                continue;
+            }
+            if(targetObj==nullptr){
+                targetObj=iter;
+                mindist=len(mousePos_-iter->position());
+                continue;
+            }
+            if(len(mousePos_-iter->position())<mindist){
+                delete targetObj;
+                targetObj=iter;
+                mindist=len(mousePos_-iter->position());
+            }
+            else{
+                delete iter;
             }
         }
         if(targetObj){
                 targetObj->setLabel(neededlabel);
                 GetDefaultLable[ObjectType::Point]=nextPointLable(neededlabel);
                 objects_.push_back(targetObj);
-                targetObj->setSelected(1);
+                loadInCache();
+                targetObj->setSelected(true);
                 selectedObjs_.insert(targetObj);
             }
         return targetObj;
@@ -188,6 +196,7 @@ void Canvas::mousePressEvent(QMouseEvent* event) {
                     newPoint = (new Point(mousePos_))->flush();
                 }
                 objects_.push_back(newPoint);
+                loadInCache();
                 newPoint->setSelected(true); // 新创建的点默认为选中状态
                 selectedObjs_.insert(newPoint);
             } else { // 如果点击在现有点附近，则选中该点
@@ -223,11 +232,13 @@ void Canvas::mousePressEvent(QMouseEvent* event) {
                         dynamic_cast<Point*>(targetPoint)->setPosition(mousePos_);
                     }
                     objects_.push_back(targetPoint);
+                    loadInCache();
                 } else {
                     targetPoint = findPointNear(mousePos_);
                     if (!targetPoint) { // 如果附近没有点，则创建新点
                         GeometricObject* newPoint = (new Point(mousePos_))->flush();
                         objects_.push_back(newPoint);
+                        loadInCache();
                         targetPoint = newPoint;
                     }
                 }
@@ -263,7 +274,7 @@ void Canvas::mousePressEvent(QMouseEvent* event) {
                     if (std::find(operationSelections_.begin(), operationSelections_.end(), targetPoint) != operationSelections_.end()){
                         clearSelections();
                     } else {
-                    operationSelections_.push_back(targetPoint);
+                        operationSelections_.push_back(targetPoint);
                     }
                 }
                 else{
@@ -274,17 +285,18 @@ void Canvas::mousePressEvent(QMouseEvent* event) {
                         if (std::find(operationSelections_.begin(), operationSelections_.end(), targetObj) != operationSelections_.end()){
                             clearSelections();
                         } else {
-                        operationSelections_.push_back(targetObj);
+                            operationSelections_.push_back(targetObj);
                         }
                     }
                     else{
                         GeometricObject* newPoint = (new Point(mousePos_))->flush();
                         objects_.push_back(newPoint);
+                        loadInCache();
                         selectedObjs_.insert(newPoint);
                         if (std::find(operationSelections_.begin(), operationSelections_.end(), newPoint) != operationSelections_.end()){
                             clearSelections();
                         } else {
-                        operationSelections_.push_back(newPoint);
+                            operationSelections_.push_back(newPoint);
                         }
                     }
                 }
@@ -297,6 +309,7 @@ void Canvas::mousePressEvent(QMouseEvent* event) {
                     objects_.push_back(obj);
                     selectedObjs_.insert(obj);
                 }
+                loadInCache();
             }
         }
         update();
@@ -370,6 +383,7 @@ void Canvas::mouseReleaseEvent(QMouseEvent* event) {
             isDuringMultipleSelection_ = false;
             // 处理拖拽结束后的 deselectPermitted 状态
             if (!deselectPermitted_) { // 如果之前是拖拽或按下时选中
+                loadInCache();
                 deselectPermitted_ = true;
             } else { // 如果是一个简单的点击释放（没有拖拽，且按下时未改变选择状态）
                 // 这里的逻辑用于处理：如果用户点击一个已选中的对象（非Ctrl），是否取消选择它。
@@ -568,6 +582,7 @@ void Canvas::contextMenuEvent(QContextMenuEvent* event) {
     menu.addAction(tr("hide"), [this, contextMenuObj]() {
         contextMenuObj->setHidden(true);
         contextMenuObj->setSelected(false);
+        loadInCache();
         selectedObjs_.erase(contextMenuObj);
         update();
     });
@@ -593,42 +608,30 @@ void Canvas::contextMenuEvent(QContextMenuEvent* event) {
 }
 
 void Canvas::keyPressEvent(QKeyEvent *event) {
-    if (event->key() == Qt::Key_Up) {
+    if (event->key() == Qt::Key_Up or event->key() == Qt::Key_Down or
+        event->key() == Qt::Key_Right or event->key() == Qt::Key_Left) {
+        QPointF delta;
+        switch (event->key()) {
+        case (Qt::Key_Up):
+            delta = QPointF(0, 3);
+            break;
+        case (Qt::Key_Down):
+            delta = QPointF(0, -3);
+        case (Qt::Key_Right):
+            delta = QPointF(-3, 0);
+        case (Qt::Key_Left):
+            delta = QPointF(3, 0);
+        }
         for (auto obj : objects_) {
             if (obj->getObjectType() == ObjectType::Point and obj->getParents().empty()) {
                 auto curPosition = obj->position();
                 Point* point = dynamic_cast<Point*>(obj);
-                point->setPosition(curPosition + QPointF(0, 3));
+                point->setPosition(curPosition + delta);
             }
         }
-        update();
-    }
-    if (event->key() == Qt::Key_Down) {
-        for (auto obj : objects_) {
-            if (obj->getObjectType() == ObjectType::Point and obj->getParents().empty()) {
-                auto curPosition = obj->position();
-                Point* point = dynamic_cast<Point*>(obj);
-                point->setPosition(curPosition + QPointF(0, -3));
-            }
-        }
-        update();
-    }
-    if (event->key() == Qt::Key_Right) {
-        for (auto obj : objects_) {
-            if (obj->getObjectType() == ObjectType::Point and obj->getParents().empty()) {
-                auto curPosition = obj->position();
-                Point* point = dynamic_cast<Point*>(obj);
-                point->setPosition(curPosition + QPointF(-3, 0));
-            }
-        }
-        update();
-    }
-    if (event->key() == Qt::Key_Left) {
-        for (auto obj : objects_) {
-            if (obj->getObjectType() == ObjectType::Point and obj->getParents().empty()) {
-                auto curPosition = obj->position();
-                Point* point = dynamic_cast<Point*>(obj);
-                point->setPosition(curPosition + QPointF(3, 0));
+        for (auto& v : cachePos_) {
+            for (QPointF& p : v) {
+                p += delta;
             }
         }
         update();
@@ -642,6 +645,24 @@ void Canvas::keyPressEvent(QKeyEvent *event) {
     }
     if (event->modifiers() == Qt::ControlModifier && event->key() == Qt::Key_L) {
         loadFile();
+        update();
+    }
+    if (event->modifiers() == Qt::ControlModifier && event->key() == Qt::Key_Z) {
+        undo();
+        update();
+    }
+    if (event->modifiers() == Qt::ControlModifier && event->key() == Qt::Key_Y) {
+        redo();
+        update();
+    }
+    if (event->modifiers() == Qt::ControlModifier && event->key() == Qt::Key_A) {
+        selectedObjs_.clear();
+        for (auto obj : objects_) { // 只需要遍历已选中的对象
+            if (obj->isShown()) {
+                obj->setSelected(true);
+                selectedObjs_.insert(obj);
+            }
+        }
         update();
     }
     if (event->key() == Qt::Key_Delete) {
@@ -663,6 +684,11 @@ void Canvas::wheelEvent(QWheelEvent *event) {
                 update();
             }
         }
+        for (auto& v : cachePos_) {
+            for (QPointF& p : v) {
+                p += QPointF(0.3 * deltax, 0.3 * deltay);
+            }
+        }
     } else {
         double deltay = event->angleDelta().y();
         for (auto obj : objects_) {
@@ -671,6 +697,11 @@ void Canvas::wheelEvent(QWheelEvent *event) {
                 Point* point = dynamic_cast<Point*>(obj);
                 QPointF center = mousePos_;
                 point->setPosition(curPosition * (1 + deltay / 2000) - center * (deltay / 2000));
+            }
+        }
+        for (auto& v : cachePos_) {
+            for (QPointF& p : v) {
+                p = p * (1 + deltay / 2000) - mousePos_ * (deltay / 2000);
             }
         }
     }
@@ -730,27 +761,85 @@ void Canvas::loadFile() {
     filePath_ = path;
 }
 
+void Canvas::loadInCache() {
+    maxUndoCount_ = std::min(maxCacheSize, maxUndoCount_ + 1);
+    maxRedoCount_ = 0;
+    currentCacheIndex_ = (currentCacheIndex_ + 1) % maxCacheSize;
+    cacheObj_[currentCacheIndex_] = objects_;
+    cacheDel_[currentCacheIndex_] = deletedObjs_;
+    std::vector<bool> hiddenStates = {};
+    std::vector<QPointF> pos = {};
+    for (auto obj : objects_) {
+        hiddenStates.push_back(obj->isHidden());
+        pos.push_back(obj->position());
+    }
+    cacheHidden_[currentCacheIndex_] = hiddenStates;
+    cachePos_[currentCacheIndex_] = pos;
+}
+
+void Canvas::undo() {
+    if (maxUndoCount_ == 0) {
+        return;
+    }
+    --maxUndoCount_;
+    ++maxRedoCount_;
+    currentCacheIndex_ = (currentCacheIndex_ + maxCacheSize - 1) % maxCacheSize;
+    objects_ = cacheObj_[currentCacheIndex_];
+    deletedObjs_ = cacheDel_[currentCacheIndex_];
+    for (int i = 0; i < objects_.size(); ++i) {
+        objects_[i]->setHidden(cacheHidden_[currentCacheIndex_][i]);
+        objects_[i]->setSelected(false);
+        if (objects_[i]->getObjectType() == ObjectType::Point) {
+            Point* p = dynamic_cast<Point*>(objects_[i]);
+            p->setPosition(cachePos_[currentCacheIndex_][i]);
+        }
+    }
+    selectedObjs_.clear();
+}
+
+void Canvas::redo() {
+    if (maxRedoCount_ == 0) {
+        return;
+    }
+    --maxRedoCount_;
+    ++maxUndoCount_;
+    currentCacheIndex_ = (currentCacheIndex_ + 1) % maxCacheSize;
+    objects_ = cacheObj_[currentCacheIndex_];
+    deletedObjs_ = cacheDel_[currentCacheIndex_];
+    for (int i = 0; i < objects_.size(); ++i) {
+        objects_[i]->setHidden(cacheHidden_[currentCacheIndex_][i]);
+        objects_[i]->setSelected(false);
+        if (objects_[i]->getObjectType() == ObjectType::Point) {
+            Point* p = dynamic_cast<Point*>(objects_[i]);
+            p->setPosition(cachePos_[currentCacheIndex_][i]);
+        }
+    }
+    selectedObjs_.clear();
+}
+
 void Canvas::deleteObjects(){
     std::vector<GeometricObject*> toDelete(selectedObjs_.begin(), selectedObjs_.end());
     selectedObjs_.clear(); // 清空选中集合
-
-    for (GeometricObject* obj : toDelete) {
-        // 从 objects_ 列表中移除
-        std::stack<GeometricObject*> s;
-        s.push(obj);
-        while (!s.empty()){
-            GeometricObject* curObj = s.top();
-            s.pop();
-            auto iter = std::find(objects_.begin(), objects_.end(), curObj);
-            if (iter != objects_.end()){
-                objects_.erase(iter);
-                auto children = curObj->getChildren();
-                for (auto child : children){
-                    s.push(child);
+    if (!toDelete.empty()) {
+        for (GeometricObject* obj : toDelete) {
+            // 从 objects_ 列表中移除
+            std::stack<GeometricObject*> s;
+            s.push(obj);
+            while (!s.empty()){
+                GeometricObject* curObj = s.top();
+                s.pop();
+                auto iter = std::find(objects_.begin(), objects_.end(), curObj);
+                if (iter != objects_.end()){
+                    objects_.erase(iter);
+                    auto children = curObj->getChildren();
+                    for (auto child : children){
+                        s.push(child);
+                    }
+                    deletedObjs_.push_back(curObj);
                 }
-                delete curObj;
             }
         }
+        loadInCache();
     }
     update();
 }
@@ -759,6 +848,7 @@ void Canvas::hideObjects(){
     for (auto obj : selectedObjs_){
         obj->setHidden(true);
     }
+    loadInCache();
     selectedObjs_.clear();
 }
 
@@ -771,10 +861,14 @@ void Canvas::showObjects(){
             showObjectsCache.insert(obj);
         }
     }
+    loadInCache();
 }
 
 void Canvas::clearObjects(){
     for (auto obj : objects_){
+        delete obj;
+    }
+    for (auto obj : deletedObjs_){
         delete obj;
     }
     objects_.clear();
@@ -782,6 +876,10 @@ void Canvas::clearObjects(){
     selectedObjs_.clear();
     initialPositions_.clear();
     operationSelections_.clear();
+    cacheObj_ = std::vector<std::vector<GeometricObject*>>(maxCacheSize, std::vector<GeometricObject*>());
+    cacheDel_ = std::vector<std::vector<GeometricObject*>>(maxCacheSize, std::vector<GeometricObject*>());
+    cacheHidden_ = std::vector<std::vector<bool>>(maxCacheSize, std::vector<bool>());
+    cachePos_ = std::vector<std::vector<QPointF>>(maxCacheSize, std::vector<QPointF>());
     GetDefaultLable={
         {ObjectType::Point, "A"},       // 点的默认标签
         {ObjectType::Line, "line_1"},
