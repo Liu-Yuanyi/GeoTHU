@@ -4,9 +4,21 @@
 #include "geometricobject.h"
 #include <QPointF>
 #include <QColor>
-#include "calculator.h"
 
 class Saveloadhelper;
+
+inline long double len(const QPointF& p){
+    return sqrt(p.x()*p.x()+p.y()*p.y());
+}
+inline long double len(const std::pair<QPointF, QPointF> p){
+    return len(p.first-p.second);
+}
+inline long double len2(const QPointF& p){
+    return p.x()*p.x()+p.y()*p.y();
+}
+inline long double len2(const std::pair<QPointF, QPointF> p){
+    return len2(p.first-p.second);
+}
 
 class Point : public GeometricObject {
 public:

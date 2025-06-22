@@ -13,19 +13,6 @@ constexpr long double PI_2 = 1.5707963267948966192313216916397514420985846996875
 inline bool thetainst (const long double theta, const long double s, const long double t){
     return (s <= t) ? (theta >= s && theta <= t) : (theta >= s || theta <= t);
 }
-inline long double len(const QPointF& p){
-    return sqrt(p.x()*p.x()+p.y()*p.y());
-}
-inline long double len(const std::pair<QPointF, QPointF> p){
-    return len(p.first-p.second);
-}
-inline long double len2(const QPointF& p){
-    return p.x()*p.x()+p.y()*p.y();
-}
-inline long double len2(const std::pair<QPointF, QPointF> p){
-    return len(p.first-p.second);
-}
-
 inline long double normalizeAngle(long double angle) {
     return (angle < 0) ? angle + 2*PI : (angle>=2*PI? angle-2*PI : angle);
 }
