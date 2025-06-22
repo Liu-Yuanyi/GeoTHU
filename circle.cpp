@@ -4,6 +4,7 @@
 #include <QPainter>
 #include <cmath> // For std::pow, std::sqrt
 #include <QMessageBox>
+#include "point.h"
 #include "lineoo.h"
 #include "calculator.h"
 // 初始化全局默认值 (如果需要，这些通常在主程序或特定初始化函数中完成，
@@ -78,14 +79,7 @@ void Circle::draw(QPainter* painter) const {
         pen.setStyle(Qt::SolidLine);
         painter->setPen(pen);
 
-            painter->drawEllipse(center, radius, radius);
-            // 添加标签绘制（如果有）
-            if (!labelhidden_) {
-                painter->setPen(Qt::black);
-                painter->drawText(center.x() + radius + 6,
-                                  center.y() - 6,
-                                  label_);
-            }
+        painter->drawEllipse(center, radius, radius);
 
     }
 
@@ -108,7 +102,49 @@ void Circle::draw(QPainter* painter) const {
 
 }
 void Arc::draw(QPainter* painter) const {
-#warning 1
+
+    if (!isShown()) return;
+
+    // 获取圆心和半径
+    auto points = getTwoPoints();
+    QPointF center = points.first;
+    double radius = QLineF(points.first, points.second).length();
+    std::pair<double,double> Angles = getAngles();
+    int startAngleQt = Angles.first * 180 / M_PI * 16;
+    int spanAngleQt = (Angles.second - Angles.first) * 180 / M_PI * 16;
+    if(spanAngleQt<0){ spanAngleQt+= 360*16;    }
+    QRectF rect(center.x() - radius, center.y() - radius, radius * 2, radius * 2);
+    QPen pen;
+    double add = ((int)hovered_) * HOVER_ADD_WIDTH;
+
+    // 如果被选中，先绘制一个较宽的选中效果
+    if (selected_) {
+        QColor selectcolor = getColor().lighter(250);
+        selectcolor.setAlpha(128);
+        pen.setColor(selectcolor);
+        pen.setWidthF(getSize() + add + SELECTED_WIDTH);
+        pen.setStyle(Qt::SolidLine);
+        painter->setPen(pen);
+
+        painter->drawArc(rect, startAngleQt, spanAngleQt);
+    }
+
+    // 设置正常绘制的画笔
+    pen.setColor(getColor());
+    pen.setWidthF(getSize() + add); // 添加 hovered 状态的额外宽度
+    pen.setStyle(getPenStyle());    // 假设您有 getPenStyle() 方法
+    painter->setPen(pen);
+
+    // 根据圆的类型绘制不同形状
+
+    painter->drawArc(rect, startAngleQt, spanAngleQt);
+    // 添加标签绘制（如果有）
+    if (!labelhidden_) {
+        painter->setPen(Qt::black);
+        painter->drawText(center.x() + radius*cos(startAngleQt+16*10) + 6,
+                          center.y() + radius*sin(startAngleQt+16*10)- 6,
+                          label_);
+    }
 
 }
 
@@ -124,14 +160,21 @@ bool Circle::isNear(const QPointF& pos) const {
     double distToCenter = std::sqrt(std::pow(pos.x() - currentCenter.x(), 2) +
                                     std::pow(pos.y() - currentCenter.y(), 2));
 
-    // 容差考虑了线宽和一些额外像素
-    double tolerance = getSize() / 2.0 + 2.0;
-    return std::abs(distToCenter - currentRadius) <= tolerance;
+    return std::abs(distToCenter - currentRadius) <= getSize() + 1e-2;
 }
+
 bool Arc::isNear(const QPointF& pos) const {
-#warning 1
-    return 1;
+    double theta=std::atan2((pos-position()).x(),(pos-position()).y());
+    auto [s,t]=getAngles();
+    double closestAngle = (s <= t ? (theta >= s && theta <= t) : (theta >= s || theta <= t))
+                                  ? theta
+                                  : ((std::min(std::min(std::abs(theta - s), std::abs(s + 2*M_PI - theta)),
+                                               std::min(std::abs(theta - t), std::abs(t + 2*M_PI - theta)))
+                                      == std::min(std::abs(theta - s), std::abs(s + 2*M_PI - theta))) ? s : t);
+    QPointF p= position()+len(getTwoPoints().first-getTwoPoints().second)*QPointF(cos(closestAngle),sin(closestAngle));
+    return len(p-pos)<=(getSize()+1e-2);
 }
+
 GeometricObject* Circle::flush(){
     position_.clear();
     legal_ = true;
@@ -159,7 +202,14 @@ GeometricObject* Circle::flush(){
         return this;
     }
     case 1:{
-        position_.push_back(parents_[0]->position()),position_.push_back(parents_[0]->position()+QPointF(dynamic_cast<Lineoo*>(parents_[1])->length(),0));
+        if(parents_.size()==2){
+            position_.push_back(parents_[0]->position());
+            position_.push_back(parents_[0]->position()+QPointF(dynamic_cast<Lineoo*>(parents_[1])->length(),0));
+        }
+        else{
+            position_.push_back(parents_[0]->position());
+            position_.push_back(parents_[0]->position()+QPointF(len(parents_[1]->position()-parents_[2]->position()),0));
+        }
         return this;
     }
     case 2:{
@@ -174,9 +224,35 @@ GeometricObject* Circle::flush(){
     }
 }
 GeometricObject* Arc::flush(){
-#warning
-}
+    position_.clear();
+    legal_ = true;
+    for (auto iter : parents_) {
+        if (!iter->isLegal()) {
+            legal_ = false;
+            position_.push_back(QPointF());position_.push_back(QPointF(1, 1));
+            return this;
+        }
+    }
 
+    switch (generation_) {
+    case 0:{
+        position_.push_back((parents_[0]->position()+parents_[1]->position())/2);
+        position_.push_back(parents_[0]->position());
+        QPointF tmp=parents_[0]->position()-parents_[1]->position();
+        Angles_.first=std::atan2(tmp.x(),tmp.y());
+        Angles_.second=(Angles_.first>=M_PI? Angles_.first-M_PI: Angles_.first+M_PI);
+        return this;
+    }
+    default:{
+        QMessageBox::warning(nullptr,"警告","Cirle的flush方法未实现!");
+        position_.push_back(QPointF());position_.push_back(QPointF(1, 1));
+        return this;
+    }
+    }
+}
+std::pair<double, double> Arc::getAngles() const{
+    return Angles_;
+}
 QPointF Circle::position() const {
     return getTwoPoints().first;
 }
@@ -198,37 +274,6 @@ std::pair<const QPointF, const QPointF> Circle::getTwoPoints() const {
 }
 std::pair<const QPointF, const QPointF> Arc::getTwoPoints() const {
     return std::make_pair(position_[0],position_[1]);
-}
-
-TwoPointCircleCreator::TwoPointCircleCreator(){
-    inputType.push_back({ObjectType::Point, ObjectType::Point});
-    operationName = "TwoPointCircleCreator";
-}
-
-std::set<GeometricObject*> TwoPointCircleCreator::apply(std::vector<GeometricObject*> objs,
-                                                         QPointF position) const {
-    return std::set<GeometricObject*>{(new Circle(objs,0))->flush()};
-}
-
-CenterRadiusCircleCreator::CenterRadiusCircleCreator() {
-    // 需要三个点：前两点距离作为半径，第三点为圆心
-    inputType.push_back({ObjectType::Point, ObjectType::Lineoo});
-    operationName = "CenterRadiusCircleCreator";
-}
-
-std::set<GeometricObject*> CenterRadiusCircleCreator::apply(std::vector<GeometricObject*> objs,
-                                                             QPointF position) const {
-    return std::set<GeometricObject*>{(new Circle(objs,1))->flush()};
-}
-
-ThreePointCircleCreator::ThreePointCircleCreator() {
-    inputType.push_back({ObjectType::Point, ObjectType::Point, ObjectType::Point});
-    operationName = "ThreePointCircleCreator";
-}
-
-std::set<GeometricObject*> ThreePointCircleCreator::apply(std::vector<GeometricObject*> objs,
-                                                           QPointF position) const {
-    return std::set<GeometricObject*>{(new Circle(objs,2))->flush()};
 }
 
 bool Circle::isTouchedByRectangle(const QPointF& start, const QPointF& end) const {
@@ -260,4 +305,47 @@ bool Circle::isTouchedByRectangle(const QPointF& start, const QPointF& end) cons
 }
 bool Arc::isTouchedByRectangle(const QPointF& start, const QPointF& end) const {
 #warning 1
+    return 0;
+}
+
+
+TwoPointCircleCreator::TwoPointCircleCreator(){
+    inputType.push_back({ObjectType::Point, ObjectType::Point});
+    operationName = "TwoPointCircleCreator";
+}
+
+std::set<GeometricObject*> TwoPointCircleCreator::apply(std::vector<GeometricObject*> objs,
+                                                         QPointF position) const {
+    return std::set<GeometricObject*>{(new Circle(objs,0))->flush()};
+}
+
+CenterRadiusCircleCreator::CenterRadiusCircleCreator() {
+    inputType.push_back({ObjectType::Point, ObjectType::Lineoo});
+    inputType.push_back({ObjectType::Point, ObjectType::Point, ObjectType::Point});
+    operationName = "CenterRadiusCircleCreator";
+}
+
+std::set<GeometricObject*> CenterRadiusCircleCreator::apply(std::vector<GeometricObject*> objs,
+                                                             QPointF position) const {
+    return std::set<GeometricObject*>{(new Circle(objs,1))->flush()};
+}
+
+ThreePointCircleCreator::ThreePointCircleCreator() {
+    inputType.push_back({ObjectType::Point, ObjectType::Point, ObjectType::Point});
+    operationName = "ThreePointCircleCreator";
+}
+
+std::set<GeometricObject*> ThreePointCircleCreator::apply(std::vector<GeometricObject*> objs,
+                                                           QPointF position) const {
+    return std::set<GeometricObject*>{(new Circle(objs,2))->flush()};
+}
+
+SemicircleCreator::SemicircleCreator(){
+    inputType.push_back({ObjectType::Point, ObjectType::Point});
+    operationName = "SemiircleCreator";
+}
+
+std::set<GeometricObject*> SemicircleCreator::apply(std::vector<GeometricObject*> objs,
+                                                           QPointF position) const {
+    return std::set<GeometricObject*>{(new Arc(objs,0))->flush()};
 }

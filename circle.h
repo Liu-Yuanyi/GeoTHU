@@ -71,15 +71,22 @@ public:
     GeometricObject* flush() override;
     virtual bool isTouchedByRectangle(const QPointF& start, const QPointF& end) const override;
 
-    std::pair<const QPointF, const QPointF> getTwoPoints() const override;
+    std::pair<const QPointF, const QPointF> getTwoPoints() const override;//Arc的getTwoPoints保证second是弧的起点
 
     std::pair<double, double> getAngles() const;
-
 protected:
-
+    std::pair<double,double> Angles_;
     Qt::PenStyle getPenStyle() const;
 
 };
+//Arc产生方式
+//0:两点半圆, 1:弧心+弧起点+弧终点方向, 2:过三点的弧
 
+class SemicircleCreator : public Operation {
+public:
+    SemicircleCreator();
+    std::set<GeometricObject*> apply(std::vector<GeometricObject*> objs,
+                                      QPointF position = QPointF()) const;
+};
 
 #endif // CIRCLE_H

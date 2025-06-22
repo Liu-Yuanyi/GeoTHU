@@ -33,6 +33,7 @@ inline const QPointF calculateCircleCenter(const QPointF& p1, const QPointF& p2,
     return QPointF(cx, cy);
 }
 
+
 inline const qreal footRatio(QPointF P, std::pair<QPointF, QPointF> line, ObjectType mode=ObjectType::Line) {
     const QPointF& A = line.first;
     const QPointF& B = line.second;
