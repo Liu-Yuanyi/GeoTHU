@@ -43,6 +43,7 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         icon.qrc
         app.rc
         Log.md
+        README.md
         saveloadhelper.h saveloadhelper.cpp
     )
 # Define target properties for Android with Qt 6 as:
