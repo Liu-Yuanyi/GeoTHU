@@ -17,8 +17,12 @@ const int Dotted = 2; // 如果以后需要
 // ... 其他样式
 }
 
+class Saveloadhelper;
+
 class GeometricObject {
 public:
+    static int counter;
+    static void setCounter(int n);
 
     GeometricObject(ObjectName name);
 
@@ -68,6 +72,8 @@ public:
     virtual GeometricObject* flush()=0;//返回自己
     virtual bool isTouchedByRectangle(const QPointF& start, const QPointF& end) const=0;
 
+    friend class Saveloadhelper;
+
 protected:
 
     inline void expectParentNum(size_t num)const{
@@ -92,6 +98,7 @@ protected:
     int generation_;//这个对象是怎么产生的
     //统一约定: -1为平移产生的, -2为旋转产生的, -3为轴对称产生的, -4为中心对称产生的, -5为反演产生的
     ObjectName name_;
+    int index_;
 };
 
 inline QString nextLineLable(const QString& input) {

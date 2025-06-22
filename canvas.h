@@ -53,6 +53,7 @@ private:
     QPointF multipleSelectionStartPos_;
     QPointF multipleSelectionEndPos_;
     bool isDuringMultipleSelection_;
+    QString filePath_;
 
     // --- 私有辅助函数 ---
     void updateHoverState(const QPointF& pos);                  // 更新鼠标悬停状态
@@ -61,6 +62,8 @@ private:
     Point* findPointNear(const QPointF& pos) const;           // 查找指定位置附近的点对象
     void clearSelections();                                     // 清除所有对象的选中状态
     GeometricObject* automaticIntersection();
+    void saveFile();
+    void loadFile();
 };
 
 #endif // CANVAS_H

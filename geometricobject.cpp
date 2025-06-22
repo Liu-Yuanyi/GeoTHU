@@ -39,6 +39,11 @@ std::map<ObjectType, int> GetDefaultShape = {
     {ObjectType::Circle, LineStyle::Solid}
 };
 
+int GeometricObject::counter = 0;
+
+void GeometricObject::setCounter(int n) {
+    counter = n;
+}
 
 GeometricObject::GeometricObject(ObjectName name):
     position_(),
@@ -52,11 +57,13 @@ GeometricObject::GeometricObject(ObjectName name):
     color_(GetDefaultColor[name]),   // 使用映射表获取默认颜色
     size_(GetDefaultSize[name]),     // 使用映射表获取默认大小
     shape_(GetDefaultShape[name]),   // 使用映射表获取默认形状/线型
-    generation_(0) {
+    generation_(0),
+    index_(counter){
     if(name==ObjectName::Point){
         labelhidden_=false;
     }
-}     // 对象的生成代数，初始为0
+    ++counter;
+}
 
 GeometricObject::~GeometricObject() {
     // 移除父子关系

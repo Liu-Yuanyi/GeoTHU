@@ -27,6 +27,7 @@ void Point::setPosition(const QPointF& pos) {
     case 0:{
         expectParentNum(0);
         PointArg = pos;
+        qDebug() << "pos: " << pos.x();
         return;
     }
     case 1:

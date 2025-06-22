@@ -2,14 +2,17 @@
 #include <QPainter>
 #include <QInputDialog> // 确保包含 QInputDialog
 #include <QColorDialog> // 确保包含 QColorDialog
+#include <QFileDialog>
 #include <cmath>        // For std::sqrt, std::pow, std::abs (QLineF::length() 也可以)
 #include <algorithm>    // For std::remove if deleting objects
+#include "geometricobject.h"
 #include "circle.h"
 #include "line.h"
 #include "lineo.h"
 #include "lineoo.h"
 #include "tools.h"
 #include "intersectioncreator.h"
+#include "saveloadhelper.h"
 #include <stack>
 
 // 假设你的 ObjectType 和 ObjectName 在 "objecttype.h" (或其他地方) 定义，并且 GetDefault... 映射存在
@@ -24,6 +27,7 @@ Canvas::Canvas(QWidget* parent) : QWidget(parent) {
     currentOperation_ = nullptr; // 初始化
     currentMode = SelectionMode;
     setFocusPolicy(Qt::StrongFocus);
+    filePath_ = "";
     operations.push_back(new TwoPointCircleCreator());
     operations.push_back(new LineCreator());
     operations.push_back(new LineooCreator());
@@ -334,7 +338,6 @@ void Canvas::mouseMoveEvent(QMouseEvent* event) {
                     Point* point = dynamic_cast<Point*>(obj);
                     if (point) point->setPosition(newPos);
                 }
-                // 你可能需要为其他类型的对象（如线、多边形等）添加拖动逻辑
             }
             deselectPermitted_ = false; // 拖动过程中不允许取消选择
             update();
@@ -397,16 +400,20 @@ void Canvas::paintEvent(QPaintEvent* event) {
         QPen pen(Qt::black);             // solid black edge
         pen.setWidth(2);                 // thickness of the edge
         painter.setPen(pen);
+
         // Set light fill color (brush)
         QBrush brush(Qt::lightGray);     // light gray fill
         painter.setBrush(brush);
+
         double x = multipleSelectionStartPos_.x(), y = multipleSelectionStartPos_.y();
         double dx = multipleSelectionEndPos_.x() - x;
         double dy = multipleSelectionEndPos_.y() - y;
         QRect rect(x, y, dx, dy);    // x, y, width, height
         painter.drawRect(rect);
+
         painter.setBrush(Qt::NoBrush);
     }
+
     if (!showObjectsCache.empty()){
         for (auto obj : showObjectsCache){
             obj->setSelected(true);
@@ -626,29 +633,38 @@ void Canvas::keyPressEvent(QKeyEvent *event) {
         }
         update();
     }
+    if (event->modifiers() == Qt::ControlModifier && event->key() == Qt::Key_H) {
+        hideObjects();
+        update();
+    }
+    if (event->modifiers() == Qt::ControlModifier && event->key() == Qt::Key_S) {
+        saveFile();
+    }
+    if (event->modifiers() == Qt::ControlModifier && event->key() == Qt::Key_L) {
+        loadFile();
+        update();
+    }
+    if (event->key() == Qt::Key_Delete) {
+        deleteObjects();
+        update();
+    }
 }
 
 void Canvas::wheelEvent(QWheelEvent *event) {
     mousePos_ = event->position();
     if (!(event->modifiers() & Qt::ControlModifier)){
-        double deltay = event->angleDelta().y(); // y() gives vertical scroll
+        double deltay = event->angleDelta().y();
+        double deltax = event->angleDelta().x();
         for (auto obj : objects_) {
             if (obj->getObjectType() == ObjectType::Point and obj->getParents().empty()) {
                 auto curPosition = obj->position();
                 Point* point = dynamic_cast<Point*>(obj);
-                point->setPosition(curPosition + QPointF(0, 0.3 * deltay));
-            }
-        }
-        double deltax = event->angleDelta().x(); // y() gives vertical scroll
-        for (auto obj : objects_) {
-            if (obj->getObjectType() == ObjectType::Point and obj->getParents().empty()) {
-                auto curPosition = obj->position();
-                Point* point = dynamic_cast<Point*>(obj);
-                point->setPosition(curPosition + QPointF(0.3 * deltax, 0));
+                point->setPosition(curPosition + QPointF(0.3 * deltax, 0.3 * deltay));
+                update();
             }
         }
     } else {
-        double deltay = event->angleDelta().y(); // y() gives vertical scroll
+        double deltay = event->angleDelta().y();
         for (auto obj : objects_) {
             if (obj->getObjectType() == ObjectType::Point and obj->getParents().empty()) {
                 auto curPosition = obj->position();
@@ -659,10 +675,59 @@ void Canvas::wheelEvent(QWheelEvent *event) {
         }
     }
     update();
-
-
-
     event->accept();
+}
+
+void Canvas::saveFile() {
+    if (filePath_.isEmpty()) {
+        QString path = QFileDialog::getSaveFileName(this, "save", "", "My Files (*.thu)");
+        if (path.isEmpty()){
+            return;
+        }
+        filePath_ = path;
+    }
+
+    QFile file(filePath_);
+    if (!file.open(QIODevice::WriteOnly)) {
+        QMessageBox::critical(this, "Error", "Could not open file:\n" + file.errorString());
+        return;
+    }
+    QDataStream out(&file);
+    out.setVersion(QDataStream::Qt_6_0);
+    Saveloadhelper helper;
+    out << int(objects_.size());
+    qDebug() << objects_.size();
+    for (auto obj : objects_) {
+        helper.save(obj, out);
+    }
+    file.close();
+}
+
+void Canvas::loadFile() {
+    clearObjects();
+    QString path = QFileDialog::getOpenFileName(this, "Open", "", "My Files (*.thu)");
+    if (path.isEmpty()) {
+        return;
+    }
+
+    QFile file(path);
+    if (!file.open(QIODevice::ReadOnly)) {
+        QMessageBox::warning(this, "Error", "Could not open the file.");
+        return;
+    }
+
+    QDataStream in(&file);
+    in.setVersion(QDataStream::Qt_6_0);
+    int n;
+    in >> n;
+    qDebug() << n;
+    Saveloadhelper helper;
+    for (int i = 0; i < n; ++i){
+        GeometricObject* obj = helper.load(in);
+        objects_.push_back(obj);
+    }
+    file.close();
+    filePath_ = path;
 }
 
 void Canvas::deleteObjects(){
@@ -724,7 +789,9 @@ void Canvas::clearObjects(){
         {ObjectType::Lineoo, "segment_1"},
         {ObjectType::Circle, "Circle1"}
         };
+    GeometricObject::setCounter(0);
 }
+
 
 GeometricObject* Canvas::findObjNear(const QPointF& pos) const {
     // 为了让用户更容易选中，可以考虑优先返回选中的对象（如果多个对象重叠）

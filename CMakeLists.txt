@@ -43,6 +43,7 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         icon.qrc
         app.rc
         Log.md
+        saveloadhelper.h saveloadhelper.cpp
     )
 # Define target properties for Android with Qt 6 as:
 #    set_property(TARGET test_project APPEND PROPERTY QT_ANDROID_PACKAGE_SOURCE_DIR
