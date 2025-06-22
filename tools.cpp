@@ -140,9 +140,7 @@ std::set<GeometricObject*> AxialSymmetry::apply(std::vector<GeometricObject*> ob
     GeometricObject *ret;
     switch(objs[0]->getObjectType()){
     case ObjectType::Circle:{
-        QMessageBox::warning(nullptr, "警告", "Circle暂时不兼容几何变换!");
-        return std::set<GeometricObject*>();
-        //return std::set<GeometricObject*>{new Circle(objs, 7)};
+        return std::set<GeometricObject*>{(new Circle(objs, -3))->flush()};
         break;
     }
     case ObjectType::Line:{
@@ -183,9 +181,7 @@ std::set<GeometricObject*> CentralSymmetry::apply(std::vector<GeometricObject*> 
     GeometricObject *ret;
     switch(objs[0]->getObjectType()){
     case ObjectType::Circle:{
-        QMessageBox::warning(nullptr, "警告", "Circle暂时不兼容几何变换!");
-        return std::set<GeometricObject*>();
-        //return std::set<GeometricObject*>{new Circle(objs, 7)};
+        return std::set<GeometricObject*>{(new Circle(objs, -4))->flush()};
         break;
     }
     case ObjectType::Line:{

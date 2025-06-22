@@ -54,4 +54,32 @@ public:
                                       QPointF position = QPointF()) const;
 };
 
+
+
+class Arc : public GeometricObject {
+public:
+    // 构造函数: 可以有多种，例如通过圆心点对象和半径，或通过圆心坐标和半径
+    explicit Arc(const std::vector<GeometricObject*>& parents,const int& generation);
+
+    // --- 重写 GeometricObject 的纯虚函数 ---
+    ObjectType getObjectType() const override { return ObjectType::Circle; } // 假设ObjectType::Circle存在
+    void draw(QPainter* painter) const override;
+    bool isNear(const QPointF& pos) const override;
+    QPointF position() const override; // 返回圆心
+
+    double getRadius() const;
+    GeometricObject* flush() override;
+    virtual bool isTouchedByRectangle(const QPointF& start, const QPointF& end) const override;
+
+    std::pair<const QPointF, const QPointF> getTwoPoints() const override;
+
+    std::pair<double, double> getAngles() const;
+
+protected:
+
+    Qt::PenStyle getPenStyle() const;
+
+};
+
+
 #endif // CIRCLE_H

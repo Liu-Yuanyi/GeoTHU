@@ -116,6 +116,16 @@ GeometricObject* Circle::flush(){
     }
 
     switch(generation_){
+    case -4:{
+        position_.push_back(2*parents_[1]->position()-parents_[0]->getTwoPoints().first);
+        position_.push_back(2*parents_[1]->position()-parents_[0]->getTwoPoints().second);
+        return this;
+    }
+    case -3:{
+        position_.push_back(reflect(parents_[0]->getTwoPoints().first,parents_[1]->getTwoPoints()));
+        position_.push_back(reflect(parents_[0]->getTwoPoints().second,parents_[1]->getTwoPoints()));
+        return this;
+    }
     case 0:{
         position_.push_back(parents_[0]->position()),position_.push_back(parents_[1]->position());
         return this;
