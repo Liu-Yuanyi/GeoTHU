@@ -121,16 +121,19 @@ AxialSymmetry::AxialSymmetry(){
     inputType.push_back(std::vector<ObjectType>{ObjectType::Lineo, ObjectType::Line});
     inputType.push_back(std::vector<ObjectType>{ObjectType::Lineoo, ObjectType::Line});
     inputType.push_back(std::vector<ObjectType>{ObjectType::Circle, ObjectType::Line});
+    inputType.push_back(std::vector<ObjectType>{ObjectType::Arc, ObjectType::Line});
     inputType.push_back(std::vector<ObjectType>{ObjectType::Point, ObjectType::Lineo});
     inputType.push_back(std::vector<ObjectType>{ObjectType::Line, ObjectType::Lineo});
     inputType.push_back(std::vector<ObjectType>{ObjectType::Lineo, ObjectType::Lineo});
     inputType.push_back(std::vector<ObjectType>{ObjectType::Lineoo, ObjectType::Lineo});
     inputType.push_back(std::vector<ObjectType>{ObjectType::Circle, ObjectType::Lineo});
+    inputType.push_back(std::vector<ObjectType>{ObjectType::Arc, ObjectType::Lineo});
     inputType.push_back(std::vector<ObjectType>{ObjectType::Point, ObjectType::Lineoo});
     inputType.push_back(std::vector<ObjectType>{ObjectType::Line, ObjectType::Lineoo});
     inputType.push_back(std::vector<ObjectType>{ObjectType::Lineo, ObjectType::Lineoo});
     inputType.push_back(std::vector<ObjectType>{ObjectType::Lineoo, ObjectType::Lineoo});
     inputType.push_back(std::vector<ObjectType>{ObjectType::Circle, ObjectType::Lineoo});
+    inputType.push_back(std::vector<ObjectType>{ObjectType::Arc, ObjectType::Lineoo});
 
     operationName = "AxialSymmetry";
 }
@@ -141,6 +144,10 @@ std::set<GeometricObject*> AxialSymmetry::apply(std::vector<GeometricObject*> ob
     switch(objs[0]->getObjectType()){
     case ObjectType::Circle:{
         return std::set<GeometricObject*>{(new Circle(objs, -3))->flush()};
+        break;
+    }
+    case ObjectType::Arc:{
+        return std::set<GeometricObject*>{(new Arc(objs, -3))->flush()};
         break;
     }
     case ObjectType::Line:{
@@ -172,6 +179,7 @@ CentralSymmetry::CentralSymmetry(){
     inputType.push_back(std::vector<ObjectType>{ObjectType::Lineo, ObjectType::Point});
     inputType.push_back(std::vector<ObjectType>{ObjectType::Lineoo, ObjectType::Point});
     inputType.push_back(std::vector<ObjectType>{ObjectType::Circle, ObjectType::Point});
+    inputType.push_back(std::vector<ObjectType>{ObjectType::Arc, ObjectType::Point});
 
     operationName = "CentralSymmetry";
 }
@@ -182,6 +190,10 @@ std::set<GeometricObject*> CentralSymmetry::apply(std::vector<GeometricObject*> 
     switch(objs[0]->getObjectType()){
     case ObjectType::Circle:{
         return std::set<GeometricObject*>{(new Circle(objs, -4))->flush()};
+        break;
+    }
+    case ObjectType::Arc:{
+        return std::set<GeometricObject*>{(new Arc(objs, -4))->flush()};
         break;
     }
     case ObjectType::Line:{

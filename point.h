@@ -8,6 +8,9 @@
 inline long double len(const QPointF& p){
     return sqrt(p.x()*p.x()+p.y()*p.y());
 }
+inline long double len(const std::pair<QPointF, QPointF> p){
+    return len(p.first-p.second);
+}
 
 class Saveloadhelper;
 

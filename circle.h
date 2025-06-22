@@ -62,7 +62,7 @@ public:
     explicit Arc(const std::vector<GeometricObject*>& parents,const int& generation);
 
     // --- 重写 GeometricObject 的纯虚函数 ---
-    ObjectType getObjectType() const override { return ObjectType::Circle; } // 假设ObjectType::Circle存在
+    ObjectType getObjectType() const override { return ObjectType::Arc; } // 假设ObjectType::Circle存在
     void draw(QPainter* painter) const override;
     bool isNear(const QPointF& pos) const override;
     QPointF position() const override; // 返回圆心

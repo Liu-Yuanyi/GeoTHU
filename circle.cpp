@@ -156,29 +156,18 @@ void Arc::draw(QPainter* painter) const {
 
 
 bool Circle::isNear(const QPointF& pos) const {
-    if (isHidden()) return false;
-
-    // 使用 getTwoPoints 获取圆心和半径点
-    auto points = getTwoPoints();
-    QPointF currentCenter = points.first;
-    long double currentRadius = QLineF(points.first, points.second).length();
-
-    long double distToCenter = std::sqrt(std::pow(pos.x() - currentCenter.x(), 2) +
-                                    std::pow(pos.y() - currentCenter.y(), 2));
-
-    return std::abs(distToCenter - currentRadius) <= getSize() + 1e-2;
+    if (!isShown()) return false;
+    return (abs(len(pos-position())-len(getTwoPoints()))<getSize()+1e-2);
 }
 
 bool Arc::isNear(const QPointF& pos) const {
-    long double theta=Theta((pos-position()));
-    auto [s,t]=getAngles();
-    long double closestAngle = (s <= t ? (theta >= s && theta <= t) : (theta >= s || theta <= t))
-                                  ? theta
-                                  : ((std::min(std::min(std::abs(theta - s), std::abs(s + 2* PI - theta)),
-                                               std::min(std::abs(theta - t), std::abs(t + 2* PI - theta)))
-                                      == std::min(std::abs(theta - s), std::abs(s + 2* PI - theta))) ? s : t);
-    QPointF p= position()+len(getTwoPoints().first-getTwoPoints().second)*QPointF(cos(closestAngle),-sin(closestAngle));
-    return len(p-pos)<=(getSize()+1e-2);
+    if (!isShown()) return false;
+
+    auto [s,t] = getAngles();
+    long double theta=Theta(pos-position());
+
+    return (abs(len(pos-position())-len(getTwoPoints()))<getSize()+1e-2) &&
+                   ((s <= t) ? (theta >= s && theta <= t) : (theta >= s || theta <= t));
 }
 
 GeometricObject* Circle::flush(){
@@ -244,6 +233,21 @@ GeometricObject* Arc::flush(){
     qDebug()<<(double)Theta(p);qDebug()<<(double)(Theta(p)/PI)<<" pi";*/
 
     switch (generation_) {
+    case -4:{
+        position_.push_back(2*parents_[1]->position()-parents_[0]->getTwoPoints().first);
+        position_.push_back(2*parents_[1]->position()-parents_[0]->getTwoPoints().second);
+        Angles_.second=normalizeAngle(PI+dynamic_cast<Arc*>(parents_[0])->getAngles().second);
+        Angles_.first=normalizeAngle(PI+dynamic_cast<Arc*>(parents_[0])->getAngles().first);
+        return this;
+    }
+    case -3:{
+        position_.push_back(reflect(parents_[0]->getTwoPoints().first,parents_[1]->getTwoPoints()));
+        position_.push_back(reflect(parents_[0]->getTwoPoints().second,parents_[1]->getTwoPoints()));
+        long double reflectAngle = Theta(parents_[1]->getTwoPoints());
+        Angles_.second=normalizeAngle(normalizeAngle(2*reflectAngle-dynamic_cast<Arc*>(parents_[0])->getAngles().first));
+        Angles_.first=normalizeAngle(normalizeAngle(2*reflectAngle-dynamic_cast<Arc*>(parents_[0])->getAngles().second));
+        return this;
+    }
     case 0:{
         position_.push_back((parents_[0]->position()+parents_[1]->position())/2);
         position_.push_back(parents_[0]->position());

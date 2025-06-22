@@ -43,7 +43,7 @@ Canvas::Canvas(QWidget* parent) : QWidget(parent) {
     operations.push_back(new IntersectionCreator());
     operations.push_back(new CenterRadiusCircleCreator()); // 索引11
     operations.push_back(new ThreePointCircleCreator());   // 索引12
-    operations.push_back(new TwoPointCircleCreator());               // 索引13
+    operations.push_back(new CenterTwoPointArcCreator());               // 索引13
     operations.push_back(new SemicircleCreator());        // 索引14
     operations.push_back(new AxialSymmetry());             //索引15
     operations.push_back(new CentralSymmetry());
