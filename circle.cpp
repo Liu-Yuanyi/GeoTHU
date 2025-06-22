@@ -50,12 +50,12 @@ Circle::Circle(const std::vector<GeometricObject*>& parents,const int& generatio
     GetDefaultLable[ObjectType::Circle]=nextLineLable(GetDefaultLable[ObjectType::Circle]);
 }
 Arc::Arc(const std::vector<GeometricObject*>& parents,const int& generation)
-    : GeometricObject(ObjectName::Circle){
+    : GeometricObject(ObjectName::Arc){
     for(auto iter: parents){
         addParent(iter);
     }
     generation_=generation;
-    GetDefaultLable[ObjectType::Circle]=nextLineLable(GetDefaultLable[ObjectType::Circle]);
+    GetDefaultLable[ObjectType::Arc]=nextLineLable(GetDefaultLable[ObjectType::Arc]);
 }
 
 void Circle::draw(QPainter* painter) const {
@@ -107,6 +107,10 @@ void Circle::draw(QPainter* painter) const {
         }
 
 }
+void Arc::draw(QPainter* painter) const {
+#warning 1
+
+}
 
 
 bool Circle::isNear(const QPointF& pos) const {
@@ -124,7 +128,10 @@ bool Circle::isNear(const QPointF& pos) const {
     double tolerance = getSize() / 2.0 + 2.0;
     return std::abs(distToCenter - currentRadius) <= tolerance;
 }
-
+bool Arc::isNear(const QPointF& pos) const {
+#warning 1
+    return 1;
+}
 GeometricObject* Circle::flush(){
     position_.clear();
     legal_ = true;
@@ -166,8 +173,14 @@ GeometricObject* Circle::flush(){
     }
     }
 }
+GeometricObject* Arc::flush(){
+#warning
+}
 
 QPointF Circle::position() const {
+    return getTwoPoints().first;
+}
+QPointF Arc::position() const {
     return getTwoPoints().first;
 }
 
@@ -175,8 +188,15 @@ double Circle::getRadius() const {
     const auto& points = getTwoPoints();
     return len(points.first - points.second);
 }
+double Arc::getRadius() const {
+    const auto& points = getTwoPoints();
+    return len(points.first - points.second);
+}
 
 std::pair<const QPointF, const QPointF> Circle::getTwoPoints() const {
+    return std::make_pair(position_[0],position_[1]);
+}
+std::pair<const QPointF, const QPointF> Arc::getTwoPoints() const {
     return std::make_pair(position_[0],position_[1]);
 }
 
@@ -237,4 +257,7 @@ bool Circle::isTouchedByRectangle(const QPointF& start, const QPointF& end) cons
                 minDist = 0;
     }
     return maxDist >= dist and minDist <= dist;
+}
+bool Arc::isTouchedByRectangle(const QPointF& start, const QPointF& end) const {
+#warning 1
 }
