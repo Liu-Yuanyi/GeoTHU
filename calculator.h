@@ -2,9 +2,24 @@
 
 #define CALCULATOR_H
 
-#include"point.h"
+#include "point.h"
+#include "math.h"
 
-const long double Epsilon=1e-10L;
+constexpr long double Epsilon=1e-10L;
+
+constexpr long double PI = 3.1415926535897932384626433832795028841971693993751058209749445923078164062862089986280348253421170680L;
+constexpr long double PI_2 = 1.5707963267948966192313216916397514420985846996875529104874722961539082031431044993140174126710585340L;
+
+inline long double Theta(const long double& x, const long double& y){
+    long double tmp = - PI_2 + atan2(x,y);
+    return ((tmp < 0) ? tmp+2.0*PI : tmp);
+}
+inline long double Theta(const std::pair<long double, long double>& p){
+    return Theta(p.first,p.second);
+}
+inline long double Theta(const QPointF& p){
+    return Theta(p.x(),p.y());
+}
 
 inline bool is0(long double p){
     return -Epsilon<p && p<Epsilon;

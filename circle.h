@@ -89,4 +89,11 @@ public:
                                       QPointF position = QPointF()) const;
 };
 
+class CenterTwoPointArcCreator : public Operation {
+public:
+    CenterTwoPointArcCreator();
+    std::set<GeometricObject*> apply(std::vector<GeometricObject*> objs,
+                                      QPointF position = QPointF()) const;
+};
+
 #endif // CIRCLE_H

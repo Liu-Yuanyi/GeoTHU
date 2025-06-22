@@ -105,14 +105,20 @@ void Arc::draw(QPainter* painter) const {
 
     if (!isShown()) return;
 
+    qDebug()<<"theta(p0-p1)="<<(double)Theta(getTwoPoints().first-getTwoPoints().second);
+
     // 获取圆心和半径
     auto points = getTwoPoints();
     QPointF center = points.first;
     long double radius = QLineF(points.first, points.second).length();
     std::pair<long double,long double> Angles = getAngles();
-    int startAngleQt = Angles.first * 180 / M_PI * 16;
-    int spanAngleQt = (Angles.second - Angles.first) * 180 / M_PI * 16;
-    if(spanAngleQt<0){ spanAngleQt+= 360*16;    }
+    qDebug()<<"A= "<<parents_[0]->position()<<" B= "<<parents_[1]->position();
+    qDebug()<<"Angles= [ "<<(double)Angles.first<<","<<(double)Angles.second<<" ]";
+
+    int startAngleQt = (Angles.first) * 180 / PI * 16;
+    int spanAngleQt = (Angles.second - Angles.first) * 180 / PI * 16;
+    if(spanAngleQt<0){ spanAngleQt += 360*16; }
+    if(spanAngleQt>=360*16){ spanAngleQt -= 360*16; }
     QRectF rect(center.x() - radius, center.y() - radius, radius * 2, radius * 2);
     QPen pen;
     long double add = ((int)hovered_) * HOVER_ADD_WIDTH;
@@ -164,14 +170,14 @@ bool Circle::isNear(const QPointF& pos) const {
 }
 
 bool Arc::isNear(const QPointF& pos) const {
-    long double theta=std::atan2((pos-position()).x(),(pos-position()).y());
+    long double theta=Theta((pos-position()));
     auto [s,t]=getAngles();
     long double closestAngle = (s <= t ? (theta >= s && theta <= t) : (theta >= s || theta <= t))
                                   ? theta
-                                  : ((std::min(std::min(std::abs(theta - s), std::abs(s + 2*M_PI - theta)),
-                                               std::min(std::abs(theta - t), std::abs(t + 2*M_PI - theta)))
-                                      == std::min(std::abs(theta - s), std::abs(s + 2*M_PI - theta))) ? s : t);
-    QPointF p= position()+len(getTwoPoints().first-getTwoPoints().second)*QPointF(cos(closestAngle),sin(closestAngle));
+                                  : ((std::min(std::min(std::abs(theta - s), std::abs(s + 2* PI - theta)),
+                                               std::min(std::abs(theta - t), std::abs(t + 2* PI - theta)))
+                                      == std::min(std::abs(theta - s), std::abs(s + 2* PI - theta))) ? s : t);
+    QPointF p= position()+len(getTwoPoints().first-getTwoPoints().second)*QPointF(cos(closestAngle),-sin(closestAngle));
     return len(p-pos)<=(getSize()+1e-2);
 }
 
@@ -233,14 +239,23 @@ GeometricObject* Arc::flush(){
             return this;
         }
     }
+    /*
+    QPointF p= QPointF(1.0,0.01);
+    qDebug()<<(double)Theta(p);qDebug()<<(double)(Theta(p)/PI)<<" pi";*/
 
     switch (generation_) {
     case 0:{
         position_.push_back((parents_[0]->position()+parents_[1]->position())/2);
         position_.push_back(parents_[0]->position());
-        QPointF tmp=parents_[0]->position()-parents_[1]->position();
-        Angles_.first=std::atan2(tmp.x(),tmp.y());
-        Angles_.second=(Angles_.first>=M_PI? Angles_.first-M_PI: Angles_.first+M_PI);
+        Angles_.first= Theta(parents_[0]->position()-parents_[1]->position());
+        Angles_.second=(Angles_.first>= PI? Angles_.first- PI: Angles_.first+ PI);
+        return this;
+    }
+    case 1:{
+        position_.push_back(parents_[0]->position());
+        position_.push_back(parents_[1]->position());
+        Angles_.first = Theta(parents_[1]->position()-parents_[0]->position());
+        Angles_.second = Theta(parents_[2]->position()-parents_[0]->position());
         return this;
     }
     default:{
@@ -348,4 +363,14 @@ SemicircleCreator::SemicircleCreator(){
 std::set<GeometricObject*> SemicircleCreator::apply(std::vector<GeometricObject*> objs,
                                                            QPointF position) const {
     return std::set<GeometricObject*>{(new Arc(objs,0))->flush()};
+}
+
+CenterTwoPointArcCreator::CenterTwoPointArcCreator(){
+    inputType.push_back({ObjectType::Point, ObjectType::Point, ObjectType::Point});
+    operationName = "CenterTwoPointArcCreator";
+}
+
+std::set<GeometricObject*> CenterTwoPointArcCreator::apply(std::vector<GeometricObject*> objs,
+                                                     QPointF position) const {
+    return std::set<GeometricObject*>{(new Arc(objs,1))->flush()};
 }
