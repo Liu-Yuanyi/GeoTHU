@@ -819,6 +819,9 @@ void Canvas::redo() {
 
 void Canvas::deleteObjects(){
     std::vector<GeometricObject*> toDelete(selectedObjs_.begin(), selectedObjs_.end());
+    for (auto obj : selectedObjs_) {
+        obj->setSelected(false);
+    }
     selectedObjs_.clear(); // 清空选中集合
     if (!toDelete.empty()) {
         for (GeometricObject* obj : toDelete) {
@@ -845,23 +848,29 @@ void Canvas::deleteObjects(){
 }
 
 void Canvas::hideObjects(){
-    for (auto obj : selectedObjs_){
-        obj->setHidden(true);
+    if (!selectedObjs_.empty()){
+        for (auto obj : selectedObjs_){
+            obj->setHidden(true);
+        }
+        loadInCache();
+        selectedObjs_.clear();
     }
-    loadInCache();
-    selectedObjs_.clear();
 }
 
 void Canvas::showObjects(){
     clearSelections();
     showObjectsCache.clear();
+    bool flag = false;
     for (auto obj : objects_){
         if (obj->isHidden()) {
+            flag = true;
             obj->setHidden(false);
             showObjectsCache.insert(obj);
         }
     }
-    loadInCache();
+    if (flag) {
+        loadInCache();
+    }
 }
 
 void Canvas::clearObjects(){
