@@ -86,6 +86,8 @@ install(TARGETS test_project
     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
 )
 
+target_compile_definitions(test_project PUBLIC QT_USE_QREAL_OPAQUE)
+
 if(QT_VERSION_MAJOR EQUAL 6)
     qt_finalize_executable(test_project)
 endif()

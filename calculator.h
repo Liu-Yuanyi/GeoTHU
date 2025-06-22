@@ -4,17 +4,24 @@
 
 #include"point.h"
 
-const double Epsilon=0.0001;
+const long double Epsilon=1e-10L;
+
+inline bool is0(long double p){
+    return -Epsilon<p && p<Epsilon;
+}
+inline bool isp0(long double p){
+    return 0L<=p && p<Epsilon;
+}
 
 inline const QPointF calculateCircleCenter(const QPointF& p1, const QPointF& p2, const QPointF& p3) {
     // 计算向量 v1 = (p2 - p1) 和 v2 = (p3 - p1)
-    double x1 = p2.x() - p1.x();
-    double y1 = p2.y() - p1.y();
-    double x2 = p3.x() - p1.x();
-    double y2 = p3.y() - p1.y();
+    long double x1 = p2.x() - p1.x();
+    long double y1 = p2.y() - p1.y();
+    long double x2 = p3.x() - p1.x();
+    long double y2 = p3.y() - p1.y();
 
     // 计算三点共线检测的叉积
-    double cross = x1 * y2 - x2 * y1;
+    long double cross = x1 * y2 - x2 * y1;
 
     // 处理共线或接近共线的情况
 #warning 这里需要修改
@@ -23,12 +30,12 @@ inline const QPointF calculateCircleCenter(const QPointF& p1, const QPointF& p2,
     }
 
     // 计算垂直平分线交点（圆心）
-    double f = (x1*x1 + y1*y1) / 2.0;
-    double g = (x2*x2 + y2*y2) / 2.0;
+    long double f = (x1*x1 + y1*y1) / 2.0;
+    long double g = (x2*x2 + y2*y2) / 2.0;
 
-    double denominator = cross;
-    double cx = p1.x() + (f*y2 - g*y1) / denominator;
-    double cy = p1.y() + (g*x1 - f*x2) / denominator;
+    long double denominator = cross;
+    long double cx = p1.x() + (f*y2 - g*y1) / denominator;
+    long double cy = p1.y() + (g*x1 - f*x2) / denominator;
 
     return QPointF(cx, cy);
 }
@@ -82,13 +89,13 @@ inline const QPointF NearestPointOnCircle(QPointF P, std::pair<QPointF, QPointF>
 
 struct linelineIntersectionResult{
     QPointF p;
-    double t[2];//占两个线段的比例
+    long double t[2];//占两个线段的比例
     bool exist;
 };
 
 struct linecircleIntersectionResult{
     QPointF p[2];//前面那个是generation_小的
-    double t[2];//两个点在线端上的比例
+    long double t[2];//两个点在线端上的比例
     bool exist;
 };
 
@@ -113,17 +120,17 @@ inline linelineIntersectionResult linelineintersection(
     QPointF s = D - C;
 
     // 计算分母
-    double denominator = r.x() * s.y() - r.y() * s.x();
+    long double denominator = r.x() * s.y() - r.y() * s.x();
 
     // 如果分母为0，表示线段平行或共线
-    if (qFuzzyIsNull(denominator)) {
+    if (is0(denominator)) {
         return ret;
     }
 
     // 计算分子
     QPointF AC = C - A;
-    double t_numerator = AC.x() * s.y() - AC.y() * s.x();
-    double u_numerator = AC.x() * r.y() - AC.y() * r.x();
+    long double t_numerator = AC.x() * s.y() - AC.y() * s.x();
+    long double u_numerator = AC.x() * r.y() - AC.y() * r.x();
 
     // 计算比例参数
     ret.t[0] = t_numerator / denominator;
@@ -145,20 +152,20 @@ inline linecircleIntersectionResult linecircleintersection(
     // 圆心和圆上某点：用来确定半径
     QPointF O = OR.first;
     QPointF R = OR.second;
-    double radius = len(R - O);
+    long double radius = len(R - O);
 
     // 使用 A - O 形成正确的一元二次方程：|A + t(B-A) - O|^2 = r^2
     QPointF dir = B - A;
     QPointF AO = A - O;
-    double a = QPointF::dotProduct(dir, dir);
-    double b = 2.0 * QPointF::dotProduct(dir, AO);
-    double c = QPointF::dotProduct(AO, AO) - radius * radius;
+    long double a = QPointF::dotProduct(dir, dir);
+    long double b = 2.0 * QPointF::dotProduct(dir, AO);
+    long double c = QPointF::dotProduct(AO, AO) - radius * radius;
 
-    double discriminant = b * b - 4 * a * c;
+    long double discriminant = b * b - 4 * a * c;
     if (discriminant < 0) {
-        double t=footRatio(O,AB);
+        long double t=footRatio(O,AB);
         QPointF foot=A+t*(B-A);
-        if(len(foot-O)-len(R-O)<Epsilon){
+        if(is0(len(foot-O)-len(R-O))){
             result.p[0]=result.p[1]=foot;
             result.t[0]=result.t[1]=t;
             result.exist=true;
@@ -166,9 +173,9 @@ inline linecircleIntersectionResult linecircleintersection(
         return result;
     }
 
-    double sqrtDiscriminant = std::sqrt(discriminant);
-    double t1 = (-b + sqrtDiscriminant) / (2.0 * a);
-    double t2 = (-b - sqrtDiscriminant) / (2.0 * a);
+    long double sqrtDiscriminant = std::sqrt(discriminant);
+    long double t1 = (-b + sqrtDiscriminant) / (2.0 * a);
+    long double t2 = (-b - sqrtDiscriminant) / (2.0 * a);
 
     // 按 t 值排序，确保 p[0] 对应较小的 t
     if (t1 <= t2) {
@@ -195,19 +202,19 @@ inline circlecircleIntersectionResult circlecircleintersection(
     // 提取圆心和半径
     QPointF A = AB.first;
     QPointF B = AB.second;
-    double r1 = QLineF(A, B).length();
+    long double r1 = QLineF(A, B).length();
 
     QPointF O = OR.first;
     QPointF R = OR.second;
-    double r2 = QLineF(O, R).length();
+    long double r2 = QLineF(O, R).length();
 
     // 计算圆心距
     QPointF AO = O - A;
-    double d = len(AO);
+    long double d = len(AO);
 
     // 处理两圆位置关系
     if (d > r1 + r2 || d < qAbs(r1 - r2)) {
-        if(0<=(d-r1-r2) && (d-r1-r2)<=Epsilon || qAbs(r1-r2)-d>=0 && qAbs(r1-r2)-d<=Epsilon){
+        if(isp0(d-r1-r2) || isp0(qAbs(r1-r2)-d)){
             result.p[0]=result.p[1]= (len(A-B)>len(O-R)? A + (len(B-A)/len(O-A))*(O-A):O + (len(R-O)/len(O-A))*(A-O));
             result.exist=true;
         }
@@ -215,11 +222,11 @@ inline circlecircleIntersectionResult circlecircleintersection(
     }
 
     // 计算辅助变量
-    double a = (r1*r1 - r2*r2 + d*d) / (2.0 * d);
-    double h_squared = r1*r1 - a*a;
+    long double a = (r1*r1 - r2*r2 + d*d) / (2.0 * d);
+    long double h_squared = r1*r1 - a*a;
 
     // 计算交点
-    double h = std::sqrt(h_squared);
+    long double h = std::sqrt(h_squared);
     QPointF N = AO / d; // 归一化向量
     QPointF T(-N.y(), N.x()); // 垂直向量，顺时针旋转90度
 
