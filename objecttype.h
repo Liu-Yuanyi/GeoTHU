@@ -10,6 +10,7 @@ enum class ObjectName {
     Lineo,
     Lineoo,
     Circle,
+    Arc,
     Any,
 };
 
@@ -23,6 +24,7 @@ inline std::string GetObjectNameString(ObjectName name){
     case ObjectName::Lineo: return "Lineo";
     case ObjectName::Lineoo: return "Lineoo";
     case ObjectName::Circle: return "Circle";
+    case ObjectName::Arc: return "Arc";
     case ObjectName::Any: return "Any";
         // ... other cases if any
     default: return "Unknown";

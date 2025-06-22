@@ -9,7 +9,8 @@ std::map<ObjectType, QString> GetDefaultLable = {
     {ObjectType::Line, "line_1"},
     {ObjectType::Lineo, "ray_1"},
     {ObjectType::Lineoo, "segment_1"},
-    {ObjectType::Circle, "Circle1"}
+    {ObjectType::Circle, "Circle1"},
+    {ObjectType::Arc, "Arc1"}
 };
 
 // 默认颜色映射表
@@ -18,7 +19,8 @@ std::map<ObjectType, QColor> GetDefaultColor = {
     {ObjectType::Line, Qt::darkBlue},
     {ObjectType::Lineo, Qt::darkBlue},
     {ObjectType::Lineoo, Qt::darkBlue},
-    {ObjectType::Circle, Qt::darkGreen}
+    {ObjectType::Circle, Qt::darkGreen},
+    {ObjectType::Arc, Qt::darkGreen}
 };
 
 // 默认大小/粗细映射表
@@ -27,7 +29,8 @@ std::map<ObjectType, double> GetDefaultSize = {
     {ObjectType::Line, 2.0},
     {ObjectType::Lineo, 2.0},
     {ObjectType::Lineoo, 2.0},
-    {ObjectType::Circle, 2.0}
+    {ObjectType::Circle, 2.0},
+    {ObjectType::Arc, 2.0}
 };
 
 // 默认形状/线型映射表
@@ -36,7 +39,8 @@ std::map<ObjectType, int> GetDefaultShape = {
     {ObjectType::Line, LineStyle::Solid},
     {ObjectType::Lineo, LineStyle::Solid},
     {ObjectType::Lineoo, LineStyle::Solid},
-    {ObjectType::Circle, LineStyle::Solid}
+    {ObjectType::Circle, LineStyle::Solid},
+    {ObjectType::Arc, LineStyle::Solid}
 };
 
 int GeometricObject::counter = 0;

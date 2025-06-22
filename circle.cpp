@@ -27,8 +27,29 @@ Qt::PenStyle Circle::getPenStyle() const {
         return Qt::SolidLine;
     }
 }
+Qt::PenStyle Arc::getPenStyle() const {
+    // 将整数值转换为 Qt::PenStyle
+    switch (shape_) {
+    case 0: // Solid
+        return Qt::SolidLine;
+    case 1: // Dash
+        return Qt::DashLine;
+    case 2: // Dot
+        return Qt::DotLine;
+    default:
+        return Qt::SolidLine;
+    }
+}
 
 Circle::Circle(const std::vector<GeometricObject*>& parents,const int& generation)
+    : GeometricObject(ObjectName::Circle){
+    for(auto iter: parents){
+        addParent(iter);
+    }
+    generation_=generation;
+    GetDefaultLable[ObjectType::Circle]=nextLineLable(GetDefaultLable[ObjectType::Circle]);
+}
+Arc::Arc(const std::vector<GeometricObject*>& parents,const int& generation)
     : GeometricObject(ObjectName::Circle){
     for(auto iter: parents){
         addParent(iter);
