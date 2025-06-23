@@ -2,6 +2,7 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include "canvas.h"
 
 // 前向声明 (Forward declarations)
 class QDockWidget;
@@ -20,6 +21,7 @@ class MainWindow : public QMainWindow
 public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
+    Canvas *m_canvas;
 
 private slots: // 声明槽函数
     void onToolSelected(QAbstractButton *button); // <--- 用于响应工具按钮组的点击
@@ -33,7 +35,6 @@ private:
     QScrollArea *scrollArea;
 
     QButtonGroup *m_toolButtonGroup;
-    Canvas *m_canvas;
     void closeEvent(QCloseEvent *event) override;
 };
 

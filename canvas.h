@@ -28,7 +28,9 @@ public:
     void showObjects();
     void clearObjects();
     bool isSaved() { return saved_; }
+    void loadFile(bool onStartup = false);
     bool saveFile();
+    void setFilePath(QString path);
 
 protected:
     void mousePressEvent(QMouseEvent* event) override;
@@ -76,7 +78,6 @@ private:
     void clearSelections();                                     // 清除所有对象的选中状态
     void clearTempObjects();
     GeometricObject* automaticIntersection(const QPointF& pos);
-    void loadFile();
     void loadInCache();
     void undo();
     void redo();

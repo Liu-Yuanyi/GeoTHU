@@ -817,6 +817,10 @@ void Canvas::wheelEvent(QWheelEvent *event) {
     event->accept();
 }
 
+void Canvas::setFilePath(QString path) {
+    filePath_ = path;
+}
+
 bool Canvas::saveFile() {
     if (filePath_.isEmpty()) {
         QString path = QFileDialog::getSaveFileName(this, "save", "", "My Files (*.thu)");
@@ -844,15 +848,18 @@ bool Canvas::saveFile() {
     return true;
 }
 
-void Canvas::loadFile() {
+void Canvas::loadFile(bool onStartup) {
     clearObjects();
     clearTempObjects();
-    QString path = QFileDialog::getOpenFileName(this, "Open", "", "My Files (*.thu)");
-    if (path.isEmpty()) {
-        return;
+    if (!onStartup) {
+        QString path = QFileDialog::getOpenFileName(this, "Open", "", "My Files (*.thu)");
+        if (path.isEmpty()) {
+            return;
+        }
+        filePath_ = path;
     }
 
-    QFile file(path);
+    QFile file(filePath_);
     if (!file.open(QIODevice::ReadOnly)) {
         QMessageBox::warning(this, "Error", "Could not open the file.");
         return;
@@ -869,7 +876,6 @@ void Canvas::loadFile() {
         objects_.push_back(obj);
     }
     file.close();
-    filePath_ = path;
     saved_ = true;
 }
 
