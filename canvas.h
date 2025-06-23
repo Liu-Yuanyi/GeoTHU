@@ -49,7 +49,7 @@ private:
     std::set<GeometricObject*> selectedObjs_ = {}; // 当前选中的对象集合
     QPointF mousePos_;                      // 鼠标按下时的位置，用于计算拖动偏移
     std::map<GeometricObject*, QPointF> initialPositions_; // 拖动开始时选中对象的初始位置
-    bool deselectPermitted_ = true;          // 是否允许在鼠标释放时取消选择（用于区分拖拽和单击）
+    bool hasMoved_ = false;                 // 是否移动了
     Operation* currentOperation_ = nullptr;  // 当前进行的操作 (例如平移、旋转等)
     std::vector<GeometricObject*> operationSelections_; // 记录目前选择了哪些对象
     std::vector<GeometricObject*> deletedObjs_ = {};

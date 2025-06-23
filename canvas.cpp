@@ -156,27 +156,24 @@ void Canvas::mousePressEvent(QMouseEvent* event) {
                 return;
             }
             GeometricObject* clickedObj = findObjNear(mousePos_);
-            if (clickedObj) { // 点击到了对象
-                if (!clickedObj->isSelected()) { // 如果对象未被选中
-                    if (!(event->modifiers() & Qt::ControlModifier)) { // 如果没有按下Ctrl键，清除之前的选择
+            if (clickedObj) {
+                if (!clickedObj->isSelected()) {
+                    if (!(event->modifiers() & Qt::ControlModifier)) {
                         clearSelections();
                     }
                     clickedObj->setSelected(true);
                     selectedObjs_.insert(clickedObj);
-                } else { // 如果对象已被选中
-                    if (event->modifiers() & Qt::ControlModifier) { // 如果按下了Ctrl键，则取消选中该对象 (toggle)
+                } else {
+                    if (event->modifiers() & Qt::ControlModifier) {
                         clickedObj->setSelected(false);
                         selectedObjs_.erase(clickedObj);
                     }
-                    // 如果已选中且未按Ctrl，则保持选中状态，准备拖动
                 }
-                deselectPermitted_ = false; // 准备拖动或多选，释放时不取消选择
             } else { // 点击到空白区域
                 if (!(event->modifiers() & Qt::ControlModifier)) { // 如果没有按下Ctrl键
                     clearSelections();
                     multipleSelectionStartPos_ = mousePos_;
                 }
-                deselectPermitted_ = true; // 允许在释放时取消选择（如果这是一个简单的点击）
             }
             // 为所有选中的对象记录初始位置，用于拖动
             for (auto obj : selectedObjs_) {
@@ -213,7 +210,6 @@ void Canvas::mousePressEvent(QMouseEvent* event) {
                 existingPoint->setSelected(true);
                 selectedObjs_.insert(existingPoint);
             }
-            deselectPermitted_ = false;
         }
 
 
@@ -223,7 +219,6 @@ void Canvas::mousePressEvent(QMouseEvent* event) {
         //3 有可能符合，且下一个不可能是点
         //4 有可能符合，且下一个有可能是点，但不一定是点
         else if (currentMode == OperationMode) {
-            deselectPermitted_ = false; // 正在创建，释放时不取消选择
             if (currentOperation_->isValidInput(operationSelections_) == 1){ //不可能符合
                 clearSelections();
             } else if (currentOperation_->isValidInput(operationSelections_) == 2){ //下一个一定是点
@@ -372,7 +367,6 @@ void Canvas::mousePressEvent(QMouseEvent* event) {
         } else {
             clearSelections(); // 右键点击空白处，清除所有选择
         }
-        deselectPermitted_ = false; // 右键操作后通常不允许立即取消选择
         update();
         // Qt 会自动在之后调用 contextMenuEvent
     }
@@ -392,7 +386,9 @@ void Canvas::mouseMoveEvent(QMouseEvent* event) {
                     if (point) point->setPosition(newPos);
                 }
             }
-            deselectPermitted_ = false; // 拖动过程中不允许取消选择
+            if (len(delta) > 0) {
+                hasMoved_ = true;
+            }
             update();
         } else if ((event->buttons() & Qt::LeftButton) && isDuringMultipleSelection_) {
             multipleSelectionEndPos_ = currentPos;
@@ -426,28 +422,13 @@ void Canvas::mouseReleaseEvent(QMouseEvent* event) {
     if (event->button() == Qt::LeftButton) {
         if (currentMode == SelectionMode) {
             isDuringMultipleSelection_ = false;
-            // 处理拖拽结束后的 deselectPermitted 状态
-            if (!deselectPermitted_) { // 如果之前是拖拽或按下时选中
+            if (hasMoved_) { // 如果之前是拖拽或按下时选中
                 loadInCache();
-                deselectPermitted_ = true;
-            } else { // 如果是一个简单的点击释放（没有拖拽，且按下时未改变选择状态）
-                // 这里的逻辑用于处理：如果用户点击一个已选中的对象（非Ctrl），是否取消选择它。
-                // 当前的 mousePressEvent 逻辑已经处理了大部分选择情况。
-                // 如果需要点击已选中的对象（非Ctrl）来取消选择它，可以在这里添加。
-                // GeometricObject* clickedObj = findObjNear(event->position());
-                // if (clickedObj && clickedObj->isSelected() && !(event->modifiers() & Qt::ControlModifier)) {
-                //    clickedObj->setSelected(false);
-                //    selectedObjs_.erase(clickedObj);
-                // }
+                hasMoved_ = false;
             }
-            update();
-        } else if (currentMode == CreatePointMode) {
-            // 创建点主要在 mousePressEvent 中完成，释放时通常不需要额外操作
-            // setMode(SelectionMode); // 可以选择切换回选择模式
-            deselectPermitted_ = true;
-            update();
         }
     }
+    update();
 }
 
 void Canvas::paintEvent(QPaintEvent* event) {
