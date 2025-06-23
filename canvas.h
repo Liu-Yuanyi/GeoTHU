@@ -75,7 +75,7 @@ private:
     Point* findPointNear(const QPointF& pos) const;           // 查找指定位置附近的点对象
     void clearSelections();                                     // 清除所有对象的选中状态
     void clearTempObjects();
-    GeometricObject* automaticIntersection();
+    GeometricObject* automaticIntersection(const QPointF& pos);
     void loadFile();
     void loadInCache();
     void undo();

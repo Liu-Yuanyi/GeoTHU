@@ -199,6 +199,7 @@ std::pair<const QPointF,const QPointF> Lineo::getTwoPoints() const{
 LineoCreator::LineoCreator(){
     inputType.push_back(std::vector<ObjectType>{ObjectType::Point,ObjectType::Point});
     operationName="LineoCreator";
+    waitImplemented = true;
 }
 
 std::set<GeometricObject*> LineoCreator::apply(std::vector<GeometricObject*> objs,

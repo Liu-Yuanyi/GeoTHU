@@ -103,9 +103,9 @@ void Canvas::updateHoverState(const QPointF& pos) {
     update();
 }
 
-GeometricObject* Canvas::automaticIntersection(){
+GeometricObject* Canvas::automaticIntersection(const QPointF& pos) {
     QString neededlabel=GetDefaultLable[ObjectType::Point];
-    std::vector<GeometricObject*> objsNear = findObjectsNear(mousePos_);
+    std::vector<GeometricObject*> objsNear = findObjectsNear(pos);
     if (objsNear.size() >= 2){
         std::vector<GeometricObject*> v = {objsNear[0], objsNear[1]};
         auto newObjects = operations[10]->apply(v);
@@ -119,13 +119,13 @@ GeometricObject* Canvas::automaticIntersection(){
             }
             if(targetObj==nullptr){
                 targetObj=iter;
-                mindist=len(mousePos_-iter->position());
+                mindist=len(pos-iter->position());
                 continue;
             }
-            if(len(mousePos_-iter->position())<mindist){
+            if(len(pos-iter->position())<mindist){
                 delete targetObj;
                 targetObj=iter;
-                mindist=len(mousePos_-iter->position());
+                mindist=len(pos-iter->position());
             }
             else{
                 delete iter;
@@ -152,7 +152,7 @@ void Canvas::mousePressEvent(QMouseEvent* event) {
 
         if (currentMode == SelectionMode) {
             isDuringMultipleSelection_ = false;
-            if (automaticIntersection()){
+            if (automaticIntersection(mousePos_)){
                 return;
             }
             GeometricObject* clickedObj = findObjNear(mousePos_);
@@ -183,7 +183,7 @@ void Canvas::mousePressEvent(QMouseEvent* event) {
             clearSelections(); // 创建新对象前通常清除选择
             Point* existingPoint = findPointNear(mousePos_);
             if (!existingPoint) { // 如果附近没有点，则创建新点
-                if (automaticIntersection()){
+                if (automaticIntersection(mousePos_)){
                     return;
                 }
                 std::vector<GeometricObject*> objsNear = findObjectsNear(mousePos_);
@@ -222,7 +222,7 @@ void Canvas::mousePressEvent(QMouseEvent* event) {
             if (currentOperation_->isValidInput(operationSelections_) == 1){ //不可能符合
                 clearSelections();
             } else if (currentOperation_->isValidInput(operationSelections_) == 2){ //下一个一定是点
-                GeometricObject* possiblePoint = automaticIntersection();
+                GeometricObject* possiblePoint = automaticIntersection(mousePos_);
                 GeometricObject* targetPoint;
                 std::vector<GeometricObject*> objsNear = findObjectsNear(mousePos_);
                 if (possiblePoint) {
@@ -332,19 +332,22 @@ void Canvas::mousePressEvent(QMouseEvent* event) {
                     selectedObjs_.insert(obj);
                 }
                 loadInCache();
-            } else if (currentOperation_->isWaiting(operationSelections_) and tempObjects_.empty()){
-                Point* p = new Point(mousePos_, true);
-                p->setSelected(false);
-                p->setHidden(false);
-                operationSelections_.push_back(p);
-                tempObjects_.push_back(p);
-                std::set<GeometricObject*> temps = currentOperation_->wait(operationSelections_);
-                for (auto obj : temps){
-                    obj->setSelected(false);
-                    obj->setHidden(false);
-                    tempObjects_.push_back(obj);
+            } else if (currentOperation_->isWaiting(operationSelections_) and currentOperation_->waitImplemented){
+                if (tempObjects_.empty()) {
+                    Point* p = new Point(mousePos_, true);
+                    p->setSelected(false);
+                    p->setHidden(false);
+                    operationSelections_.push_back(p);
+                    tempObjects_.push_back(p);
+                    std::set<GeometricObject*> temps = currentOperation_->wait(operationSelections_);
+                    for (auto obj : temps){
+                        obj->setSelected(false);
+                        obj->setHidden(false);
+                        tempObjects_.push_back(obj);
+                    }
+                    operationSelections_.erase(operationSelections_.end() - 1);
+                    qDebug() << "size: " << operationSelections_.size();
                 }
-                operationSelections_.erase(operationSelections_.end() - 1);
             }
         }
         update();
@@ -411,7 +414,7 @@ void Canvas::mouseMoveEvent(QMouseEvent* event) {
             isDuringMultipleSelection_ = true;
         }
     } else if (currentMode == OperationMode) {
-        if (!tempObjects_.empty()) {
+        if (!tempObjects_.empty() and currentOperation_->waitImplemented) {
             Point* p = dynamic_cast<Point*>(tempObjects_[0]);
             p->setPosition(currentPos);
         }
@@ -419,12 +422,62 @@ void Canvas::mouseMoveEvent(QMouseEvent* event) {
 }
 
 void Canvas::mouseReleaseEvent(QMouseEvent* event) {
+    QPointF releasePos = event->position();
     if (event->button() == Qt::LeftButton) {
         if (currentMode == SelectionMode) {
             isDuringMultipleSelection_ = false;
             if (hasMoved_) { // 如果之前是拖拽或按下时选中
                 loadInCache();
                 hasMoved_ = false;
+            }
+        } else if (currentMode == OperationMode) {
+            if (currentOperation_->waitImplemented and !tempObjects_.empty() and
+                len(releasePos - mousePos_) > 10) {
+                clearTempObjects();
+
+                GeometricObject* possiblePoint = automaticIntersection(releasePos);
+                GeometricObject* targetPoint;
+                std::vector<GeometricObject*> objsNear = findObjectsNear(releasePos);
+                if (possiblePoint) {
+                    targetPoint = dynamic_cast<Point*>(possiblePoint);
+                } else if (objsNear.size() == 1) {
+                    GeometricObject* constraintObj = objsNear[0];
+                    if (constraintObj->getObjectType() == ObjectType::Circle) {
+                        targetPoint = (new Point(objsNear, 4));
+                        dynamic_cast<Point*>(targetPoint)->setPosition(releasePos);
+                        targetPoint->flush();
+                    } else {
+                        targetPoint = (new Point(objsNear, 3));
+                        dynamic_cast<Point*>(targetPoint)->setPosition(releasePos);
+                        targetPoint->flush();
+                    }
+                    objects_.push_back(targetPoint);
+                    loadInCache();
+                } else {
+                    targetPoint = findPointNear(releasePos);
+                    if (!targetPoint) { // 如果附近没有点，则创建新点
+                        GeometricObject* newPoint = (new Point(releasePos))->flush();
+                        objects_.push_back(newPoint);
+                        loadInCache();
+                        targetPoint = newPoint;
+                    }
+                }
+                targetPoint->setSelected(false);
+                if (std::find(operationSelections_.begin(), operationSelections_.end(), targetPoint) != operationSelections_.end()){
+                    clearSelections();
+                    operationSelections_.clear();
+                    tempObjects_.clear();
+                } else {
+                    operationSelections_.push_back(targetPoint);
+                    std::set<GeometricObject*> newObject = currentOperation_->apply(operationSelections_);
+                    clearSelections();
+                    for (auto obj : newObject){
+                        obj->setSelected(true);
+                        objects_.push_back(obj);
+                        selectedObjs_.insert(obj);
+                    }
+                    loadInCache();
+                }
             }
         }
     }

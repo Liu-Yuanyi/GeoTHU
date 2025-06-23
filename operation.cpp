@@ -73,6 +73,7 @@ bool Operation::isWaiting(std::vector<GeometricObject*> objs) const {
         if (types == v and v[v.size() - 1] == ObjectType::Point) {
             return true;
         }
+        types.erase(types.end() - 1);
     }
     return false;
 }

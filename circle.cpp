@@ -369,6 +369,7 @@ bool Arc::isTouchedByRectangle(const QPointF& start, const QPointF& end) const {
 TwoPointCircleCreator::TwoPointCircleCreator(){
     inputType.push_back({ObjectType::Point, ObjectType::Point});
     operationName = "TwoPointCircleCreator";
+    waitImplemented = true;
 }
 
 std::set<GeometricObject*> TwoPointCircleCreator::apply(std::vector<GeometricObject*> objs,
@@ -394,6 +395,7 @@ std::set<GeometricObject*> CenterRadiusCircleCreator::apply(std::vector<Geometri
 ThreePointCircleCreator::ThreePointCircleCreator() {
     inputType.push_back({ObjectType::Point, ObjectType::Point, ObjectType::Point});
     operationName = "ThreePointCircleCreator";
+    waitImplemented = true;
 }
 
 std::set<GeometricObject*> ThreePointCircleCreator::apply(std::vector<GeometricObject*> objs,
@@ -408,6 +410,7 @@ std::set<GeometricObject*> ThreePointCircleCreator::wait(std::vector<GeometricOb
 SemicircleCreator::SemicircleCreator(){
     inputType.push_back({ObjectType::Point, ObjectType::Point});
     operationName = "SemiircleCreator";
+    waitImplemented = true;
 }
 
 std::set<GeometricObject*> SemicircleCreator::apply(std::vector<GeometricObject*> objs,

@@ -295,6 +295,7 @@ std::pair<const QPointF,const QPointF> Line::getTwoPoints() const{
 LineCreator::LineCreator(){
     inputType.push_back(std::vector<ObjectType>{ObjectType::Point,ObjectType::Point});
     operationName="LineCreator";
+    waitImplemented = true;
 }
 
 std::set<GeometricObject*> LineCreator::apply(std::vector<GeometricObject*> objs,

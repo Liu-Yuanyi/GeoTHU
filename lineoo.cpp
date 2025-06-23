@@ -145,6 +145,7 @@ std::pair<const QPointF,const QPointF> Lineoo::getTwoPoints() const{
 LineooCreator::LineooCreator(){
     inputType.push_back(std::vector<ObjectType>{ObjectType::Point,ObjectType::Point});
     operationName="LineooCreator";
+    waitImplemented = true;
 }
 
 std::set<GeometricObject*> LineooCreator::apply(std::vector<GeometricObject*> objs,

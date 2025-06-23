@@ -11,6 +11,7 @@ protected:
     int getInputIndex(std::vector<GeometricObject*> objs) const;
 
 public:
+    bool waitImplemented = false;
     int isValidInput(std::vector<GeometricObject*> objs) const;
     bool isWaiting(std::vector<GeometricObject*> objs) const;
     std::string getName() { return operationName; }
