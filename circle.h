@@ -37,7 +37,8 @@ class TwoPointCircleCreator: public Operation {
 public:
     TwoPointCircleCreator();
     std::set<GeometricObject*> apply(std::vector<GeometricObject*> objs,
-                                      QPointF position = QPointF()) const;
+                                      QPointF position = QPointF()) const override;
+    std::set<GeometricObject*> wait(std::vector<GeometricObject*> objs) const override;
 };
 
 class CenterRadiusCircleCreator : public Operation {
@@ -51,7 +52,8 @@ class ThreePointCircleCreator : public Operation {
 public:
     ThreePointCircleCreator();
     std::set<GeometricObject*> apply(std::vector<GeometricObject*> objs,
-                                      QPointF position = QPointF()) const;
+                                      QPointF position = QPointF()) const override;
+    std::set<GeometricObject*> wait(std::vector<GeometricObject*> objs) const override;
 };
 
 
@@ -86,7 +88,8 @@ class SemicircleCreator : public Operation {
 public:
     SemicircleCreator();
     std::set<GeometricObject*> apply(std::vector<GeometricObject*> objs,
-                                      QPointF position = QPointF()) const;
+                                      QPointF position = QPointF()) const override;
+    std::set<GeometricObject*> wait(std::vector<GeometricObject*> objs) const override;
 };
 
 class CenterTwoPointArcCreator : public Operation {

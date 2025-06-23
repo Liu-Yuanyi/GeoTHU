@@ -2,9 +2,12 @@
 #include "objecttype.h"
 #include "calculator.h"
 
-Point::Point(const QPointF& position) : GeometricObject(ObjectName::Point), PointArg(position) {
+Point::Point(const QPointF& position, bool isTemp) : GeometricObject(ObjectName::Point), PointArg(position) {
     generation_=0;
     GetDefaultLable[ObjectType::Point]=nextPointLable(GetDefaultLable[ObjectType::Point]);
+    if (isTemp) {
+        GetDefaultLable[ObjectType::Point]=previousPointLable(GetDefaultLable[ObjectType::Point]);
+    }
 }
 
 Point::Point(const std::vector<GeometricObject*>& parents,const int& generation)

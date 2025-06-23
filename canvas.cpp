@@ -93,6 +93,13 @@ void Canvas::updateHoverState(const QPointF& pos) {
         }
     }
     hoveredObjs_ = newHover;
+    if (hoveredObjs_.size() == 1 and !tempObjects_.empty()){
+        if (hoveredObjs_[0]->getObjectType() == ObjectType::Point) {
+            tempObjects_[0]->setHidden(true);
+        }
+    } else if (!tempObjects_.empty()) {
+        tempObjects_[0]->setHidden(false);
+    }
     update();
 }
 
@@ -187,11 +194,13 @@ void Canvas::mousePressEvent(QMouseEvent* event) {
                 if (objsNear.size() == 1){
                     GeometricObject* constraintObj = objsNear[0];
                     if (constraintObj->getObjectType() == ObjectType::Circle) {
-                        newPoint = (new Point(objsNear, 4))->flush();
+                        newPoint = (new Point(objsNear, 4));
                         dynamic_cast<Point*>(newPoint)->setPosition(mousePos_);
+                        newPoint->flush();
                     } else {
-                        newPoint = (new Point(objsNear, 3))->flush();
+                        newPoint = (new Point(objsNear, 3));
                         dynamic_cast<Point*>(newPoint)->setPosition(mousePos_);
+                        newPoint->flush();
                     }
                 } else {
                     newPoint = (new Point(mousePos_))->flush();
@@ -226,11 +235,13 @@ void Canvas::mousePressEvent(QMouseEvent* event) {
                 } else if (objsNear.size() == 1) {
                     GeometricObject* constraintObj = objsNear[0];
                     if (constraintObj->getObjectType() == ObjectType::Circle) {
-                        targetPoint = (new Point(objsNear, 4))->flush();
+                        targetPoint = (new Point(objsNear, 4));
                         dynamic_cast<Point*>(targetPoint)->setPosition(mousePos_);
+                        targetPoint->flush();
                     } else {
-                        targetPoint = (new Point(objsNear, 3))->flush();
+                        targetPoint = (new Point(objsNear, 3));
                         dynamic_cast<Point*>(targetPoint)->setPosition(mousePos_);
+                        targetPoint->flush();
                     }
                     objects_.push_back(targetPoint);
                     loadInCache();
@@ -247,6 +258,8 @@ void Canvas::mousePressEvent(QMouseEvent* event) {
                 selectedObjs_.insert(targetPoint);
                 if (std::find(operationSelections_.begin(), operationSelections_.end(), targetPoint) != operationSelections_.end()){
                     clearSelections();
+                    operationSelections_.clear();
+                    tempObjects_.clear();
                 } else {
                     operationSelections_.push_back(targetPoint);
                 }
@@ -254,17 +267,23 @@ void Canvas::mousePressEvent(QMouseEvent* event) {
                 GeometricObject* targetObj = findObjNear(mousePos_);
                 if (!targetObj) {
                     clearSelections();
+                    operationSelections_.clear();
+                    tempObjects_.clear();
                 }
                 else{
                     targetObj->setSelected(true);
                     selectedObjs_.insert(targetObj);
                     if (std::find(operationSelections_.begin(), operationSelections_.end(), targetObj) != operationSelections_.end()){
                         clearSelections();
+                        operationSelections_.clear();
+                        tempObjects_.clear();
                     } else {
                         operationSelections_.push_back(targetObj);
                     }
                     if (currentOperation_->isValidInput(operationSelections_) == 1){
                         clearSelections();
+                        operationSelections_.clear();
+                        tempObjects_.clear();
                     }
                 }
             } else if (currentOperation_->isValidInput(operationSelections_) == 4){
@@ -274,6 +293,8 @@ void Canvas::mousePressEvent(QMouseEvent* event) {
                     selectedObjs_.insert(targetPoint);
                     if (std::find(operationSelections_.begin(), operationSelections_.end(), targetPoint) != operationSelections_.end()){
                         clearSelections();
+                        operationSelections_.clear();
+                        tempObjects_.clear();
                     } else {
                         operationSelections_.push_back(targetPoint);
                     }
@@ -285,6 +306,8 @@ void Canvas::mousePressEvent(QMouseEvent* event) {
                         selectedObjs_.insert(targetObj);
                         if (std::find(operationSelections_.begin(), operationSelections_.end(), targetObj) != operationSelections_.end()){
                             clearSelections();
+                            operationSelections_.clear();
+                            tempObjects_.clear();
                         } else {
                             operationSelections_.push_back(targetObj);
                         }
@@ -296,6 +319,8 @@ void Canvas::mousePressEvent(QMouseEvent* event) {
                         selectedObjs_.insert(newPoint);
                         if (std::find(operationSelections_.begin(), operationSelections_.end(), newPoint) != operationSelections_.end()){
                             clearSelections();
+                            operationSelections_.clear();
+                            tempObjects_.clear();
                         } else {
                             operationSelections_.push_back(newPoint);
                         }
@@ -305,12 +330,26 @@ void Canvas::mousePressEvent(QMouseEvent* event) {
             if (currentOperation_->isValidInput(operationSelections_) == 0){ //已经符合
                 std::set<GeometricObject*> newObject = currentOperation_->apply(operationSelections_);
                 clearSelections();
+                clearTempObjects();
                 for (auto obj : newObject){
                     obj->setSelected(true);
                     objects_.push_back(obj);
                     selectedObjs_.insert(obj);
                 }
                 loadInCache();
+            } else if (currentOperation_->isWaiting(operationSelections_) and tempObjects_.empty()){
+                Point* p = new Point(mousePos_, true);
+                p->setSelected(false);
+                p->setHidden(false);
+                operationSelections_.push_back(p);
+                tempObjects_.push_back(p);
+                std::set<GeometricObject*> temps = currentOperation_->wait(operationSelections_);
+                for (auto obj : temps){
+                    obj->setSelected(false);
+                    obj->setHidden(false);
+                    tempObjects_.push_back(obj);
+                }
+                operationSelections_.erase(operationSelections_.end() - 1);
             }
         }
         update();
@@ -355,7 +394,7 @@ void Canvas::mouseMoveEvent(QMouseEvent* event) {
             }
             deselectPermitted_ = false; // 拖动过程中不允许取消选择
             update();
-        }else if ((event->buttons() & Qt::LeftButton) && isDuringMultipleSelection_) {
+        } else if ((event->buttons() & Qt::LeftButton) && isDuringMultipleSelection_) {
             multipleSelectionEndPos_ = currentPos;
             for (auto obj : objects_){
                 if (obj->isShown()){
@@ -374,6 +413,11 @@ void Canvas::mouseMoveEvent(QMouseEvent* event) {
         } else if (event->buttons() & Qt::LeftButton) {
             multipleSelectionEndPos_ = currentPos;
             isDuringMultipleSelection_ = true;
+        }
+    } else if (currentMode == OperationMode) {
+        if (!tempObjects_.empty()) {
+            Point* p = dynamic_cast<Point*>(tempObjects_[0]);
+            p->setPosition(currentPos);
         }
     }
 }
@@ -441,12 +485,25 @@ void Canvas::paintEvent(QPaintEvent* event) {
     for (auto* obj : objects_) {
         obj->flush();
     }
+    for (auto* obj : tempObjects_) {
+        obj->flush();
+    }
     for (const auto* obj : objects_) {
         if (obj->isShown() and obj->getObjectType() != ObjectType::Point){
             obj->draw(&painter);
         }
     }
+    for (const auto* obj : tempObjects_) {
+        if (obj->isShown() and obj->getObjectType() != ObjectType::Point){
+            obj->draw(&painter);
+        }
+    }
     for (const auto* obj : objects_) {
+        if (obj->isShown() and obj->getObjectType() == ObjectType::Point){
+            obj->draw(&painter);
+        }
+    }
+    for (const auto* obj : tempObjects_) {
         if (obj->isShown() and obj->getObjectType() == ObjectType::Point){
             obj->draw(&painter);
         }
@@ -685,6 +742,14 @@ void Canvas::wheelEvent(QWheelEvent *event) {
                 update();
             }
         }
+        for (auto obj : tempObjects_) {
+            if (obj->getObjectType() == ObjectType::Point and obj->getParents().empty()) {
+                auto curPosition = obj->position();
+                Point* point = dynamic_cast<Point*>(obj);
+                point->setPosition(curPosition + QPointF(0.3 * deltax, 0.3 * deltay));
+                update();
+            }
+        }
         for (auto& v : cachePos_) {
             for (QPointF& p : v) {
                 p += QPointF(0.3 * deltax, 0.3 * deltay);
@@ -693,6 +758,14 @@ void Canvas::wheelEvent(QWheelEvent *event) {
     } else {
         long double deltay = event->angleDelta().y();
         for (auto obj : objects_) {
+            if (obj->getObjectType() == ObjectType::Point and obj->getParents().empty()) {
+                auto curPosition = obj->position();
+                Point* point = dynamic_cast<Point*>(obj);
+                QPointF center = mousePos_;
+                point->setPosition(curPosition * (1 + deltay / 2000) - center * (deltay / 2000));
+            }
+        }
+        for (auto obj : tempObjects_) {
             if (obj->getObjectType() == ObjectType::Point and obj->getParents().empty()) {
                 auto curPosition = obj->position();
                 Point* point = dynamic_cast<Point*>(obj);
@@ -739,6 +812,7 @@ bool Canvas::saveFile() {
 
 void Canvas::loadFile() {
     clearObjects();
+    clearTempObjects();
     QString path = QFileDialog::getOpenFileName(this, "Open", "", "My Files (*.thu)");
     if (path.isEmpty()) {
         return;
@@ -783,6 +857,9 @@ void Canvas::loadInCache() {
 }
 
 void Canvas::undo() {
+    clearSelections();
+    clearTempObjects();
+    operationSelections_.clear();
     if (maxUndoCount_ == 0) {
         return;
     }
@@ -803,6 +880,9 @@ void Canvas::undo() {
 }
 
 void Canvas::redo() {
+    clearSelections();
+    clearTempObjects();
+    operationSelections_.clear();
     if (maxRedoCount_ == 0) {
         return;
     }
@@ -960,4 +1040,13 @@ void Canvas::clearSelections() {
     }
     selectedObjs_.clear();
     operationSelections_.clear();
+}
+
+void Canvas::clearTempObjects(){
+    for (auto obj : tempObjects_) {
+        if (obj) {
+            delete obj;
+        }
+    }
+    tempObjects_.clear();
 }

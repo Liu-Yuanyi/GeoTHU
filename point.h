@@ -23,7 +23,7 @@ inline long double len2(const std::pair<QPointF, QPointF> p){
 class Point : public GeometricObject {
 public:
 
-    explicit Point(const QPointF& position);
+    explicit Point(const QPointF& position, bool isTemp = false);
     explicit Point(const std::vector<GeometricObject*>& parents,const int& generation);
 
     ObjectType getObjectType() const override { return ObjectType::Point; }

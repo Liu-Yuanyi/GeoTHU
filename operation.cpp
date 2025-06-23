@@ -58,3 +58,21 @@ int Operation::isValidInput(std::vector<GeometricObject*> objs) const {
         }
     }
 }
+
+std::set<GeometricObject*> Operation::wait(std::vector<GeometricObject*> objs) const {
+    return {};
+}
+
+bool Operation::isWaiting(std::vector<GeometricObject*> objs) const {
+    std::vector<ObjectType> types;
+    for (auto obj : objs){
+        types.push_back(obj->getObjectType());
+    }
+    for (auto v : inputType) {
+        types.push_back(v[v.size() - 1]);
+        if (types == v and v[v.size() - 1] == ObjectType::Point) {
+            return true;
+        }
+    }
+    return false;
+}

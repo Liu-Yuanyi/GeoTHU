@@ -305,6 +305,10 @@ std::set<GeometricObject*> LineCreator::apply(std::vector<GeometricObject*> objs
     return ret;
 }
 
+std::set<GeometricObject*> LineCreator::wait(std::vector<GeometricObject*> objs) const {
+    return { new Line(objs, 0) };
+}
+
 bool Line::isTouchedByRectangle(const QPointF& start, const QPointF& end) const {
     auto p = getTwoPoints();
     long double x1 = p.first.x(), x2 = p.second.x(), y1 = p.first.y(), y2 = p.second.y();

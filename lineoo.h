@@ -17,7 +17,8 @@ const long double SELECTED_WIDTH =2.5;
 class Lineoo : public GeometricObject {
 public:
     // 构造函数
-    explicit Lineoo(const std::vector<GeometricObject*>& parents,const int& generation);
+    explicit Lineoo(const std::vector<GeometricObject*>& parents, const int& generation);
+    explicit Lineoo(const std::vector<QPointF>& parents);
 
     // 重写 GeometricObject 中的纯虚函数
     ObjectType getObjectType() const override{return ObjectType::Lineoo;}
@@ -42,11 +43,12 @@ protected:
 //lineoo的生成方式:
 //0:两点连线
 
-class LineooCreator: public Operation{//两点连线
+class LineooCreator: public Operation{ //两点连线
 public:
     LineooCreator();
     std::set<GeometricObject*> apply(std::vector<GeometricObject*> objs,
                                       QPointF position = QPointF()) const override;
+    std::set<GeometricObject*> wait(std::vector<GeometricObject*> objs) const override;
 };
 
 #endif // LINEOO_H

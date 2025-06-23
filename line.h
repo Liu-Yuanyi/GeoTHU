@@ -41,6 +41,7 @@ public:
     LineCreator();
     std::set<GeometricObject*> apply(std::vector<GeometricObject*> objs,
                                QPointF position = QPointF()) const override;
+    std::set<GeometricObject*> wait(std::vector<GeometricObject*> objs) const override;
 };
 
 #endif // LINE_H

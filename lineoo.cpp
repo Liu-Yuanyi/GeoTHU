@@ -11,6 +11,12 @@ Lineoo::Lineoo(const std::vector<GeometricObject*>& parents,const int& generatio
     GetDefaultLable[ObjectType::Lineoo]=nextLineLable(GetDefaultLable[ObjectType::Lineoo]);
 }
 
+Lineoo::Lineoo(const std::vector<QPointF>& parents) : GeometricObject(ObjectName::Lineoo){
+    generation_= 100;
+    position_.push_back(parents[0]);
+    position_.push_back(parents[1]);
+}
+
 Qt::PenStyle Lineoo::getPenStyle()const{
     switch(shape_){
     case 0:return Qt::SolidLine;
@@ -143,13 +149,15 @@ LineooCreator::LineooCreator(){
 
 std::set<GeometricObject*> LineooCreator::apply(std::vector<GeometricObject*> objs,
                                                QPointF position) const{
-    Lineoo *pLineoo=new Lineoo(objs,0);
+    Lineoo *pLineoo=new Lineoo(objs, 0);
     pLineoo->flush();
     std::set<GeometricObject*> ret{pLineoo};
     return ret;
 }
 
-
+std::set<GeometricObject*> LineooCreator::wait(std::vector<GeometricObject*> objs) const {
+    return {(new Lineoo(objs, 0))};
+}
 
 
 bool Lineoo::isTouchedByRectangle(const QPointF& start, const QPointF& end) const {

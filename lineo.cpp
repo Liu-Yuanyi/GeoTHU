@@ -209,6 +209,10 @@ std::set<GeometricObject*> LineoCreator::apply(std::vector<GeometricObject*> obj
     return ret;
 }
 
+std::set<GeometricObject*> LineoCreator::wait(std::vector<GeometricObject*> objs) const {
+    return { new Lineo(objs, 0) };
+}
+
 bool Lineo::isTouchedByRectangle(const QPointF& start, const QPointF& end) const {
     auto p = getTwoPoints();
     long double x1 = p.first.x(), x2 = p.second.x() + 1000 * (p.second.x() - x1);

@@ -11,12 +11,12 @@ protected:
     int getInputIndex(std::vector<GeometricObject*> objs) const;
 
 public:
-    int isValidInput(std::vector<GeometricObject*> objs) const; // -1 不可能符合
-                                                                // 0  可能符合，但未输入完成
-                                                                // 1  完全符合
-    std::string getName() {return operationName;}
+    int isValidInput(std::vector<GeometricObject*> objs) const;
+    bool isWaiting(std::vector<GeometricObject*> objs) const;
+    std::string getName() { return operationName; }
     virtual std::set<GeometricObject*> apply(std::vector<GeometricObject*> objs,
                                               QPointF position = QPointF()) const = 0;
+    virtual std::set<GeometricObject*> wait(std::vector<GeometricObject*> objs) const;
     virtual ~Operation();
 };
 

@@ -42,6 +42,7 @@ protected:
 private:
     std::vector<Operation*> operations;     // 所有可能的 operation
     std::vector<GeometricObject*> objects_; // 存储所有几何对象
+    std::vector<GeometricObject*> tempObjects_;
     Mode currentMode = SelectionMode;       // 当前画布模式
     std::vector<GeometricObject*> hoveredObjs_ = {}; // 当前鼠标悬停的对象
     GeometricObject* draggedObj_ = nullptr; // 当前拖拽的对象 (在你的代码中似乎主要通过 selectedObjs_ 和 initialPositions_ 实现拖拽)
@@ -73,6 +74,7 @@ private:
     std::vector<GeometricObject*> findObjectsNear(const QPointF& pos) const;
     Point* findPointNear(const QPointF& pos) const;           // 查找指定位置附近的点对象
     void clearSelections();                                     // 清除所有对象的选中状态
+    void clearTempObjects();
     GeometricObject* automaticIntersection();
     void loadFile();
     void loadInCache();

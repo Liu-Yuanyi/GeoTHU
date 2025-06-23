@@ -376,6 +376,10 @@ std::set<GeometricObject*> TwoPointCircleCreator::apply(std::vector<GeometricObj
     return std::set<GeometricObject*>{(new Circle(objs,0))->flush()};
 }
 
+std::set<GeometricObject*> TwoPointCircleCreator::wait(std::vector<GeometricObject*> objs) const {
+    return {new Circle(objs, 0)};
+}
+
 CenterRadiusCircleCreator::CenterRadiusCircleCreator() {
     inputType.push_back({ObjectType::Point, ObjectType::Lineoo});
     inputType.push_back({ObjectType::Point, ObjectType::Point, ObjectType::Point});
@@ -397,6 +401,10 @@ std::set<GeometricObject*> ThreePointCircleCreator::apply(std::vector<GeometricO
     return std::set<GeometricObject*>{(new Circle(objs,2))->flush()};
 }
 
+std::set<GeometricObject*> ThreePointCircleCreator::wait(std::vector<GeometricObject*> objs) const {
+    return {new Circle(objs,2)};
+}
+
 SemicircleCreator::SemicircleCreator(){
     inputType.push_back({ObjectType::Point, ObjectType::Point});
     operationName = "SemiircleCreator";
@@ -405,6 +413,10 @@ SemicircleCreator::SemicircleCreator(){
 std::set<GeometricObject*> SemicircleCreator::apply(std::vector<GeometricObject*> objs,
                                                            QPointF position) const {
     return std::set<GeometricObject*>{(new Arc(objs,0))->flush()};
+}
+
+std::set<GeometricObject*> SemicircleCreator::wait(std::vector<GeometricObject*> objs) const {
+    return { (new Arc(objs,0)) };
 }
 
 CenterTwoPointArcCreator::CenterTwoPointArcCreator(){
