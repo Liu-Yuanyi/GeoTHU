@@ -9,7 +9,7 @@
 #include <QPen>   // 用于 draw 方法中的 QPen
 #include <cmath>  // 用于 isNear 方法中的 std::sqrt, std::fabs
 #include <QMessageBox>
-
+#include "calculator.h"
 // isNear 检查用的小容差值 (例如，以像素为单位)
 const long double HOVER_ADD_WIDTH =1.5;
 const long double SELECTED_WIDTH =2.5;

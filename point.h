@@ -7,18 +7,6 @@
 
 class Saveloadhelper;
 
-inline long double len(const QPointF& p){
-    return sqrt(p.x()*p.x()+p.y()*p.y());
-}
-inline long double len(const std::pair<QPointF, QPointF> p){
-    return len(p.first-p.second);
-}
-inline long double len2(const QPointF& p){
-    return p.x()*p.x()+p.y()*p.y();
-}
-inline long double len2(const std::pair<QPointF, QPointF> p){
-    return len2(p.first-p.second);
-}
 
 class Point : public GeometricObject {
 public:
@@ -52,7 +40,10 @@ lineo       8       9       10      16,17
 lineoo      11      12      13      18,19
 circle                              20,21
 
+22 圆弧上的约束点
+
 22~29预留
+
 
 中点:30
 切点:31,32

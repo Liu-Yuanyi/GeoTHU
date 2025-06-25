@@ -5,6 +5,19 @@
 #include "point.h"
 #include "math.h"
 
+inline long double len(const QPointF& p){
+    return sqrt(p.x()*p.x()+p.y()*p.y());
+}
+inline long double len(const std::pair<QPointF, QPointF> p){
+    return len(p.first-p.second);
+}
+inline long double len2(const QPointF& p){
+    return p.x()*p.x()+p.y()*p.y();
+}
+inline long double len2(const std::pair<QPointF, QPointF> p){
+    return len2(p.first-p.second);
+}
+
 constexpr long double Epsilon=1e-10L;
 
 constexpr long double PI = 3.1415926535897932384626433832795028841971693993751058209749445923078164062862089986280348253421170680L;
@@ -15,6 +28,9 @@ inline bool thetainst (const long double theta, const long double s, const long 
 }
 inline long double normalizeAngle(long double angle) {
     return (angle < 0) ? angle + 2*PI : (angle>=2*PI? angle-2*PI : angle);
+}
+inline long double AngleSubstract(long double s, long double t){
+    return normalizeAngle(s-t);
 }
 inline long double Theta(const long double& x, const long double& y){
     long double tmp = - PI_2 + atan2(x,y);
@@ -28,6 +44,9 @@ inline long double Theta(const QPointF& p){
 }
 inline long double Theta(const std::pair<QPointF,QPointF> p){
     return Theta(p.first.x()-p.second.x(),p.first.y()-p.second.y());
+}
+inline QPointF UnitVector(long double theta){
+    return QPointF(cos(theta),-sin(theta));
 }
 
 inline bool is0(long double p){

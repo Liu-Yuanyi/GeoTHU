@@ -1,6 +1,7 @@
 #include "point.h"
 #include "objecttype.h"
 #include "calculator.h"
+#include "circle.h"
 
 Point::Point(const QPointF& position, bool isTemp) : GeometricObject(ObjectName::Point), PointArg(position) {
     generation_=0;
@@ -42,7 +43,23 @@ void Point::setPosition(const QPointF& pos) {
     }
     case 4:{
         expectParentNum(1);
-        PointArg=NearestPointOnCircle(pos,parents_[0]->getTwoPoints())-parents_[0]->getTwoPoints().first;
+        PointArg=NearestPointOnCircle(pos,parents_[0]->getTwoPoints())-parents_[0]->position();
+        return;
+    }
+    case 22:{
+        expectParentNum(1);
+        QPointF tmp=NearestPointOnCircle(pos,parents_[0]->getTwoPoints())-parents_[0]->position();
+        long double theta=Theta(tmp);
+        auto [s,t]=dynamic_cast<Arc*>(parents_[0])->getAngles();
+        if(thetainst(theta, s, t)){
+            PointArg.rx()= AngleSubstract(theta,s)/AngleSubstract(t,s);
+            return;
+        }
+        if(AngleSubstract(s,theta)>AngleSubstract(theta,t)){
+            PointArg.rx()=1.0L;
+            return;
+        }
+        PointArg.rx()=0.0L;
         return;
     }
     default:
@@ -162,6 +179,12 @@ GeometricObject* Point::flush(){
         }
         position_.push_back(res.p[generation_%2]);
         return this;
+    }
+    case 22:{
+        expectParentNum(1);
+        auto [s,t]=dynamic_cast<Arc*>(parents_[0])->getAngles();
+        long double theta = s+ PointArg.x()*AngleSubstract(t,s);
+        position_.push_back(parents_[0]->position() + UnitVector(theta)*len(parents_[0]->getTwoPoints()));
     }
     case 30:{
         QPointF P1, P2;

@@ -194,6 +194,10 @@ void Canvas::mousePressEvent(QMouseEvent* event) {
                         newPoint = (new Point(objsNear, 4));
                         dynamic_cast<Point*>(newPoint)->setPosition(mousePos_);
                         newPoint->flush();
+                    } else if (constraintObj->getObjectType() == ObjectType::Arc) {
+                        newPoint = (new Point(objsNear, 22));
+                        dynamic_cast<Point*>(newPoint)->setPosition(mousePos_);
+                        newPoint->flush();
                     } else {
                         newPoint = (new Point(objsNear, 3));
                         dynamic_cast<Point*>(newPoint)->setPosition(mousePos_);
@@ -444,6 +448,10 @@ void Canvas::mouseReleaseEvent(QMouseEvent* event) {
                     GeometricObject* constraintObj = objsNear[0];
                     if (constraintObj->getObjectType() == ObjectType::Circle) {
                         targetPoint = (new Point(objsNear, 4));
+                        dynamic_cast<Point*>(targetPoint)->setPosition(releasePos);
+                        targetPoint->flush();
+                    } else if (constraintObj->getObjectType() == ObjectType::Arc) {
+                        targetPoint = (new Point(objsNear, 22));
                         dynamic_cast<Point*>(targetPoint)->setPosition(releasePos);
                         targetPoint->flush();
                     } else {
