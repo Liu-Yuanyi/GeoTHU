@@ -26,6 +26,9 @@ constexpr long double PI_2 = 1.5707963267948966192313216916397514420985846996875
 inline bool thetainst (const long double theta, const long double s, const long double t){
     return (s <= t) ? (theta >= s && theta <= t) : (theta >= s || theta <= t);
 }
+inline bool thetainst (const long double theta, std::pair<long double,long double> range){
+    return thetainst(theta, range.first,range.second);
+}
 inline long double normalizeAngle(long double angle) {
     return (angle < 0) ? angle + 2*PI : (angle>=2*PI? angle-2*PI : angle);
 }

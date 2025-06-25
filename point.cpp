@@ -46,7 +46,7 @@ void Point::setPosition(const QPointF& pos) {
         PointArg=NearestPointOnCircle(pos,parents_[0]->getTwoPoints())-parents_[0]->position();
         return;
     }
-    case 22:{
+    case 28:{
         expectParentNum(1);
         QPointF tmp=NearestPointOnCircle(pos,parents_[0]->getTwoPoints())-parents_[0]->position();
         long double theta=Theta(tmp);
@@ -180,11 +180,18 @@ GeometricObject* Point::flush(){
         position_.push_back(res.p[generation_%2]);
         return this;
     }
-    case 22:{
+    case 28:{
         expectParentNum(1);
         auto [s,t]=dynamic_cast<Arc*>(parents_[0])->getAngles();
         long double theta = s+ PointArg.x()*AngleSubstract(t,s);
         position_.push_back(parents_[0]->position() + UnitVector(theta)*len(parents_[0]->getTwoPoints()));
+        return this;
+    }
+    case 29:{
+        expectParentNum(3);
+        position_.push_back(parents_[0]->position() + (parents_[2]->position()-parents_[0]->position())*
+                                                        len(parents_[1]->position()-parents_[0]->position())/len(parents_[2]->position()-parents_[0]->position()));
+        return this;
     }
     case 30:{
         QPointF P1, P2;
@@ -202,8 +209,7 @@ GeometricObject* Point::flush(){
         return this;
     }
     case 31:case 32:{
-        const QPointF& center = parents_[1]->getTwoPoints().first;
-        const QPointF& pointOnCircle = parents_[1]->getTwoPoints().second;
+        auto [center, pointOnCircle] = parents_[1]->getTwoPoints();
         const QPointF& A =parents_[0]->position();
         qreal radius = len(center-pointOnCircle);
         QPointF AC = A - center;
@@ -231,6 +237,44 @@ GeometricObject* Point::flush(){
                 center.y() + (-AC.x() * sin_theta + AC.y() * cos_theta) * radius / dist
                 ));
         }
+        return this;
+    }
+    case 34:case 35:case 36:case 37:case 38:case 39:{
+        expectParentNum(2);
+        int range=(generation_-34)/2;
+        auto res=linecircleintersection(parents_[0]->getTwoPoints(),parents_[1]->getTwoPoints());
+        if( res.exist==false ||
+            range==1&&res.t[generation_%2]<0 ||
+            range==2&& (res.t[generation_%2]<0 ||res.t[generation_%2]>1) ||
+            !thetainst(Theta(res.p[generation_%2]-parents_[1]->position()),
+                        dynamic_cast<Arc*>(parents_[1])->getAngles())){
+            legal_=false;
+        }
+        position_.push_back(res.p[generation_%2]);
+        return this;
+    }
+    case 40:case 41:{
+        expectParentNum(2);
+        auto res=circlecircleintersection(parents_[0]->getTwoPoints(),parents_[1]->getTwoPoints());
+        if(res.exist==false ||
+            !thetainst(Theta(res.p[generation_%2]-parents_[1]->position()),
+                       dynamic_cast<Arc*>(parents_[1])->getAngles())){
+            legal_=false;
+        }
+        position_.push_back(res.p[generation_%2]);
+        return this;
+    }
+    case 42:case 43:{
+        expectParentNum(2);
+        auto res=circlecircleintersection(parents_[0]->getTwoPoints(),parents_[1]->getTwoPoints());
+        if(res.exist==false ||
+            !thetainst(Theta(res.p[generation_%2]-parents_[1]->position()),
+                       dynamic_cast<Arc*>(parents_[1])->getAngles()) ||
+            !thetainst(Theta(res.p[generation_%2]-parents_[0]->position()),
+                       dynamic_cast<Arc*>(parents_[0])->getAngles())){
+            legal_=false;
+        }
+        position_.push_back(res.p[generation_%2]);
         return this;
     }
     default:

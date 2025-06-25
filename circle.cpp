@@ -429,5 +429,5 @@ CenterTwoPointArcCreator::CenterTwoPointArcCreator(){
 
 std::set<GeometricObject*> CenterTwoPointArcCreator::apply(std::vector<GeometricObject*> objs,
                                                      QPointF position) const {
-    return std::set<GeometricObject*>{(new Arc(objs,1))->flush()};
+    return std::set<GeometricObject*>{(new Arc(objs,1))->flush(), (new Point(objs,29))->flush()};
 }

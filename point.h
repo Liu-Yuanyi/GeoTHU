@@ -34,20 +34,23 @@ private:
 /* 0自由点
 1,2,3,4 line,lineo,lineoo,circle上的约束点
 
-交点:     line    lineo   lineoo  circle
-line        5       6       7       14,15
-lineo       8       9       10      16,17
-lineoo      11      12      13      18,19
-circle                              20,21
+交点:     line    lineo   lineoo  circle    Arc
+line        5       6       7       14,15   34,35
+lineo       8       9       10      16,17   36,37
+lineoo      11      12      13      18,19   38,39
+circle                              20,21   40,41
+Arc                                         42,43
 
-22 圆弧上的约束点
+23~27预留
 
-22~29预留
-
+28 圆弧上的约束点
+29 圆弧的另一个端点
 
 中点:30
 切点:31,32
-圆心:33
+圆心:33(未实现)
+
+
 
 */
 
