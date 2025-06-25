@@ -191,7 +191,7 @@ void MainWindow::setupToolPanel()
     circleLayout->setContentsMargins(5,5,5,5);
 
     circleLayout->addWidget(createToolButton(tr("Arc"), ":/raw_icons/circle_arc.png", tr("Draw a circular arc")));
-    circleLayout->addWidget(createToolButton(tr("Circle (Radius, Center)"), ":/raw_icons/circle_center_radius.png", tr("Draw circle with center and radius")));
+    circleLayout->addWidget(createToolButton(tr("Circle (Center, Radius)"), ":/raw_icons/circle_center_radius.png", tr("Draw circle with center and radius")));
     circleLayout->addWidget(createToolButton(tr("Circle (Center, Point)"), ":/raw_icons/circle_center_point.png", tr("Draw circle with center and point on circumference")));
     circleLayout->addWidget(createToolButton(tr("Semicircle"), ":/raw_icons/circle_semi.png", tr("Draw a semicircle")));
     circleLayout->addWidget(createToolButton(tr("Circle (3 Points)"), ":/raw_icons/circle_three_point.png", tr("Draw circle through three points")));
