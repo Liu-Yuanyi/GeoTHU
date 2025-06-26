@@ -237,6 +237,10 @@ void Canvas::mousePressEvent(QMouseEvent* event) {
                         targetPoint = (new Point(objsNear, 4));
                         dynamic_cast<Point*>(targetPoint)->setPosition(mousePos_);
                         targetPoint->flush();
+                    } else if (constraintObj->getObjectType() == ObjectType::Arc) {
+                        targetPoint = (new Point(objsNear, 28));
+                        dynamic_cast<Point*>(targetPoint)->setPosition(mousePos_);
+                        targetPoint->flush();
                     } else {
                         targetPoint = (new Point(objsNear, 3));
                         dynamic_cast<Point*>(targetPoint)->setPosition(mousePos_);

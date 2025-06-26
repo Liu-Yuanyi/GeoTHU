@@ -13,7 +13,8 @@ void Saveloadhelper::save(GeometricObject* object, QDataStream& out) {
         << object->label_ << object->color_ << object->size_ << object->shape_
         << object->generation_ << object->name_ << object->index_;
     if (object->name_ == ObjectName::Point) {
-        out << object->position();
+        Point* p = dynamic_cast<Point*>(object);
+        out << p->PointArg;
     }
     QVector<int> indices = {};
     for (auto parent : object->parents_) {
@@ -51,6 +52,8 @@ GeometricObject* Saveloadhelper::load(QDataStream& in) {
     case (ObjectType::Circle):
         object = new Circle({}, 0);
         break;
+    case (ObjectType::Arc):
+        object = new Arc({}, 0);
     default:
         break;
     }

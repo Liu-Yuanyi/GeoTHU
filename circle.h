@@ -7,6 +7,8 @@
 #include <cmath> // For std::sqrt in isNear
 #include "operation.h"
 
+class Saveloadhelper;
+
 class Circle : public GeometricObject {
 public:
     // 构造函数: 可以有多种，例如通过圆心点对象和半径，或通过圆心坐标和半径
@@ -76,6 +78,8 @@ public:
     std::pair<const QPointF, const QPointF> getTwoPoints() const override;//Arc的getTwoPoints保证second是弧的起点
 
     std::pair<long double, long double> getAngles() const;
+
+    friend class Saveloadhelper;
 protected:
     std::pair<long double,long double> Angles_;
     Qt::PenStyle getPenStyle() const;
