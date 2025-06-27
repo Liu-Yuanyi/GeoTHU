@@ -12,6 +12,7 @@ enum class ObjectName {
     Circle,
     Arc,
     Any,
+    Measurement,
 };
 
 typedef ObjectName ObjectType;
