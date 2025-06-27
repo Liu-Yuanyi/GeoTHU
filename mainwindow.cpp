@@ -331,7 +331,7 @@ void MainWindow::onToolSelected(QAbstractButton *abstractButton)
         m_canvas->setOperation(9);
     } else if (toolId == tr("Intersect")){
         m_canvas->setOperation(10);
-    } else if (toolId == tr("Circle (Radius, Center)")){
+    } else if (toolId == tr("Circle (Center, Radius)")){
         m_canvas->setOperation(11);
     } else if (toolId == tr("Circle (3 Points)")){
         m_canvas->setOperation(12);

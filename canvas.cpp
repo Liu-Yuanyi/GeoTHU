@@ -13,6 +13,7 @@
 #include "tools.h"
 #include "intersectioncreator.h"
 #include "saveloadhelper.h"
+#include "measurement.h"
 #include <stack>
 
 // 假设你的 ObjectType 和 ObjectName 在 "objecttype.h" (或其他地方) 定义，并且 GetDefault... 映射存在
@@ -44,8 +45,8 @@ Canvas::Canvas(QWidget* parent) : QWidget(parent) {
     operations.push_back(new IntersectionCreator());
     operations.push_back(new CenterRadiusCircleCreator()); // 索引11
     operations.push_back(new ThreePointCircleCreator());   // 索引12
-    operations.push_back(new CenterTwoPointArcCreator());               // 索引13
-    operations.push_back(new SemicircleCreator());        // 索引14
+    operations.push_back(new LengthMeasurementCreator()); //待会要改回来CenterTwoPointArcCreator              // 索引13
+    operations.push_back(new AngleMeasurementCreator());  //待会要改回来SemicircleCreator      // 索引14
     operations.push_back(new AxialSymmetry());             //索引15
     operations.push_back(new CentralSymmetry());
     // TODO: add other operations here.
