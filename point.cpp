@@ -88,7 +88,7 @@ void Point::draw(QPainter* painter) const {
         }
         return;
     }
-
+    qDebug()<<position_[0];
     painter->save();
     painter->setRenderHint(QPainter::Antialiasing);    // Smooth edges
     painter->setBrush(color_); // Fill color

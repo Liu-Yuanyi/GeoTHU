@@ -18,7 +18,6 @@ class Lineoo : public GeometricObject {
 public:
     // 构造函数
     explicit Lineoo(const std::vector<GeometricObject*>& parents, const int& generation);
-    explicit Lineoo(const std::vector<QPointF>& parents);
 
     // 重写 GeometricObject 中的纯虚函数
     ObjectType getObjectType() const override{return ObjectType::Lineoo;}

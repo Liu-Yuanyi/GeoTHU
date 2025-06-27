@@ -11,12 +11,6 @@ Lineoo::Lineoo(const std::vector<GeometricObject*>& parents,const int& generatio
     GetDefaultLable[ObjectType::Lineoo]=nextLineLable(GetDefaultLable[ObjectType::Lineoo]);
 }
 
-Lineoo::Lineoo(const std::vector<QPointF>& parents) : GeometricObject(ObjectName::Lineoo){
-    generation_= 100;
-    position_.push_back(parents[0]);
-    position_.push_back(parents[1]);
-}
-
 Qt::PenStyle Lineoo::getPenStyle()const{
     switch(shape_){
     case 0:return Qt::SolidLine;
