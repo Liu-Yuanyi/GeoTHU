@@ -18,20 +18,17 @@ public:
 
 
     // 重写 GeometricObject 中的纯虚函数
-    ObjectType getObjectType() const override{return ObjectType::Lineoo;}
+    ObjectType getObjectType() const override{return ObjectType::Measurement;}
     void draw(QPainter* painter) const override; // 绘制函数
-    bool isNear(const QPointF& pos) const override; // 判断点是否在线附近
-    QPointF position() const override; // 返回 startPoint_
-    std::pair<const QPointF, const QPointF> getTwoPoints() const override;
+    bool isNear(const QPointF& pos) const override; // 判断 点是否在线附近
+    QPointF position() const override; // 返回 左上角
+    std::pair<const QPointF, const QPointF> getTwoPoints() const override;//返回 左上角和右下角
 
-    long double length() const{return len(getTwoPoints().first-getTwoPoints().second);}
     GeometricObject* flush() override;
     virtual bool isTouchedByRectangle(const QPointF& start, const QPointF& end) const override;
 
 protected:
-    // isNear 计算的辅助函数 (点到线段的距离)
-    Qt::PenStyle getPenStyle()const;
-    long double distanceToLineoo(const QPointF& p,const std::pair<QPointF,QPointF>& Points) const;
+    long double num;//度量的值
 };
 
 #endif // MEASUREMENT_H
