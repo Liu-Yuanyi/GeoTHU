@@ -45,10 +45,12 @@ Canvas::Canvas(QWidget* parent) : QWidget(parent) {
     operations.push_back(new IntersectionCreator());
     operations.push_back(new CenterRadiusCircleCreator()); // 索引11
     operations.push_back(new ThreePointCircleCreator());   // 索引12
-    operations.push_back(new LengthMeasurementCreator()); //待会要改回来CenterTwoPointArcCreator              // 索引13
-    operations.push_back(new AngleMeasurementCreator());  //待会要改回来SemicircleCreator      // 索引14
-    operations.push_back(new AxialSymmetry());             //索引15
-    operations.push_back(new CentralSymmetry());
+    operations.push_back(new CenterTwoPointArcCreator());  // 索引13
+    operations.push_back(new SemicircleCreator());         // 索引14
+    operations.push_back(new AxialSymmetry());             // 索引15
+    operations.push_back(new CentralSymmetry());           // 索引16
+    operations.push_back(new LengthMeasurementCreator());  // 索引17
+    operations.push_back(new AngleMeasurementCreator());   // 索引18
     // TODO: add other operations here.
 
     cacheObj_ = std::vector<std::vector<GeometricObject*>>(maxCacheSize, std::vector<GeometricObject*>());
