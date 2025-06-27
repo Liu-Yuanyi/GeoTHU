@@ -6,6 +6,7 @@ int NumOfMeasurements = 0;
 
 constexpr long double TextHeight = 30.0L;
 const QFont font("Arial", 16);
+constexpr int Precision = 2;
 
 Measurement::Measurement(const std::vector<GeometricObject*>& parents, const int& generation)
     :GeometricObject(ObjectName::Measurement)
@@ -99,7 +100,7 @@ GeometricObject* Measurement::flush() {
             text_+=" ";
             text_+=segment->getLabel();
             text_+=" = ";
-            text_+=QString::number(segment->length(),'f',6);
+            text_+=QString::number(segment->length(),'f', Precision );
         }
         else if(parents_.size() == 2 && parents_[0]->getObjectType() == ObjectType::Point &&parents_[1]->getObjectType()==ObjectType::Point) {
             text_.clear();
@@ -107,7 +108,7 @@ GeometricObject* Measurement::flush() {
             text_+=parents_[0]->getLabel();
             text_+=parents_[1]->getLabel();
             text_+=" = ";
-            text_+=QString::number(len(parents_[0]->position()-parents_[1]->position()),'f',6);
+            text_+=QString::number(len(parents_[0]->position()-parents_[1]->position()),'f',Precision);
         }
         else{
             QMessageBox::warning(nullptr, "警告", "Measurement的长度测量parents_出错!");
@@ -125,7 +126,7 @@ GeometricObject* Measurement::flush() {
 
         text_+=" = ";
         text_+=QString::number(
-            PI-abs(normalizeAngle(Theta(parents_[0]->position()-parents_[1]->position())-Theta(parents_[2]->position()-parents_[1]->position()))-PI) ,'f',6);
+            PI-abs(normalizeAngle(Theta(parents_[0]->position()-parents_[1]->position())-Theta(parents_[2]->position()-parents_[1]->position()))-PI) ,'f',Precision);
         return this;
     }
     default:
