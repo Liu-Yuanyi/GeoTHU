@@ -40,10 +40,11 @@ protected:
     void contextMenuEvent(QContextMenuEvent* event) override;
     void keyPressEvent(QKeyEvent *event) override;
     void wheelEvent(QWheelEvent *event) override;
+    std::vector<GeometricObject*> objects_; // 存储所有几何对象
+    friend class MainWindow;
 
 private:
     std::vector<Operation*> operations;     // 所有可能的 operation
-    std::vector<GeometricObject*> objects_; // 存储所有几何对象
     std::vector<GeometricObject*> tempObjects_;
     Mode currentMode = SelectionMode;       // 当前画布模式
     std::vector<GeometricObject*> hoveredObjs_ = {}; // 当前鼠标悬停的对象

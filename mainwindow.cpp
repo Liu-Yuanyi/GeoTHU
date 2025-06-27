@@ -349,7 +349,7 @@ void MainWindow::onToolSelected(QAbstractButton *abstractButton)
 }
 
 void MainWindow::closeEvent(QCloseEvent *event){
-    if (!m_canvas->isSaved()) {
+    if (!m_canvas->isSaved() && !m_canvas->objects_.empty() ) {
         QMessageBox::StandardButton reply = QMessageBox::warning(
             this, "Unsaved Changes", "Do you want to save your changes?",
             QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel
