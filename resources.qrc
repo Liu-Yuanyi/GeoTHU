@@ -24,5 +24,7 @@
         <file>raw_icons/ray.png</file>
         <file>raw_icons/intersect.png</file>
         <file>raw_icons/clear.png</file>
+        <file>raw_icons/angle.png</file>
+        <file>raw_icons/distance.png</file>
     </qresource>
 </RCC>

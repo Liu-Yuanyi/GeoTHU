@@ -235,6 +235,24 @@ void MainWindow::setupToolPanel()
     mainLayout->addWidget(transformUtilGroup);
     mainLayout->addStretch(); // 确保所有组都靠上
 
+    // --- 新增分组5: Measurement ---
+    QGroupBox *measurementGroup = new QGroupBox(tr("Measurement"), toolPanelContent);
+    QVBoxLayout *measurementLayout = new QVBoxLayout;
+    measurementLayout->setSpacing(5);
+    measurementLayout->setContentsMargins(5,5,5,5);
+    measurementLayout->addWidget(createToolButton(tr("Angle"), ":/raw_icons/angle.png", tr("Measure angle between lines or points")));
+    measurementLayout->addWidget(createToolButton(tr("Distance"), ":/raw_icons/distance.png", tr("Measure distance between points")));
+    measurementLayout->addStretch();
+    measurementGroup->setLayout(measurementLayout);
+
+    // 将所有分组添加到主布局
+    mainLayout->addWidget(basicGroup);
+    mainLayout->addWidget(circleGroup);
+    mainLayout->addWidget(constructionGroup);
+    mainLayout->addWidget(transformUtilGroup);
+    mainLayout->addWidget(measurementGroup);  // 添加新的测量分组
+    mainLayout->addStretch();
+
     toolPanelContent->setLayout(mainLayout); // 将主布局设置给 toolPanelContent
 }
 
@@ -345,6 +363,12 @@ void MainWindow::onToolSelected(QAbstractButton *abstractButton)
         m_canvas->setOperation(15);
     } else if (toolId == tr("Central Symmetry")){
         m_canvas->setOperation(16);
+    } else if (toolId == tr("Central Symmetry")){
+        m_canvas->setOperation(16);
+    } else if (toolId == tr("Angle")){
+        m_canvas->setOperation(19);
+    } else if (toolId == tr("Distance")){
+        m_canvas->setOperation(20);
     }
 }
 
