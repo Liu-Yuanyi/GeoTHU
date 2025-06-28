@@ -343,6 +343,8 @@ void MainWindow::onToolSelected(QAbstractButton *abstractButton)
                 scrollArea->setWidget(toolPanelContent); // 将 toolPanelContent 设置为滚动区域的部件
 
             }
+        } else {
+            QMessageBox::warning(this, "Invalid Selection", "No tools can be created.");
         }
         if (!m_toolButtonGroup->buttons().isEmpty()) {
             QAbstractButton* firstButton = m_toolButtonGroup->buttons().first();

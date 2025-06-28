@@ -67,6 +67,13 @@ bool CustomizedOperationCreator::canApply(std::set<GeometricObject*> selectedObj
         if (!isDeterminedBy(input, obj)){
             return false;
         }
+        if (obj->getObjectType() == ObjectType::Measurement){
+            for (auto parent : obj->getParents()) {
+                if (selectedObjs.find(parent) == selectedObjs.end()){
+                    return false;
+                }
+            }
+        }
     }
     return true;
 }
