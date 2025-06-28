@@ -94,24 +94,43 @@ TangentLineCreator::TangentLineCreator(){
     inputType.push_back(std::vector<ObjectType>{ObjectType::Point, ObjectType::Circle});
     inputType.push_back(std::vector<ObjectType>{ObjectType::Circle, ObjectType::Point});
 
+    inputType.push_back(std::vector<ObjectType>{ObjectType::Point, ObjectType::Arc});
+    inputType.push_back(std::vector<ObjectType>{ObjectType::Arc, ObjectType::Point});
+
     operationName = "TangentLineCreator";
 }
 
 std::set<GeometricObject*> TangentLineCreator::apply(std::vector<GeometricObject*> objs,
                                                       QPointF position) const {
-    if(objs[0]->getObjectType()==ObjectType::Circle){
+    if(objs[1]->getObjectType()==ObjectType::Point){
         std::swap(objs[0],objs[1]);
     }
-    Circle* circle = dynamic_cast<Circle*>(objs[1]);
-    QPointF p1 = objs[0]->position(), p2 = circle->position();
-    long double radius = circle->getRadius();
-    long double dist = std::sqrt(std::pow(p1.x() - p2.x(), 2) + std::pow(p1.y() - p2.y(), 2));
-    if (radius > dist + 1e-4) {
-        return std::set<GeometricObject*>();
-    } else if (abs(radius - dist) <= 1e-4) {
-        return std::set<GeometricObject*>{(new Line(objs, 7))->flush()};
-    } else {
-        return std::set<GeometricObject*>{(new Line(objs, 8))->flush(), (new Line(objs, 9))->flush(), (new Point(objs,31))->flush(), (new Point(objs,32))->flush()};
+    if(objs[1]->getObjectType()==ObjectType::Circle){
+        Circle* circle = dynamic_cast<Circle*>(objs[1]);
+        QPointF p1 = objs[0]->position(), p2 = circle->position();
+        long double radius = circle->getRadius();
+        long double dist = std::sqrt(std::pow(p1.x() - p2.x(), 2) + std::pow(p1.y() - p2.y(), 2));
+        if (radius > dist + 1e-6) {
+            return std::set<GeometricObject*>();
+        } else if (abs(radius - dist) <= 1e-6) {
+            return std::set<GeometricObject*>{(new Line(objs, 7))->flush()};
+        } else {
+            return std::set<GeometricObject*>{(new Line(objs, 8))->flush(), (new Line(objs, 9))->flush(), (new Point(objs,31))->flush(), (new Point(objs,32))->flush()};
+        }
+    }
+    else{
+        Arc* arc = dynamic_cast<Arc*>(objs[1]);
+        QPointF p1 = objs[0]->position(), p2 = arc->position();
+        long double radius = arc->getRadius();
+        long double dist = std::sqrt(std::pow(p1.x() - p2.x(), 2) + std::pow(p1.y() - p2.y(), 2));
+        if (radius > dist + 1e-6) {
+            return std::set<GeometricObject*>();
+        } else if (abs(radius - dist) <= 1e-6) {
+            return std::set<GeometricObject*>{(new Line(objs, 7))->flush()};
+        } else {
+            return std::set<GeometricObject*>{(new Line(objs, 8))->flush(), (new Line(objs, 9))->flush(), (new Point(objs,31))->flush(), (new Point(objs,32))->flush()};
+        }
+
     }
 }
 

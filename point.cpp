@@ -238,6 +238,9 @@ GeometricObject* Point::flush(){
                 center.y() + (-AC.x() * sin_theta + AC.y() * cos_theta) * radius / dist
                 ));
         }
+        if(parents_[1]->getObjectType()==ObjectType::Arc and !thetainst(Theta(position_[0]-center),dynamic_cast<Arc*>(parents_[1])->getAngles())){
+            legal_=false;
+        }
         return this;
     }
     case 34:case 35:case 36:case 37:case 38:case 39:{

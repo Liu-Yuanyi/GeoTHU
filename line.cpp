@@ -245,9 +245,9 @@ GeometricObject* Line::flush(){
     }
     case 8:{
         expectParentNum(2);
-        Circle* circle = dynamic_cast<Circle*>(parents_[1]);
+        GeometricObject* circle = parents_[1];
         QPointF P1 = parents_[0]->position(), P2 = circle->position();
-        long double radius = circle->getRadius();
+        long double radius = len(circle->getTwoPoints());
         long double dist1 = std::sqrt(std::pow(P1.x() - P2.x(), 2) + std::pow(P1.y() - P2.y(), 2));
         if (dist1 * dist1 - radius * radius < 0){
             legal_ = false;
@@ -261,13 +261,16 @@ GeometricObject* Line::flush(){
         QPointF P3 = P1 + direction1 * dist2 / dist1 + direction2 * radius / dist1;
         position_.push_back(P1);
         position_.push_back(P3);
+        if(parents_[1]->getObjectType()==ObjectType::Arc and !thetainst(normalizeAngle(Theta(P3-P1)-PI_2),dynamic_cast<Arc*>(circle)->getAngles())){
+            legal_=false;
+        }
         return this;
     }
     case 9:{
         expectParentNum(2);
-        Circle* circle = dynamic_cast<Circle*>(parents_[1]);
+        GeometricObject* circle = parents_[1];
         QPointF P1 = parents_[0]->position(), P2 = circle->position();
-        long double radius = circle->getRadius();
+        long double radius = len(circle->getTwoPoints());
         long double dist1 = std::sqrt(std::pow(P1.x() - P2.x(), 2) + std::pow(P1.y() - P2.y(), 2));
         if (dist1 * dist1 - radius * radius < 0){
             legal_ = false;
@@ -281,6 +284,9 @@ GeometricObject* Line::flush(){
         QPointF P3 = P1 + direction1 * dist2 / dist1 - direction2 * radius / dist1;
         position_.push_back(P1);
         position_.push_back(P3);
+        if(parents_[1]->getObjectType()==ObjectType::Arc and !thetainst(normalizeAngle(Theta(P3-P1)+PI_2),dynamic_cast<Arc*>(circle)->getAngles())){
+            legal_=false;
+        }
         return this;
     }
     default:
