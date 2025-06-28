@@ -891,6 +891,7 @@ void Canvas::loadFile(bool onStartup) {
     }
     NumOfMeasurements = m;
     file.close();
+    loadInCache();
     saved_ = true;
 }
 

@@ -87,5 +87,5 @@ GeometricObject* Saveloadhelper::load(QDataStream& in) {
         }
     }
     GeometricObject::counter = std::max(GeometricObject::counter, index + 1);
-    return object;
+    return object->flush();
 }
