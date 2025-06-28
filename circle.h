@@ -12,7 +12,8 @@ class Saveloadhelper;
 class Circle : public GeometricObject {
 public:
     // 构造函数: 可以有多种，例如通过圆心点对象和半径，或通过圆心坐标和半径
-    explicit Circle(const std::vector<GeometricObject*>& parents,const int& generation);
+    explicit Circle(const std::vector<GeometricObject*>& parents, const int& generation,
+                    bool isTemp = false);
 
     // --- 重写 GeometricObject 的纯虚函数 ---
     ObjectType getObjectType() const override { return ObjectType::Circle; } // 假设ObjectType::Circle存在
@@ -63,7 +64,8 @@ public:
 class Arc : public GeometricObject {
 public:
     // 构造函数: 可以有多种，例如通过圆心点对象和半径，或通过圆心坐标和半径
-    explicit Arc(const std::vector<GeometricObject*>& parents,const int& generation);
+    explicit Arc(const std::vector<GeometricObject*>& parents, const int& generation,
+                 bool isTemp = false);
 
     // --- 重写 GeometricObject 的纯虚函数 ---
     ObjectType getObjectType() const override { return ObjectType::Arc; } // 假设ObjectType::Circle存在
@@ -100,7 +102,8 @@ class CenterTwoPointArcCreator : public Operation {
 public:
     CenterTwoPointArcCreator();
     std::set<GeometricObject*> apply(std::vector<GeometricObject*> objs,
-                                      QPointF position = QPointF()) const;
+                                      QPointF position = QPointF()) const override;
+    std::set<GeometricObject*> wait(std::vector<GeometricObject*> objs) const override;
 };
 
 #endif // CIRCLE_H

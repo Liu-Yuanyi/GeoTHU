@@ -12,7 +12,8 @@
 class Line : public GeometricObject {
 public:
     // 构造函数
-    explicit Line(const std::vector<GeometricObject*>& parents,const int& generation);
+    explicit Line(const std::vector<GeometricObject*>& parents, const int& generation,
+                  bool isTemp = false);
 
     // 重写 GeometricObject 中的纯虚函数
     ObjectType getObjectType() const override{return ObjectType::Line;}

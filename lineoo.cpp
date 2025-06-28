@@ -2,13 +2,15 @@
 #include <QMessageBox>
 #include "calculator.h"
 
-Lineoo::Lineoo(const std::vector<GeometricObject*>& parents,const int& generation)
+Lineoo::Lineoo(const std::vector<GeometricObject*>& parents, const int& generation, bool isTemp)
     : GeometricObject(ObjectName::Lineoo){
     for(auto iter: parents){
         addParent(iter);
     }
     generation_=generation;
-    GetDefaultLable[ObjectType::Lineoo]=nextLineLable(GetDefaultLable[ObjectType::Lineoo]);
+    if (!isTemp){
+        GetDefaultLable[ObjectType::Lineoo]=nextLineLable(GetDefaultLable[ObjectType::Lineoo]);
+    }
 }
 
 Qt::PenStyle Lineoo::getPenStyle()const{
@@ -151,7 +153,7 @@ std::set<GeometricObject*> LineooCreator::apply(std::vector<GeometricObject*> ob
 }
 
 std::set<GeometricObject*> LineooCreator::wait(std::vector<GeometricObject*> objs) const {
-    return {(new Lineoo(objs, 0))};
+    return {(new Lineoo(objs, 0, true))};
 }
 
 

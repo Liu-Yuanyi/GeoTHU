@@ -42,21 +42,26 @@ Qt::PenStyle Arc::getPenStyle() const {
     }
 }
 
-Circle::Circle(const std::vector<GeometricObject*>& parents,const int& generation)
+Circle::Circle(const std::vector<GeometricObject*>& parents, const int& generation, bool isTemp)
     : GeometricObject(ObjectName::Circle){
     for(auto iter: parents){
         addParent(iter);
     }
     generation_=generation;
-    GetDefaultLable[ObjectType::Circle]=nextLineLable(GetDefaultLable[ObjectType::Circle]);
+    if (!isTemp) {
+        GetDefaultLable[ObjectType::Circle]=nextLineLable(GetDefaultLable[ObjectType::Circle]);
+    }
 }
-Arc::Arc(const std::vector<GeometricObject*>& parents,const int& generation)
+
+Arc::Arc(const std::vector<GeometricObject*>& parents, const int& generation, bool isTemp)
     : GeometricObject(ObjectName::Arc){
     for(auto iter: parents){
         addParent(iter);
     }
     generation_=generation;
-    GetDefaultLable[ObjectType::Arc]=nextLineLable(GetDefaultLable[ObjectType::Arc]);
+    if (!isTemp) {
+        GetDefaultLable[ObjectType::Arc]=nextLineLable(GetDefaultLable[ObjectType::Arc]);
+    }
 }
 
 void Circle::draw(QPainter* painter) const {
@@ -378,7 +383,7 @@ std::set<GeometricObject*> TwoPointCircleCreator::apply(std::vector<GeometricObj
 }
 
 std::set<GeometricObject*> TwoPointCircleCreator::wait(std::vector<GeometricObject*> objs) const {
-    return {new Circle(objs, 0)};
+    return {new Circle(objs, 0, true)};
 }
 
 CenterRadiusCircleCreator::CenterRadiusCircleCreator() {
@@ -404,7 +409,7 @@ std::set<GeometricObject*> ThreePointCircleCreator::apply(std::vector<GeometricO
 }
 
 std::set<GeometricObject*> ThreePointCircleCreator::wait(std::vector<GeometricObject*> objs) const {
-    return {new Circle(objs,2)};
+    return {new Circle(objs, 2, true)};
 }
 
 SemicircleCreator::SemicircleCreator(){
@@ -419,15 +424,20 @@ std::set<GeometricObject*> SemicircleCreator::apply(std::vector<GeometricObject*
 }
 
 std::set<GeometricObject*> SemicircleCreator::wait(std::vector<GeometricObject*> objs) const {
-    return { (new Arc(objs,0)) };
+    return { (new Arc(objs, 0, true)) };
 }
 
 CenterTwoPointArcCreator::CenterTwoPointArcCreator(){
     inputType.push_back({ObjectType::Point, ObjectType::Point, ObjectType::Point});
     operationName = "CenterTwoPointArcCreator";
+    waitImplemented = true;
 }
 
 std::set<GeometricObject*> CenterTwoPointArcCreator::apply(std::vector<GeometricObject*> objs,
                                                      QPointF position) const {
     return std::set<GeometricObject*>{(new Arc(objs,1))->flush()};
+}
+
+std::set<GeometricObject*> CenterTwoPointArcCreator::wait(std::vector<GeometricObject*> objs) const {
+    return { (new Arc(objs, 1, true)) };
 }

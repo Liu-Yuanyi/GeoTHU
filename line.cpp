@@ -77,13 +77,15 @@ void drawExtendedLine(QPainter* painter, const QPointF& p1, const QPointF& p2) {
         }
     }
 }
-Line::Line(const std::vector<GeometricObject*>& parents,const int& generation)
+Line::Line(const std::vector<GeometricObject*>& parents, const int& generation, bool isTemp)
     : GeometricObject(ObjectName::Line){
     for(auto iter: parents){
         addParent(iter);
     }
     generation_=generation;
-    GetDefaultLable[ObjectType::Line]=nextLineLable(GetDefaultLable[ObjectType::Line]);
+    if (!isTemp) {
+        GetDefaultLable[ObjectType::Line]=nextLineLable(GetDefaultLable[ObjectType::Line]);
+    }
 }
 
 Qt::PenStyle Line::getPenStyle()const{
@@ -307,7 +309,7 @@ std::set<GeometricObject*> LineCreator::apply(std::vector<GeometricObject*> objs
 }
 
 std::set<GeometricObject*> LineCreator::wait(std::vector<GeometricObject*> objs) const {
-    return { new Line(objs, 0) };
+    return { new Line(objs, 0, true) };
 }
 
 bool Line::isTouchedByRectangle(const QPointF& start, const QPointF& end) const {

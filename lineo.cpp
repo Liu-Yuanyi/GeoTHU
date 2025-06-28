@@ -63,14 +63,15 @@ void drawExtendedLineo(QPainter* painter, const QPointF& p1, const QPointF& p2) 
     painter->drawLine(p1, endpoint);
 }
 
-Lineo::Lineo(const std::vector<GeometricObject*>& parents,const int& generation)
+Lineo::Lineo(const std::vector<GeometricObject*>& parents, const int& generation, bool isTemp)
     : GeometricObject(ObjectName::Lineo){
     for(auto iter: parents){
         addParent(iter);
     }
     generation_=generation;
-    GetDefaultLable[ObjectType::Lineo]=nextLineLable(GetDefaultLable[ObjectType::Lineo]);
-
+    if (!isTemp) {
+        GetDefaultLable[ObjectType::Lineo]=nextLineLable(GetDefaultLable[ObjectType::Lineo]);
+    }
 }
 
 Qt::PenStyle Lineo::getPenStyle()const{
@@ -211,7 +212,7 @@ std::set<GeometricObject*> LineoCreator::apply(std::vector<GeometricObject*> obj
 }
 
 std::set<GeometricObject*> LineoCreator::wait(std::vector<GeometricObject*> objs) const {
-    return { new Lineo(objs, 0) };
+    return { new Lineo(objs, 0, true) };
 }
 
 bool Lineo::isTouchedByRectangle(const QPointF& start, const QPointF& end) const {
