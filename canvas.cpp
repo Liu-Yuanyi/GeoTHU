@@ -964,9 +964,15 @@ bool Canvas::saveFile() {
     QDataStream out(&file);
     out.setVersion(QDataStream::Qt_6_0);
     Saveloadhelper helper;
-    out << int(objects_.size());
+    out << int(objects_.size()) + int(auxObjs_.size());
     out << NumOfMeasurements;
-    for (auto obj : objects_) {
+    std::vector<GeometricObject*> allObjs = objects_;
+    for (auto obj : auxObjs_) {
+        allObjs.push_back(obj);
+    }
+    std::sort(allObjs.begin(), allObjs.end(),
+              [](GeometricObject* a, GeometricObject* b) { return a->getIndex() < b->getIndex(); });
+    for (auto obj : allObjs) {
         helper.save(obj, out);
     }
     file.close();
@@ -998,7 +1004,11 @@ void Canvas::loadFile(bool onStartup) {
     Saveloadhelper helper;
     for (int i = 0; i < n; ++i){
         GeometricObject* obj = helper.load(in);
-        objects_.push_back(obj);
+        if (obj->isAux()){
+            auxObjs_.push_back(obj);
+        } else {
+            objects_.push_back(obj);
+        }
     }
     NumOfMeasurements = m;
     file.close();

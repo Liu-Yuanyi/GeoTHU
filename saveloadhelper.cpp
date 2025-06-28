@@ -12,7 +12,7 @@ Saveloadhelper::Saveloadhelper() {}
 void Saveloadhelper::save(GeometricObject* object, QDataStream& out) {
     out << object->legal_ << object->hidden_ << object->labelhidden_
         << object->label_ << object->color_ << object->size_ << object->shape_
-        << object->generation_ << object->name_ << object->index_;
+        << object->generation_ << object->name_ << object->index_ << object->aux_;
     if (object->name_ == ObjectName::Point) {
         Point* p = dynamic_cast<Point*>(object);
         out << p->PointArg;
@@ -29,7 +29,7 @@ void Saveloadhelper::save(GeometricObject* object, QDataStream& out) {
 
 GeometricObject* Saveloadhelper::load(QDataStream& in) {
     ObjectName name;
-    bool legal, hidden, labelhidden;
+    bool legal, hidden, labelhidden, aux;
     QString label;
     QColor color;
     double size;
@@ -37,7 +37,7 @@ GeometricObject* Saveloadhelper::load(QDataStream& in) {
     QPointF position;
     GeometricObject* object = nullptr;
     in >> legal >> hidden >> labelhidden >> label >> color >> size
-        >> shape >> generation >> name >> index;
+        >> shape >> generation >> name >> index >> aux;
     switch (name) {
     case (ObjectType::Point):
         in >> position;
@@ -77,6 +77,7 @@ GeometricObject* Saveloadhelper::load(QDataStream& in) {
     object->generation_ = generation;
     object->name_ = name;
     object->index_ = index;
+    object->aux_ = aux;
     QVector<int> indices = {};
     in >> indices;
     for (int index : indices) {
