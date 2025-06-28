@@ -5,6 +5,7 @@
 #include "lineo.h"
 #include "lineoo.h"
 #include "circle.h"
+#include "measurement.h"
 
 Saveloadhelper::Saveloadhelper() {}
 
@@ -15,6 +16,9 @@ void Saveloadhelper::save(GeometricObject* object, QDataStream& out) {
     if (object->name_ == ObjectName::Point) {
         Point* p = dynamic_cast<Point*>(object);
         out << p->PointArg;
+    } else if (object->name_ == ObjectName::Measurement) {
+        Measurement* m = dynamic_cast<Measurement*>(object);
+        out << m->id_;
     }
     QVector<int> indices = {};
     for (auto parent : object->parents_) {
@@ -29,12 +33,11 @@ GeometricObject* Saveloadhelper::load(QDataStream& in) {
     QString label;
     QColor color;
     double size;
-    int shape, generation, index;
+    int shape, generation, index, mID;
     QPointF position;
     GeometricObject* object = nullptr;
     in >> legal >> hidden >> labelhidden >> label >> color >> size
         >> shape >> generation >> name >> index;
-    //qDebug() << GetObjectNameString(name);
     switch (name) {
     case (ObjectType::Point):
         in >> position;
@@ -54,6 +57,10 @@ GeometricObject* Saveloadhelper::load(QDataStream& in) {
         break;
     case (ObjectType::Arc):
         object = new Arc({}, 0);
+    case (ObjectType::Measurement):
+        in >> mID;
+        object = new Measurement({}, 0);
+        dynamic_cast<Measurement*>(object)->id_ = mID;
     default:
         break;
     }

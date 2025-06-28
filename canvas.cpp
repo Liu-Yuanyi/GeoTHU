@@ -854,7 +854,7 @@ bool Canvas::saveFile() {
     out.setVersion(QDataStream::Qt_6_0);
     Saveloadhelper helper;
     out << int(objects_.size());
-    qDebug() << objects_.size();
+    out << NumOfMeasurements;
     for (auto obj : objects_) {
         helper.save(obj, out);
     }
@@ -882,14 +882,14 @@ void Canvas::loadFile(bool onStartup) {
 
     QDataStream in(&file);
     in.setVersion(QDataStream::Qt_6_0);
-    int n;
-    in >> n;
-    qDebug() << n;
+    int n, m;
+    in >> n >> m;
     Saveloadhelper helper;
     for (int i = 0; i < n; ++i){
         GeometricObject* obj = helper.load(in);
         objects_.push_back(obj);
     }
+    NumOfMeasurements = m;
     file.close();
     saved_ = true;
 }

@@ -13,6 +13,8 @@
 
 extern int NumOfMeasurements;
 
+class Saveloadhelper;
+
 class Measurement : public GeometricObject {
 public:
     // 构造函数
@@ -28,6 +30,8 @@ public:
 
     GeometricObject* flush() override;
     virtual bool isTouchedByRectangle(const QPointF& start, const QPointF& end) const override;
+
+    friend class Saveloadhelper;
 
 protected:
     int id_;//这个标签的序号(决定了其显示的位置)
