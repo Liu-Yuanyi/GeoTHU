@@ -466,6 +466,10 @@ void Canvas::mouseMoveEvent(QMouseEvent* event) {
     } else if (currentMode == OperationMode) {
         if (!tempObjects_.empty() and currentOperation_->waitImplemented) {
             Point* p = dynamic_cast<Point*>(tempObjects_[0]);
+            Point* nearP = findPointNear(currentPos);
+            if (nearP) {
+                currentPos = nearP->position();
+            }
             p->setPosition(currentPos);
         }
     }
