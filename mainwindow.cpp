@@ -354,21 +354,17 @@ void MainWindow::onToolSelected(QAbstractButton *abstractButton)
     } else if (toolId == tr("Circle (3 Points)")){
         m_canvas->setOperation(12);
     } else if (toolId == tr("Arc")){
-        m_canvas->setOperation(17);
-#warning 待会要改回13
+        m_canvas->setOperation(13);
     } else if (toolId == tr("Semicircle")){
-        m_canvas->setOperation(18);
-#warning 待会要改回14
+        m_canvas->setOperation(14);
     } else if (toolId == tr("Axial Symmetry")){
         m_canvas->setOperation(15);
     } else if (toolId == tr("Central Symmetry")){
         m_canvas->setOperation(16);
-    } else if (toolId == tr("Central Symmetry")){
-        m_canvas->setOperation(16);
-    } else if (toolId == tr("Angle")){
-        m_canvas->setOperation(19);
     } else if (toolId == tr("Distance")){
-        m_canvas->setOperation(20);
+        m_canvas->setOperation(17);
+    } else if (toolId == tr("Angle")){
+        m_canvas->setOperation(18);
     }
 }
 
