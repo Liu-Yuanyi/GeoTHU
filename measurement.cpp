@@ -8,15 +8,16 @@ constexpr long double TextHeight = 30.0L;
 const QFont font("Arial", 16);
 constexpr int Precision = 2;
 
-Measurement::Measurement(const std::vector<GeometricObject*>& parents, const int& generation)
-    :GeometricObject(ObjectName::Measurement)
-{
+Measurement::Measurement(const std::vector<GeometricObject*>& parents, const int& generation,
+                         bool isTemp, bool aux): GeometricObject(ObjectName::Measurement, aux) {
     for(auto iter: parents){
         addParent(iter);
     }
     generation_=generation;
-    GetDefaultLable[ObjectType::Lineoo]=nextLineLable(GetDefaultLable[ObjectType::Lineoo]);
-    NumOfMeasurements++;
+    if (!isTemp and !aux){
+        GetDefaultLable[ObjectType::Lineoo]=nextLineLable(GetDefaultLable[ObjectType::Lineoo]);
+        NumOfMeasurements++;
+    }
     id_=NumOfMeasurements;
 }
 

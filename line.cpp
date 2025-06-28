@@ -77,13 +77,14 @@ void drawExtendedLine(QPainter* painter, const QPointF& p1, const QPointF& p2) {
         }
     }
 }
-Line::Line(const std::vector<GeometricObject*>& parents, const int& generation, bool isTemp)
-    : GeometricObject(ObjectName::Line){
+
+Line::Line(const std::vector<GeometricObject*>& parents, const int& generation, bool isTemp, bool aux)
+    : GeometricObject(ObjectName::Line, aux){
     for(auto iter: parents){
         addParent(iter);
     }
     generation_=generation;
-    if (!isTemp) {
+    if (!isTemp and !aux) {
         GetDefaultLable[ObjectType::Line]=nextLineLable(GetDefaultLable[ObjectType::Line]);
     }
 }

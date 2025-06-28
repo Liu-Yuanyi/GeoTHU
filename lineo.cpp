@@ -63,13 +63,13 @@ void drawExtendedLineo(QPainter* painter, const QPointF& p1, const QPointF& p2) 
     painter->drawLine(p1, endpoint);
 }
 
-Lineo::Lineo(const std::vector<GeometricObject*>& parents, const int& generation, bool isTemp)
-    : GeometricObject(ObjectName::Lineo){
+Lineo::Lineo(const std::vector<GeometricObject*>& parents, const int& generation, bool isTemp, bool aux)
+    : GeometricObject(ObjectName::Lineo, aux){
     for(auto iter: parents){
         addParent(iter);
     }
     generation_=generation;
-    if (!isTemp) {
+    if (!isTemp and !aux) {
         GetDefaultLable[ObjectType::Lineo]=nextLineLable(GetDefaultLable[ObjectType::Lineo]);
     }
 }

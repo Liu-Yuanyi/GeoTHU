@@ -35,6 +35,7 @@ private:
     QScrollArea *scrollArea;
 
     QButtonGroup *m_toolButtonGroup;
+    std::map<QString, int> newTools = {};
     void closeEvent(QCloseEvent *event) override;
 };
 

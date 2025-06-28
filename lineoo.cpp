@@ -2,13 +2,13 @@
 #include <QMessageBox>
 #include "calculator.h"
 
-Lineoo::Lineoo(const std::vector<GeometricObject*>& parents, const int& generation, bool isTemp)
-    : GeometricObject(ObjectName::Lineoo){
+Lineoo::Lineoo(const std::vector<GeometricObject*>& parents, const int& generation, bool isTemp, bool aux)
+    : GeometricObject(ObjectName::Lineoo, aux){
     for(auto iter: parents){
         addParent(iter);
     }
     generation_=generation;
-    if (!isTemp){
+    if (!isTemp and !aux){
         GetDefaultLable[ObjectType::Lineoo]=nextLineLable(GetDefaultLable[ObjectType::Lineoo]);
     }
 }

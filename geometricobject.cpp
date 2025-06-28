@@ -49,7 +49,7 @@ void GeometricObject::setCounter(int n) {
     counter = n;
 }
 
-GeometricObject::GeometricObject(ObjectName name):
+GeometricObject::GeometricObject(ObjectName name, bool aux):
     position_(),
     selected_(true),      // 默认选中状态 (注意：这里设置为 true，通常可能希望是 false)
     hovered_(false),      // 默认悬停状态
@@ -62,9 +62,13 @@ GeometricObject::GeometricObject(ObjectName name):
     size_(GetDefaultSize[name]),     // 使用映射表获取默认大小
     shape_(GetDefaultShape[name]),   // 使用映射表获取默认形状/线型
     generation_(0),
-    index_(counter){
-    if(name==ObjectName::Point){
-        labelhidden_=false;
+    aux_(aux),
+    index_(counter) {
+    if (name == ObjectName::Point){
+        labelhidden_ = false;
+    }
+    if (aux){
+        hidden_ = true;
     }
     ++counter;
 }
@@ -87,6 +91,10 @@ GeometricObject::~GeometricObject() {
 
     children_.clear();  // 清空子对象列表
     parents_.clear();   // 清空父对象列表
+}
+
+bool GeometricObject::operator < (const GeometricObject& other) const {
+    return getObjectType() < other.getObjectType();
 }
 
 bool GeometricObject::addParent(GeometricObject* parent) {

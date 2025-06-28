@@ -12,7 +12,7 @@ class Point : public GeometricObject {
 public:
 
     explicit Point(const QPointF& position, bool isTemp = false);
-    explicit Point(const std::vector<GeometricObject*>& parents,const int& generation);
+    explicit Point(const std::vector<GeometricObject*>& parents, const int& generation, bool aux = false);
 
     ObjectType getObjectType() const override { return ObjectType::Point; }
     void draw(QPainter* painter) const override;

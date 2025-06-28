@@ -18,7 +18,8 @@ class Saveloadhelper;
 class Measurement : public GeometricObject {
 public:
     // 构造函数
-    explicit Measurement(const std::vector<GeometricObject*>& parents, const int& generation);
+    explicit Measurement(const std::vector<GeometricObject*>& parents, const int& generation,
+                         bool isTemp = false, bool aux = false);
 
 
     // 重写 GeometricObject 中的纯虚函数

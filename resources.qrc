@@ -26,5 +26,6 @@
         <file>raw_icons/clear.png</file>
         <file>raw_icons/angle.png</file>
         <file>raw_icons/distance.png</file>
+        <file>raw_icons/new_tool.png</file>
     </qresource>
 </RCC>

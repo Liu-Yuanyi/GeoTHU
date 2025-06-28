@@ -42,24 +42,24 @@ Qt::PenStyle Arc::getPenStyle() const {
     }
 }
 
-Circle::Circle(const std::vector<GeometricObject*>& parents, const int& generation, bool isTemp)
-    : GeometricObject(ObjectName::Circle){
+Circle::Circle(const std::vector<GeometricObject*>& parents, const int& generation, bool isTemp, bool aux)
+    : GeometricObject(ObjectName::Circle, aux){
     for(auto iter: parents){
         addParent(iter);
     }
     generation_=generation;
-    if (!isTemp) {
+    if (!isTemp and !aux) {
         GetDefaultLable[ObjectType::Circle]=nextLineLable(GetDefaultLable[ObjectType::Circle]);
     }
 }
 
-Arc::Arc(const std::vector<GeometricObject*>& parents, const int& generation, bool isTemp)
-    : GeometricObject(ObjectName::Arc){
+Arc::Arc(const std::vector<GeometricObject*>& parents, const int& generation, bool isTemp, bool aux)
+    : GeometricObject(ObjectName::Arc, aux){
     for(auto iter: parents){
         addParent(iter);
     }
     generation_=generation;
-    if (!isTemp) {
+    if (!isTemp and !aux) {
         GetDefaultLable[ObjectType::Arc]=nextLineLable(GetDefaultLable[ObjectType::Arc]);
     }
 }

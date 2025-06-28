@@ -5,20 +5,21 @@
 
 Point::Point(const QPointF& position, bool isTemp) : GeometricObject(ObjectName::Point), PointArg(position) {
     generation_=0;
-    GetDefaultLable[ObjectType::Point]=nextPointLable(GetDefaultLable[ObjectType::Point]);
-    if (isTemp) {
-        GetDefaultLable[ObjectType::Point]=previousPointLable(GetDefaultLable[ObjectType::Point]);
+    if (!isTemp) {
+        GetDefaultLable[ObjectType::Point]=nextPointLable(GetDefaultLable[ObjectType::Point]);
     }
 }
 
-Point::Point(const std::vector<GeometricObject*>& parents,const int& generation)
-    : GeometricObject(ObjectName::Point){
-    PointArg=QPoint(1,0);
+Point::Point(const std::vector<GeometricObject*>& parents, const int& generation, bool aux)
+    : GeometricObject(ObjectName::Point, aux){
+    PointArg = QPoint(1,0);
     for(auto iter: parents){
         addParent(iter);
     }
-    generation_=generation;
-    GetDefaultLable[ObjectType::Point]=nextPointLable(GetDefaultLable[ObjectType::Point]);
+    generation_ = generation;
+    if (!aux){
+        GetDefaultLable[ObjectType::Point]=nextPointLable(GetDefaultLable[ObjectType::Point]);
+    }
 }
 
 

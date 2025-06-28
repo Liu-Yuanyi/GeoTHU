@@ -14,6 +14,7 @@
 #include "geometricobject.h"
 #include "point.h"
 #include "operation.h"
+#include "customizedoperation.h"
 
 class Canvas : public QWidget {
     Q_OBJECT
@@ -31,6 +32,10 @@ public:
     void loadFile(bool onStartup = false);
     bool saveFile();
     void setFilePath(QString path);
+    void setOperationNames(std::set<QString> names);
+    bool canCreateTool();
+    std::pair<QString, int> createTool();
+    std::vector<Operation*> customizeOperations = {};
 
 protected:
     void mousePressEvent(QMouseEvent* event) override;
@@ -55,7 +60,10 @@ private:
     bool hasMoved_ = false;                 // 是否移动了
     Operation* currentOperation_ = nullptr;  // 当前进行的操作 (例如平移、旋转等)
     std::vector<GeometricObject*> operationSelections_; // 记录目前选择了哪些对象
+    std::set<QString> operationNames_ = {};
     std::vector<GeometricObject*> deletedObjs_ = {};
+    std::vector<GeometricObject*> auxObjs_ = {};
+    CustomizedOperationCreator* operationCreator_;
 
     QPointF multipleSelectionStartPos_;
     QPointF multipleSelectionEndPos_;
@@ -65,6 +73,7 @@ private:
 
     std::vector<std::vector<GeometricObject*>> cacheObj_;
     std::vector<std::vector<GeometricObject*>> cacheDel_;
+    std::vector<std::vector<GeometricObject*>> cacheAux_;
     std::vector<std::vector<bool>> cacheHidden_;
     std::vector<std::vector<QPointF>> cachePos_;
     int currentCacheIndex_ = 0;

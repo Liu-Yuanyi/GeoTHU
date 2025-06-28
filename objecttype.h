@@ -11,9 +11,13 @@ enum class ObjectName {
     Lineoo,
     Circle,
     Arc,
-    Any,
     Measurement,
+    Any,
 };
+
+inline bool operator < (ObjectName a, ObjectName b) {
+    return static_cast<int>(a) < static_cast<int>(b);
+}
 
 typedef ObjectName ObjectType;
 
@@ -26,6 +30,7 @@ inline std::string GetObjectNameString(ObjectName name){
     case ObjectName::Lineoo: return "Lineoo";
     case ObjectName::Circle: return "Circle";
     case ObjectName::Arc: return "Arc";
+    case ObjectName::Measurement: return "Measurement";
     case ObjectName::Any: return "Any";
         // ... other cases if any
     default: return "Unknown";

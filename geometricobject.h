@@ -24,7 +24,7 @@ public:
     static int counter;
     static void setCounter(int n);
 
-    GeometricObject(ObjectName name);
+    GeometricObject(ObjectName name, bool aux = false);
 
     virtual ~GeometricObject();
 
@@ -35,15 +35,18 @@ public:
     virtual std::pair<const QPointF, const QPointF> getTwoPoints() const;
 
     // --- Status Getters ---
-    bool isShown()const {return legal_ && !hidden_;}
+    bool isShown()const {return legal_ && !hidden_ && !aux_;}
     bool isSelected() const { return selected_; }
     bool isHidden() const { return hidden_; }
     bool isLegal() const { return legal_; }
     bool isHovered() const { return hovered_; }
+    bool isAux() const { return aux_; }
     QString getLabel() const { return label_; }
     QColor getColor() const { return color_; }
     double getSize() const { return size_; }
     int getShape() const { return shape_; }
+    int getIndex() const { return index_; }
+    int getGeneration() const { return generation_; }
     bool islablehidden() const {return labelhidden_;}
 
     // --- Status Setters ---
@@ -74,6 +77,8 @@ public:
 
     friend class Saveloadhelper;
 
+    bool operator < (const GeometricObject& other) const;
+
 protected:
 
     inline void expectParentNum(size_t num)const{
@@ -88,6 +93,7 @@ protected:
     bool hovered_;
     mutable bool legal_;
     bool hidden_;
+    bool aux_;
     bool labelhidden_;
     std::vector<GeometricObject*> parents_ = {};
     std::vector<GeometricObject*> children_ = {};

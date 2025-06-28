@@ -22,6 +22,14 @@ MainWindow::MainWindow(QWidget *parent)
     // 1. 创建 Canvas 实例
     m_canvas = new Canvas(this); // 父对象是 MainWindow
     m_canvas->setFocus();
+    std::set<QString> names = {tr("Move/Select"), tr("Point"), tr("Line"), tr("Ray"), tr("Segment"),
+                               tr("Arc"), tr("Circle (Center, Radius)"), tr("Circle (Center, Point)"),
+                               tr("Semicircle"), tr("Circle (3 Points)"), tr("Midpoint"), tr("Parallel Line"),
+                               tr("Perpendicular Line"), tr("Perpendicular Bisector"), tr("Angle Bisector"),
+                               tr("Tangents"), tr("Intersect"), tr("Central Symmetry"), tr("Axial Symmetry"),
+                               tr("Hide"), tr("Show"), tr("Delete"), tr("Clear"), tr("Angle"),
+                               tr("Distance"), tr("New Tool")};
+    m_canvas->setOperationNames(names);
 
     // 2. 将 Canvas 设置为主窗口的中央部件
     setCentralWidget(m_canvas); // <--- 这是关键！
@@ -228,14 +236,7 @@ void MainWindow::setupToolPanel()
     transformUtilLayout->addStretch();
     transformUtilGroup->setLayout(transformUtilLayout);
 
-
-    mainLayout->addWidget(basicGroup);
-    mainLayout->addWidget(circleGroup);
-    mainLayout->addWidget(constructionGroup);
-    mainLayout->addWidget(transformUtilGroup);
-    mainLayout->addStretch(); // 确保所有组都靠上
-
-    // --- 新增分组5: Measurement ---
+    // --- 分组5: Measurement ---
     QGroupBox *measurementGroup = new QGroupBox(tr("Measurement"), toolPanelContent);
     QVBoxLayout *measurementLayout = new QVBoxLayout;
     measurementLayout->setSpacing(5);
@@ -245,12 +246,25 @@ void MainWindow::setupToolPanel()
     measurementLayout->addStretch();
     measurementGroup->setLayout(measurementLayout);
 
+    // --- 分组6: Customize ---
+    QGroupBox *CustomizeGroup = new QGroupBox(tr("Customize"), toolPanelContent);
+    QVBoxLayout *CustomizeLayout = new QVBoxLayout;
+    CustomizeLayout->setSpacing(5);
+    CustomizeLayout->setContentsMargins(5,5,5,5);
+    CustomizeLayout->addWidget(createToolButton(tr("New Tool"), ":/raw_icons/new_tool.png", tr("Create your own tool")));
+    for (auto iter = newTools.begin(); iter != newTools.end(); ++iter) {
+        CustomizeLayout->addWidget(createToolButton(iter->first, ":/raw_icons/new_tool.png",iter->first));
+    }
+    CustomizeLayout->addStretch();
+    CustomizeGroup->setLayout(CustomizeLayout);
+
     // 将所有分组添加到主布局
     mainLayout->addWidget(basicGroup);
     mainLayout->addWidget(circleGroup);
     mainLayout->addWidget(constructionGroup);
     mainLayout->addWidget(transformUtilGroup);
-    mainLayout->addWidget(measurementGroup);  // 添加新的测量分组
+    mainLayout->addWidget(measurementGroup);
+    mainLayout->addWidget(CustomizeGroup);
     mainLayout->addStretch();
 
     toolPanelContent->setLayout(mainLayout); // 将主布局设置给 toolPanelContent
@@ -317,9 +331,27 @@ void MainWindow::onToolSelected(QAbstractButton *abstractButton)
             if (firstButton) {
                     firstButton->setChecked(true); // 选中按钮
                     onToolSelected(firstButton);   // 调用槽函数以应用初始模式
-                }
             }
-       m_canvas->setMode(Canvas::SelectionMode);
+        }
+        m_canvas->setMode(Canvas::SelectionMode);
+    } else if (toolId == tr("New Tool")){
+        if (m_canvas->canCreateTool()){
+            std::pair<QString, int> p = m_canvas->createTool();
+            if (!p.first.isEmpty()){
+                newTools[p.first] = p.second;
+                setupToolPanel();
+                scrollArea->setWidget(toolPanelContent); // 将 toolPanelContent 设置为滚动区域的部件
+
+            }
+        }
+        if (!m_toolButtonGroup->buttons().isEmpty()) {
+            QAbstractButton* firstButton = m_toolButtonGroup->buttons().first();
+            if (firstButton) {
+                firstButton->setChecked(true); // 选中按钮
+                onToolSelected(firstButton);   // 调用槽函数以应用初始模式
+            }
+        }
+        m_canvas->setMode(Canvas::SelectionMode);
     } else {
         // 对于尚未明确处理的工具，可以设置为 OperationMode 或 SelectionMode
         // 或者在 Canvas 中为每个工具实现一个特定的模式
@@ -365,6 +397,8 @@ void MainWindow::onToolSelected(QAbstractButton *abstractButton)
         m_canvas->setOperation(17);
     } else if (toolId == tr("Angle")){
         m_canvas->setOperation(18);
+    } else if (newTools.find(toolId) != newTools.end()){
+        m_canvas->setOperation(newTools[toolId]);
     }
 }
 
