@@ -645,9 +645,10 @@ void Canvas::contextMenuEvent(QContextMenuEvent* event) {
             }
         });
     }
-    else if (contextMenuObj->getObjectType() == ObjectType::Circle) { // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< 新增：圆的上下文菜单
+    else if (contextMenuObj->getObjectType() == ObjectType::Circle or contextMenuObj->getObjectType() == ObjectType::Arc) {
         Circle* circle = dynamic_cast<Circle*>(contextMenuObj);
-        if (!circle) return;
+        Arc* arc = dynamic_cast<Arc*>(contextMenuObj);
+        if (!circle and !arc) return;
 
         QMenu* colorMenu = menu.addMenu(tr("color"));
         colorMenu->addAction(tr("red"), [this, circle]() { circle->setColor(Qt::red); update(); });
@@ -694,12 +695,14 @@ void Canvas::contextMenuEvent(QContextMenuEvent* event) {
         update();
     });
 
-    menu.addAction(tr(contextMenuObj->islablehidden()?"show label":"hide label"), [this, contextMenuObj]() {
-        contextMenuObj->setlabelhidden(1-contextMenuObj->islablehidden());
-        contextMenuObj->setSelected(false);
-        selectedObjs_.erase(contextMenuObj);
-        update();
-    });
+    if (contextMenuObj->getObjectType() != ObjectType::Measurement){
+        menu.addAction(tr(contextMenuObj->islablehidden()?"show label":"hide label"), [this, contextMenuObj]() {
+            contextMenuObj->setlabelhidden(1-contextMenuObj->islablehidden());
+            contextMenuObj->setSelected(false);
+            selectedObjs_.erase(contextMenuObj);
+            update();
+        });
+    }
 
     // 删除操作 (作用于所有当前选中的对象)
 
