@@ -94,7 +94,10 @@ GeometricObject::~GeometricObject() {
 }
 
 bool GeometricObject::operator < (const GeometricObject& other) const {
-    return getObjectType() < other.getObjectType();
+    if (getObjectType() != other.getObjectType()) {
+        return getObjectType() < other.getObjectType();
+    }
+    return getIndex() < other.getIndex();
 }
 
 bool GeometricObject::addParent(GeometricObject* parent) {
