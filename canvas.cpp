@@ -574,15 +574,7 @@ void Canvas::paintEvent(QPaintEvent* event) {
     }
 
     // 绘制所有正式的几何对象
-    for (auto* obj : auxObjs_) {
-        obj->flush();
-    }
-    for (auto* obj : objects_) {
-        obj->flush();
-    }
-    for (auto* obj : tempObjects_) {
-        obj->flush();
-    }
+    flushObjects();
     for (const auto* obj : objects_) {
         if (obj->isShown() and obj->getObjectType() != ObjectType::Point){
             obj->draw(&painter);
@@ -835,24 +827,7 @@ void Canvas::keyPressEvent(QKeyEvent *event) {
         deleteObjects();
         update();
     }
-    for (auto* obj : auxObjs_) {
-        obj->flush();
-    }
-    for (auto* obj : objects_) {
-        obj->flush();
-    }
-    for (auto* obj : tempObjects_) {
-        obj->flush();
-    }
-    for (auto* obj : auxObjs_) {
-        obj->flush();
-    }
-    for (auto* obj : objects_) {
-        obj->flush();
-    }
-    for (auto* obj : tempObjects_) {
-        obj->flush();
-    }
+    flushObjects();
 }
 
 void Canvas::wheelEvent(QWheelEvent *event) {
@@ -921,24 +896,7 @@ void Canvas::wheelEvent(QWheelEvent *event) {
             }
         }
     }
-    for (auto* obj : auxObjs_) {
-        obj->flush();
-    }
-    for (auto* obj : objects_) {
-        obj->flush();
-    }
-    for (auto* obj : tempObjects_) {
-        obj->flush();
-    }
-    for (auto* obj : auxObjs_) {
-        obj->flush();
-    }
-    for (auto* obj : objects_) {
-        obj->flush();
-    }
-    for (auto* obj : tempObjects_) {
-        obj->flush();
-    }
+    flushObjects();
     update();
     event->accept();
 }
@@ -1163,6 +1121,8 @@ void Canvas::clearObjects(){
     selectedObjs_.clear();
     initialPositions_.clear();
     operationSelections_.clear();
+    deletedObjs_.clear();
+    draggedObj_ = nullptr;
     cacheObj_ = std::vector<std::vector<GeometricObject*>>(maxCacheSize, std::vector<GeometricObject*>());
     cacheDel_ = std::vector<std::vector<GeometricObject*>>(maxCacheSize, std::vector<GeometricObject*>());
     cacheAux_ = std::vector<std::vector<GeometricObject*>>(maxCacheSize, std::vector<GeometricObject*>());
@@ -1243,4 +1203,19 @@ void Canvas::clearTempObjects(){
         }
     }
     tempObjects_.clear();
+}
+
+void Canvas::flushObjects(){
+    std::vector<GeometricObject*> v = objects_;
+    for (auto obj : auxObjs_){
+        v.push_back(obj);
+    }
+    for (auto obj : tempObjects_){
+        v.push_back(obj);
+    }
+    std::sort(v.begin(), v.end(),
+              [](GeometricObject* a, GeometricObject* b) {return a->getIndex() < b->getIndex();});
+    for (auto obj : v){
+        obj->flush();
+    }
 }
