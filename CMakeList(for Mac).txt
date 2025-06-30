@@ -1,0 +1,103 @@
+#mac用户请将此文件内容粘贴到CMakeList.txt打开，如遇项目构建失败问题需手动检查Qt路径设置
+cmake_minimum_required(VERSION 3.16)
+project(Project1 VERSION 0.1 LANGUAGES CXX)
+
+# 启用自动处理 Qt 相关文件
+set(CMAKE_AUTOUIC ON)
+set(CMAKE_AUTOMOC ON)
+set(CMAKE_AUTORCC ON)
+
+# C++ 标准设置
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+# Qt 路径设置
+if(NOT CMAKE_PREFIX_PATH)
+    if(APPLE)
+        set(QT_POSSIBLE_PATHS
+            "$ENV{HOME}/Qt/6.9.0/macos"
+            "$ENV{HOME}/Qt/6.8.0/macos"
+            "$ENV{HOME}/Qt/5.15.2/clang_64"
+        )
+    endif()
+    
+    foreach(QT_PATH ${QT_POSSIBLE_PATHS})
+        if(EXISTS "${QT_PATH}")
+            set(CMAKE_PREFIX_PATH "${QT_PATH}")
+            message(STATUS "Found Qt at: ${QT_PATH}")
+            break()
+        endif()
+    endforeach()
+endif()
+
+# 查找 Qt
+find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Widgets)
+find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets)
+
+# 🌟 根据实际文件列表更新源文件
+set(PROJECT_SOURCES
+    main.cpp
+    mainwindow.cpp
+    mainwindow.h
+    mainwindow.ui
+    canvas.cpp
+    canvas.h
+    circle.cpp
+    circle.h
+    calculator.h
+    customizedoperation.cpp    
+    customizedoperation.h         
+    geometricobject.cpp
+    geometricobject.h
+    intersectioncreator.cpp
+    intersectioncreator.h
+    line.cpp
+    line.h
+    lineo.cpp
+    lineo.h
+    lineoo.cpp
+    lineoo.h
+    objecttype.h
+    operation.cpp
+    operation.h
+    point.cpp
+    point.h
+    tools.cpp
+    tools.h
+    saveloadhelper.h
+    saveloadhelper.cpp
+    measurement.h
+    measurement.cpp
+)
+
+# 添加资源文件（如果存在）
+if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/icon.qrc")
+    list(APPEND PROJECT_SOURCES "icon.qrc")
+    message(STATUS "✅ Found: icon.qrc")
+endif()
+
+# 显示源文件列表
+message(STATUS "Project source files:")
+foreach(source_file ${PROJECT_SOURCES})
+    if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/${source_file}")
+        message(STATUS "  ✅ ${source_file}")
+    else()
+        message(WARNING "  ❌ Missing: ${source_file}")
+    endif()
+endforeach()
+
+# 创建可执行文件
+if(QT_VERSION_MAJOR EQUAL 6)
+    qt_add_executable(Project1
+        MANUAL_FINALIZATION
+        ${PROJECT_SOURCES}
+    )
+    qt_finalize_executable(Project1)
+else()
+    add_executable(Project1 ${PROJECT_SOURCES})
+endif()
+
+# 链接库
+target_link_libraries(Project1 PRIVATE Qt${QT_VERSION_MAJOR}::Widgets)
+
+message(STATUS "🎯 Project configured successfully!")
