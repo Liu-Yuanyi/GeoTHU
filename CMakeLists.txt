@@ -42,7 +42,6 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         calculator.h
         icon.qrc
         app.rc
-        Log.md
         README.md
         saveloadhelper.h saveloadhelper.cpp
         measurement.h measurement.cpp
