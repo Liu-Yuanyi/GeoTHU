@@ -7,10 +7,18 @@ https://disk.pku.edu.cn/link/AADBF59E1A71824BDFAC82D6A8C40F4617
 有效期限：2025-07-30 19:53
 
 ## 作业报告
-同代码一起在仓库根目录下
+同代码一起在仓库根目录下, 也可通过下方链接访问:
+
+https://disk.pku.edu.cn/link/AA67442829957342138003B72B58861C01
+
+文件名：33-作业报告.pdf
+
+有效期限：2025-07-30 21:10
 
 ## 使用说明
 Windows用户可以直接使用Qt Creator打开CMakeLists.txt;  Mac用户可以删除这个文件, 并将CMakeList(for Mac).txt改名为CMakeLists.txt, 然后使用Qt Creator打开
+
+如遇到构建问题需手动配置Qt路径
 
 本项目使用Qt6.9.0进行开发
 
