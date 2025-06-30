@@ -9,6 +9,11 @@ https://disk.pku.edu.cn/link/AADBF59E1A71824BDFAC82D6A8C40F4617
 ## 作业报告
 同代码一起在仓库根目录下
 
+## 使用说明
+Windows用户可以直接使用Qt Creator打开CMakeLists.txt;  Mac用户可以删除这个文件, 并将CMakeList(for Mac).txt改名为CMakeLists.txt, 然后使用Qt Creator打开
+
+本项目使用Qt6.9.0进行开发
+
 ## 版权声明  
 本项目为北京大学程序设计实习课程（2025年春季）大作业成果，版权归属于 北京大学信息科学技术学院2024级本科生 陈羿桥, 丁彦辰, 刘小康。未经允许，严禁直接复制或作为个人作业提交
 
