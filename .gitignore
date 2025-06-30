@@ -1,2 +1,4 @@
 CMakeLists.txt.user
 build/
+code/build/
+code/CMakeLists.txt.user
