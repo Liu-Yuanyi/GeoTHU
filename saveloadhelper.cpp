@@ -57,6 +57,7 @@ GeometricObject* Saveloadhelper::load(QDataStream& in) {
         break;
     case (ObjectType::Arc):
         object = new Arc({}, 0);
+        break;
     case (ObjectType::Measurement):
         in >> mID;
         object = new Measurement({}, 0);

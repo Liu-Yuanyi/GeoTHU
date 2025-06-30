@@ -1128,6 +1128,9 @@ void Canvas::clearObjects(){
     cacheAux_ = std::vector<std::vector<GeometricObject*>>(maxCacheSize, std::vector<GeometricObject*>());
     cacheHidden_ = std::vector<std::vector<bool>>(maxCacheSize, std::vector<bool>());
     cachePos_ = std::vector<std::vector<QPointF>>(maxCacheSize, std::vector<QPointF>());
+    maxUndoCount_ = 0;
+    maxRedoCount_ = 0;
+    currentCacheIndex_ = 0;
     GetDefaultLable={
         {ObjectType::Point, "A"},       // 点的默认标签
         {ObjectType::Line, "line_1"},
