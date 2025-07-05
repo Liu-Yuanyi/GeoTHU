@@ -68,6 +68,8 @@ set(PROJECT_SOURCES
     saveloadhelper.cpp
     measurement.h
     measurement.cpp
+    customizedoperation.h
+    customizedoperation.cpp
 )
 
 # 添加资源文件（如果存在）
